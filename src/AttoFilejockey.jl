@@ -28,6 +28,7 @@ using Base.Filesystem
 using OrderedCollections
 
 using AttoFunctionAliases
+using AttoHabits
 
 
 include("./fsentry.jl")
