@@ -1,0 +1,4 @@
+name = "AttoFilejockey"
+uuid = "bc1231ea-70fa-4965-b0b3-6932f742a22e"
+authors = ["Martin <martin@umlet.com>"]
+version = "0.1.0"
