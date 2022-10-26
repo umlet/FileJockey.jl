@@ -6,6 +6,7 @@ export AbstractFsEntry
 export FsFile, FsDir, FsSymlink, FsOther, FsUnknownNonexist
 export FsEntry
 export @fs_str
+export path
 
 export fsreaddir
 export FsTree, iterdir, DIR, Dir
@@ -33,7 +34,9 @@ using AttoHabits
 
 include("./fsentry.jl")
 include("./fsdir.jl")
+
 include("./ext.jl")
+include("./batchfunctions.jl")
 
 include("./pprint.jl")
 

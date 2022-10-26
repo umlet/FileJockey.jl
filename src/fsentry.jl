@@ -91,7 +91,7 @@ struct FsUnknownNonexist <: AbstractFsEntry
 end
 _show(io::IO, x::FsUnknownNonexist) = print(io, """FsUnknownNonexist(?$(x.path)?)""")
 
-
+path(x::AbstractFsEntry) = x.path
 
 # function _show(io::IO, X::AbstractVector{<:AbstractFsEntry})
 #     print("$(length(X))-element $(typeof(X)):")
