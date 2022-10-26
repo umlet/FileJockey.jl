@@ -27,7 +27,7 @@ export isfilelike
 using Base.Filesystem
 using OrderedCollections
 
-using AttoCurry #: ext as sext
+using AttoFunctionAliases
 
 
 include("./fsentry.jl")
