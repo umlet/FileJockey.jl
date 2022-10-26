@@ -79,7 +79,7 @@ end
 # # export isafsdir
 
 
-AttoCurry.ext(x::AbstractFsEntry) = ext(x.path.s)
+AttoFunctionAliases.ext(x::AbstractFsEntry) = ext(x.path.s)
 
 # files and symlink to files
 isfilelike(x::Union{FsFile, FsSymlink{FsFile}}) = true
