@@ -5,4 +5,5 @@ version = "0.1.0"
 
 [deps]
 AttoFunctionAliases = "3b9ca5f2-f1fa-4f4c-81ef-0d48c36974eb"
+AttoHabits = "eaa7d568-9cd2-4d2a-ac78-1c4fa034d634"
 OrderedCollections = "bac558e1-5e72-5ebc-8fee-abe8a469f55d"
