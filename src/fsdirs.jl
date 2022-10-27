@@ -65,7 +65,7 @@ ls(x::AbstractFsEntry) = x
 ls(x::FsDir) = fsreaddir(x)
 ls(x::FsSymlink{FsDir}) = fsreaddir(x.target)
 
-ls(s::AbtractString) = ls(FsEntry(s))
+ls(s::AbstractString) = ls(FsEntry(s))
 
 
 #DIR(args...) = iterdir(args...)
