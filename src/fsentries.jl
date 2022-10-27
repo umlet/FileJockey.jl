@@ -138,6 +138,24 @@ macro fs_str(s)
     FsEntry(s)
 end
 
+# hmmm..
+#AttoFunctionAliases.cl(X) = 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 Base.endswith(x::AbstractFsEntry, a) = endswith(x.path.s, a)
 
