@@ -159,4 +159,4 @@ Base.Filesystem.lstat(x::AbstractFsEntry) = stat(x)
 
 # stat & lstat should usually be sufficient to override
 # however, Base.Filesystem throws in a rather weird joinpath; so we override that as well
-Base.Filesystem.joinpath(x::AnstractFsEntry) = x
+Base.Filesystem.joinpath(x::AbstractFsEntry) = x
