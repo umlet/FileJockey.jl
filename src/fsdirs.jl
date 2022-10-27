@@ -61,11 +61,14 @@ fswalkdir(x::AbstractFsEntry) = FsTreeIter(x)
 fswalkdir(s::AbstractString=".") = iterdir(FsEntry(s))
 
 
- 
+ls(x::AbstractFsEntry) = x
+ls(x::FsDir) = fsreaddir(x)
+ls(x::FsSymlink{FsDir}) = fsreaddir(x.target)
+
+ls(s::AbtractString) = ls(FsEntry(s))
 
 
-
-DIR(args...) = iterdir(args...)
-Dir(args...) = collect(iterdir(args...))
+#DIR(args...) = iterdir(args...)
+#Dir(args...) = collect(iterdir(args...))
 
 
