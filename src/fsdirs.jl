@@ -58,7 +58,7 @@ function Base.iterate(x::FsTreeIter, ::Nothing)
 end
 
 fswalkdir(x::AbstractFsEntry) = FsTreeIter(x)
-fswalkdir(s::AbstractString=".") = iterdir(FsEntry(s))
+fswalkdir(s::AbstractString=".") = fswalkdir(FsEntry(s))
 
 
 ls(x::AbstractFsEntry) = x
