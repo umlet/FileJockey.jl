@@ -11,6 +11,8 @@ export path
 export fsreaddir, fswalkdir
 export ls, find, finditer
 
+export HaveDistinctPaths
+
 export ext, Ext
 export @ex_str
 export hasext, hasExt
