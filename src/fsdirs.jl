@@ -40,8 +40,8 @@ struct FsTreeIter
     FsTreeIter(x::AbstractFsEntry) = new([x])
 end
 Base.IteratorSize(::Type{FsTreeIter}) = Base.SizeUnknown()
-#Base.IteratorEltype(::Type{FsTreeIter}) = Base.HasEltype()
-#Base.eltype(::Type{FsTreeIter}) = AbstractFsEntry
+Base.IteratorEltype(::Type{FsTreeIter}) = Base.HasEltype()
+Base.eltype(::Type{FsTreeIter}) = AbstractFsEntry
 Base.isdone(x::FsTreeIter, state=nothing) = length(x.state) == 0
 
 _treechildren(x::Union{FsDir, FsSymlink{FsDir}}) = fsreaddir(x)
@@ -57,8 +57,13 @@ function Base.iterate(x::FsTreeIter, ::Nothing)
     return (item, nothing)
 end
 
-iterdir(x::AbstractFsEntry) = FsTreeIter(x)
-iterdir(s::AbstractString=".") = iterdir(FsEntry(s))
+fswalkdir(x::AbstractFsEntry) = FsTreeIter(x)
+fswalkdir(s::AbstractString=".") = iterdir(FsEntry(s))
+
+
+
+
+
 
 DIR(args...) = iterdir(args...)
 Dir(args...) = collect(iterdir(args...))
