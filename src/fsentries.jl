@@ -17,21 +17,7 @@ struct PathCanon
         return new(path)
     end
 end
-# OK, behaviour in line with lstat returning stat implicitly
-Base.Filesystem.lstat(x::PathCanon) = lstat(x.s)
-Base.Filesystem.stat(x::PathCanon) = stat(x.s)
 
-# stat returns target
-Base.Filesystem.stat(x::FsSymlink) = x.target.st
-Base.Filesystem.stat(x::AbstractFsEntry) = x.st
-
-# lstat defaults to stat if no symlink
-Base.Filesystem.lstat(x::FsSymlink) = x.st
-Base.Filesystem.lstat(x::AbstractFsEntry) = stat(x)
-
-# stat & lstat should usually be sufficient to override
-# however, Base.Filesystem throws in a rather weird joinpath; so we override that as well
-Base.Filesystem.joinpath(x::AnstractFsEntry) = x
 
 struct FsEntryCanon
     path::PathCanon  
@@ -156,3 +142,21 @@ end
 Base.endswith(x::AbstractFsEntry, a) = endswith(x.path.s, a)
 
 Base.splitext(x::AbstractFsEntry) = splitext(x.path.s)
+
+
+
+# OK, behaviour in line with lstat returning stat implicitly
+Base.Filesystem.lstat(x::PathCanon) = lstat(x.s)
+Base.Filesystem.stat(x::PathCanon) = stat(x.s)
+
+# stat returns target
+Base.Filesystem.stat(x::FsSymlink) = x.target.st
+Base.Filesystem.stat(x::AbstractFsEntry) = x.st
+
+# lstat defaults to stat if no symlink
+Base.Filesystem.lstat(x::FsSymlink) = x.st
+Base.Filesystem.lstat(x::AbstractFsEntry) = stat(x)
+
+# stat & lstat should usually be sufficient to override
+# however, Base.Filesystem throws in a rather weird joinpath; so we override that as well
+Base.Filesystem.joinpath(x::AnstractFsEntry) = x
