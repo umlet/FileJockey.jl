@@ -69,6 +69,6 @@ ls(s::AbstractString=".") = ls(FsEntry(s))
 
 
 finditer(args...) = fswalkdir(args...)
-find(args...) = collect(walkdir(args...))
+find(args...) = collect(fswalkdir(args...))
 
 
