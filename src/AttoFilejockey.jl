@@ -8,8 +8,8 @@ export FsEntry
 export @fs_str
 export path
 
-export fsreaddir
-export FsTree, iterdir, DIR, Dir
+export fsreaddir, fswalkdir
+export ls, find
 
 export ext, Ext
 export @ex_str
@@ -32,8 +32,8 @@ using AttoFunctionAliases
 using AttoHabits
 
 
-include("./fsentry.jl")
-include("./fsdir.jl")
+include("./fsentries.jl")
+include("./fsdirs.jl")
 
 include("./ext.jl")
 include("./batchfunctions.jl")
