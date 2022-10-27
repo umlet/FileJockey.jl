@@ -68,7 +68,7 @@ ls(x::FsSymlink{FsDir}) = fsreaddir(x.target)
 ls(s::AbstractString=".") = ls(FsEntry(s))
 
 
-#DIR(args...) = iterdir(args...)
-#Dir(args...) = collect(iterdir(args...))
+finditer(args...) = fswalkdir(args...)
+find(args...) = collect(walkdir(args...))
 
 
