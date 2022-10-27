@@ -9,7 +9,7 @@ export @fs_str
 export path
 
 export fsreaddir, fswalkdir
-export ls, find
+export ls, find, finditer
 
 export ext, Ext
 export @ex_str
