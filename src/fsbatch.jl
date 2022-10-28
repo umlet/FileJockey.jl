@@ -9,9 +9,10 @@ abstract type AbstractBatchTrait end
 struct AllEntriesAreStandard <: AbstractBatchTrait end
 function areallentriesstandard(X::AbstractVector{<:AbstractFsEntry})::Bool
     !CONF.quiet  &&  @info """
-Checking if all entries are standard entries:
+Ensuring 'AllEntriesAreStandard'..
+Checks if all entries are standard entries:
 - files, dirs, symlinks to files, or symlinks to dirs;
-- BUT NOT: others (like FIFOs), symlinks to others, broken symlinks.
+- BUT NOT: others (like FIFOs), symlinks to others, or broken symlinks.
 """
     fs = X |> fl(!isstandard)
     success = length(fs) == 0
