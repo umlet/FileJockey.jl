@@ -31,8 +31,8 @@ end
 traitfunction(::Type{AllEntriesAreStandard}) = areallentriesstandard
 
 
-struct TheDirlikesAreUnique <: AbstractBatchTrait end
-function arethedirlikesunique(X::AbstractVector{<:AbstractFsEntry})::Bool
+struct TheDirlikesAreDistinct <: AbstractBatchTrait end
+function arethedirlikesdistinct(X::AbstractVector{<:AbstractFsEntry})::Bool
     !CONF.quiet  &&  @info """
 Ensuring 'TheDirlikesAreDistinct'..
 - Checks if the Symlinks-to-dirs don't point to other, already-known, Dirs in the entries.
@@ -61,7 +61,9 @@ Ensuring 'TheDirlikesAreDistinct'..
     !CONF.quiet  &&  @info "OK."
     return true
 end
-traitfunction(::Type{TheDirlikesAreUnique}) = arethedirlikesunique
+traitfunction(::Type{TheDirlikesAreDistinct}) = arethedirlikesdistinct
+
+
 
 
 
