@@ -9,6 +9,7 @@ export FsEntry
 export @fs_str
 
 export path, pathcanon
+export isstandard
 export isfilelike
 export follow
 
@@ -19,7 +20,7 @@ export ls, find, finditer
 
 
 # from fsbatch
-export FilelikesAreUnique
+export TheFilelikesAreUnique
 export FsBatch, batch
 
 

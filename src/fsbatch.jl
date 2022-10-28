@@ -3,18 +3,24 @@
 abstract type AbstractBatchTrait end
 
 
+# fails if entries contain
+# - Otherlike (regulas or symlink)
+# - broken symlinks (FsSymlink{FsUnknwonNonexist})
+struct AllEntriesAreStandard <: AbstractBatchTrait
+areallentriesstandard(X::AbstractVector{<:AbstractFsEntry})::Bool = ( cn(isstandard, X) == length(X))
+traitfunction(::Type{AllEntriesAreStandard}) = areallentriesstandard
 
 # Filelikes (FsFiles or Symlink{FsFile}) have
-# 1. different paths, AND
-# 2. are different entries, i.e., no hardlinks to same file
-struct FilelikesAreUnique <: AbstractBatchTrait end
-function arefilelikesunique(X::AbstractVector{<:AbstractFsEntry})::Bool
+# - different paths, AND
+# - are different entries, i.e., no hardlinks to same file
+struct TheFilelikesAreUnique <: AbstractBatchTrait end
+function arethefilelikesunique(X::AbstractVector{<:AbstractFsEntry})::Bool
     v = X |> fl(isfilelike) |> mp(follow)
 
 
     return false
 end
-traitfunction(::Type{FilelikesAreUnique}) = havedistinctpaths
+traitfunction(::Type{TheFilelikesAreUnique}) = havedistinctpaths
 
 
 
