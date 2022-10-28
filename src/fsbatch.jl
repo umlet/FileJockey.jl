@@ -6,7 +6,7 @@ abstract type AbstractBatchTrait end
 # fails if entries contain
 # - Otherlike (regulas or symlink)
 # - broken symlinks (FsSymlink{FsUnknwonNonexist})
-struct AllEntriesAreStandard <: AbstractBatchTrait
+struct AllEntriesAreStandard <: AbstractBatchTrait end
 areallentriesstandard(X::AbstractVector{<:AbstractFsEntry})::Bool = ( cn(isstandard, X) == length(X))
 traitfunction(::Type{AllEntriesAreStandard}) = areallentriesstandard
 
