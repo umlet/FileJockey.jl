@@ -10,7 +10,7 @@ export @fs_str
 
 export path, pathcanon
 export isstandard
-export isfilelike
+export isfilelike, isdirlike
 export follow
 
 

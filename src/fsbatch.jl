@@ -4,34 +4,66 @@ abstract type AbstractBatchTrait end
 
 
 # fails if entries contain
-# - Otherlike (regulas or symlink)
+# - otherlike (regular or symlink)
 # - broken symlinks (FsSymlink{FsUnknwonNonexist})
 struct AllEntriesAreStandard <: AbstractBatchTrait end
 function areallentriesstandard(X::AbstractVector{<:AbstractFsEntry})::Bool
     !CONF.quiet  &&  @info """
 Ensuring 'AllEntriesAreStandard'..
-Checks if all entries are standard entries: files, dirs, symlinks to files, or symlinks to dirs.
-NOT allowed: others (like FIFOs, devices..), symlinks to others, or broken symlinks.
+- Checks if all entries are standard ones: Files, Dirs, Symlinks-to-files, or Symlinks-to-dirs.
+  (Fails if entries contain Others (like FIFOs, devices..), Symlinks-to-others, or broken symlinks.)
 """
     fs = X |> fl(!isstandard)
     success = length(fs) == 0
 
-    if success
-        !CONF.quiet  &&  @info "OK."
-        return true
-    end
-
-    # failure:
-    if !CONF.quiet
+    if !success
         ss = fs |> tk(5) |> mp(string)
         length(fs) > 5  &&  push!(ss, "...")
-        pushfirst!(ss, "Entries contain $(length(ss)) non-standard ones:")
+        pushfirst!(ss, "Entries contain $(length(fs)) non-standard ones:")
         msg = join(ss, "\n")
         @error msg
+        return false
     end
-    return false
+
+    !CONF.quiet  &&  @info "OK."
+    return true
 end
 traitfunction(::Type{AllEntriesAreStandard}) = areallentriesstandard
+
+
+struct TheDirlikesAreUnique <: AbstractBatchTrait end
+function arethedirlikesunique(X::AbstractVector{<:AbstractFsEntry})::Bool
+    !CONF.quiet  &&  @info """
+Ensuring 'TheDirlikesAreDistinct'..
+- Checks if the Symlinks-to-dirs don't point to other, already-known, Dirs in the entries.
+  (Fails, for example, if a 'find()' result contains a symlink to a Dir inside the same hierarchy.)
+- Checks if all Dirlikes (Dirs and Symlink-to-dirs) point to distinct Dirs.
+  (Fails, e.g., if the entries were set up with the same Dir occurring multiple times.)
+"""
+    ds = X |> fl(is(FsDir))
+    dpaths = path.(ds)
+    dpathset = Set(dpaths)
+
+    sds = X |> fl(is(FsSymlink{FsDir}))
+    sdproblems = sds |> fl(x -> x.target.path.s in dpathset)
+
+    success = length(sdproblems) == 0
+
+    if !success
+        ss = sds |> tk(5) |> mp(string)
+        length(sdproblems) > 5  &&  push!(ss, "...")
+        pushfirst!(ss, "Entries contain $(length(sdproblems)) Symlinks-to-dirs pointing to known Dirs in entries:")
+        msg = join(ss, "\n")
+        @error msg
+        return false
+    end
+
+    !CONF.quiet  &&  @info "OK."
+    return true
+end
+traitfunction(::Type{TheDirlikesAreUnique}) = arethedirlikesunique
+
+
 
 
 
@@ -50,6 +82,11 @@ traitfunction(::Type{TheFilelikesAreUnique}) = havedistinctpaths
 
 
 
+
+
+
+
+#------------------------------------------------------------------------------
 struct FsBatch
     _v::Vector{AbstractFsEntry}
     traits::Set{AbstractBatchTrait}
