@@ -15,7 +15,7 @@ function areallentriesstandard(X::AbstractVector{<:AbstractFsEntry})::Bool
 """
     success = cn(isstandard, X) == length(X)
     
-    CONF.quite  ||  @info "OK."
+    CONF.quiet  ||  @info "OK."
 
     return success
 end
