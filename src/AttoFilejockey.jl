@@ -26,7 +26,7 @@ export FsBatch, batch
 
 
 # from conf
-export CONF
+export CONF, Conf
 
 
 export ext, Ext
@@ -51,6 +51,8 @@ include("./fsentries.jl")
 include("./fsdirs.jl")
 
 include("./ext.jl")
+
+include("./conf.jl")
 include("./fsbatch.jl")
 
 include("./pprint.jl")
