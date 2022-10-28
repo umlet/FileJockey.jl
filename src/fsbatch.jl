@@ -23,12 +23,12 @@ function areallentriesstandard(X::AbstractVector{<:AbstractFsEntry})::Bool
 
     # failure:
     if !CONF.quiet
-        @warn "Entries contain non-standard ones:"
-        for f in fs
-            @warn f
-        end
+        ss = fs |> tk(5) |> mp(string)
+        length(fs) > 5  &&  push!(ss, "...")
+        pushfirst!(ss, "Entries contain non-standard ones:")
+        msg = join(ss, "\n")
+        @error msg
     end
-
     return false
 end
 traitfunction(::Type{AllEntriesAreStandard}) = areallentriesstandard
