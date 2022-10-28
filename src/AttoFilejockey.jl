@@ -1,17 +1,29 @@
 module AttoFilejockey
 
 
+# from fsentries
 export PathCanon, FsEntryCanon
 export AbstractFsEntry
 export FsFile, FsDir, FsSymlink, FsOther, FsUnknownNonexist
 export FsEntry
 export @fs_str
-export path
 
+export path, pathcanon
+export isfilelike
+export follow
+
+
+# from fsdirs
 export fsreaddir, fswalkdir
 export ls, find, finditer
 
-export HaveDistinctPaths
+
+# from fsbatch
+export FilelikesAreUnique
+export FsBatch, batch
+
+
+
 
 export ext, Ext
 export @ex_str
@@ -20,9 +32,6 @@ export hasext, hasExt
 export stats, info
 
 
-
-#TODO fit above
-export isfilelike
 
 
 
@@ -38,7 +47,7 @@ include("./fsentries.jl")
 include("./fsdirs.jl")
 
 include("./ext.jl")
-include("./batchfunctions.jl")
+include("./fsbatch.jl")
 
 include("./pprint.jl")
 
@@ -88,8 +97,8 @@ end
 AttoFunctionAliases.ext(x::AbstractFsEntry) = ext(x.path.s)
 
 # files and symlink to files
-isfilelike(x::Union{FsFile, FsSymlink{FsFile}}) = true
-isfilelike(x::AbstractFsEntry) = false
+# isfilelike(x::Union{FsFile, FsSymlink{FsFile}}) = true
+# isfilelike(x::AbstractFsEntry) = false
 
 
 

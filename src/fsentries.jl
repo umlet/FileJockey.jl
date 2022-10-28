@@ -89,7 +89,6 @@ struct FsUnknownNonexist <: AbstractFsEntry
 end
 _show(io::IO, x::FsUnknownNonexist) = print(io, """FsUnknownNonexist(?$(x.path)?)""")
 
-path(x::AbstractFsEntry) = x.path
 
 # function _show(io::IO, X::AbstractVector{<:AbstractFsEntry})
 #     print("$(length(X))-element $(typeof(X)):")
@@ -138,12 +137,18 @@ macro fs_str(s)
     FsEntry(s)
 end
 
-# hmmm..
-#AttoFunctionAliases.cl(X) = 
 
 
+path(x::AbstractFsEntry) = x.path.s
+pathcanon(x::AbstractFsEntry) = x.path
 
 
+isfilelike(x::Union{FsFile, FsSymlink{FsFile}}) = true
+isfilelike(x::AbstractFsEntry) = false
+
+
+follow(x::AbstractFsEntry) = x
+follow(x::FsSymlink) = x.target
 
 
 
