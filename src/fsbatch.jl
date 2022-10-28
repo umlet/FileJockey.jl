@@ -22,7 +22,7 @@ struct FsBatch
     _v::Vector{AbstractFsEntry}
     traits::Set{<:AbstractBatchTrait}
     function FsBatch(X::AbstractVector{<:AbstractFsEntry})
-        return new(X, Set{<:AbstractFsEntry}())
+        return new(X, Set{AbstractFsEntry}())
     end
 end
 FsBatch(X) = FsBatch(cl())
