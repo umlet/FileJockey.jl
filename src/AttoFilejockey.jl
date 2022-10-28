@@ -52,8 +52,9 @@ include("./fsdirs.jl")
 
 include("./ext.jl")
 
-include("./conf.jl")
 include("./fsbatch.jl")
+
+include("./conf.jl")
 
 include("./pprint.jl")
 
