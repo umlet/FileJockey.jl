@@ -35,10 +35,13 @@ struct TheDirlikesAreDistinct <: AbstractBatchTrait end
 function arethedirlikesdistinct(X::AbstractVector{<:AbstractFsEntry})::Bool
     !CONF.quiet  &&  @info """
 Ensuring 'TheDirlikesAreDistinct'..
-- Checks if the Symlinks-to-dirs don't point to other, already-known, Dirs in the entries.
-  (Fails, for example, if a 'find()' result contains a symlink to a Dir inside the same hierarchy.)
-- Checks if all Dirlikes (Dirs and Symlink-to-dirs) point to distinct Dirs.
-  (Fails, e.g., if the entries were set up with the same Dir occurring multiple times.)
+Checks the soundness of the Dirlikes (Dirs and Symlinks-to-dirs) in this order:
+- Ensure that no two Symlink-to-Dirs point to the same target Dir.
+- Ensure that no Symlink-to-Dir target is a Dir already contained in the entries.
+- Ensure that no two Dirs in the entries are the same.
+(If all is met, one can 'follow()' all Symlink-to-dirs (i.e., replace them with their target),
+and end up with distinct Dirs. The order of the checks should facilitate debugging, 
+as few Symlink-to-dirs are most likely to cause many subsequent duplicate entries.)
 """
     ds = X |> fl(is(FsDir))
     dpaths = path.(ds)
