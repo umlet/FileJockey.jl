@@ -142,12 +142,14 @@ end
 path(x::AbstractFsEntry) = x.path.s
 pathcanon(x::AbstractFsEntry) = x.path
 
-
 isfilelike(x::Union{FsFile, FsSymlink{FsFile}}) = true
 isfilelike(x::AbstractFsEntry) = false
 
-isstandard(x::AbstractFsEntry) = false
+isdirlike(x::Union{FsDir, FsSymlink{FsDir}}) = true
+isdirlike(x::AbstractFsEntry) = false
+
 isstandard(x::Union{FsFile, FsDir, FsSymlink{FsFile}, FsSymlink{FsDir}}) = true
+isstandard(x::AbstractFsEntry) = false
 
 follow(x::AbstractFsEntry) = x
 follow(x::FsSymlink) = x.target
