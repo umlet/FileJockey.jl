@@ -20,6 +20,7 @@ export ls, find, finditer
 
 
 # from fsbatch
+export AbstractBatchTrait
 export AllEntriesAreStandard
 export TheFilelikesAreUnique
 export FsBatch, batch
