@@ -59,3 +59,4 @@ function ensure!(X::FsBatch, T::Type{<:AbstractBatchTrait})
     push!(X.traits, T())
     return X
 end
+ensure!(T::Type{<:AbstractBatchTrait}) = X -> ensure!(X, T)
