@@ -1,7 +1,7 @@
 
 
 mutable struct Conf
-    batch_ensure_defaults::Vector{AbstractBatchTrait}
+    batch_ensure_defaults::Vector
     function Conf()
         return new([AllEntriesAreStandard])
     end
