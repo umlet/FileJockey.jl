@@ -66,7 +66,7 @@ function ensure!(X::FsBatch, T::Type{<:AbstractBatchTrait})
     T() in X.traits  &&  return X
 
     f = traitfunction(T)
-    !f(X._v)  &&  error("checking batch for '$(T)' failed")
+    !f(X._v)  &&  error("ensuring '$(T)' failed")
 
     push!(X.traits, T())
     return X
