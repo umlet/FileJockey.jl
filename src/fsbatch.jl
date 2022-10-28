@@ -35,5 +35,16 @@ struct FsBatch
     end
 end
 FsBatch(X) = FsBatch(cl())
-
 batch(args...) = FsBatch(args...)
+
+
+# returns X, or throws exception!
+function ensure!(X::FsBatch, T::Type{<:AbstractBatchTrait})
+    T() in X.traits  &&  return X
+
+    f = traitfunction(T)
+    !f(X._v)  &&  error("checking batch for '$(T)' failed")
+
+    push!(X.traits, T())
+    return X
+end
