@@ -20,7 +20,7 @@ traitfunction(::Type{FilelikesAreUnique}) = havedistinctpaths
 
 struct FsBatch
     _v::Vector{AbstractFsEntry}
-    traits::Set{<:AbstractBatchTrait}
+    traits::Set{AbstractBatchTrait}
     function FsBatch(X::AbstractVector{<:AbstractFsEntry})
         return new(X, Set{AbstractFsEntry}())
     end
