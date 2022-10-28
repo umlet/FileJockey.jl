@@ -7,7 +7,18 @@ abstract type AbstractBatchTrait end
 # - Otherlike (regulas or symlink)
 # - broken symlinks (FsSymlink{FsUnknwonNonexist})
 struct AllEntriesAreStandard <: AbstractBatchTrait end
-areallentriesstandard(X::AbstractVector{<:AbstractFsEntry})::Bool = ( cn(isstandard, X) == length(X))
+function areallentriesstandard(X::AbstractVector{<:AbstractFsEntry})::Bool
+    CONF.quiet  ||  @info """
+    Checking if all entries are standard entries:
+    - files, dirs, symlinks to files, or symlinks to dirs;
+    - BUT NOT: others (like FIFOs), symlinks to others, broken symlinks.
+"""
+    success = cn(isstandard, X) == length(X)
+    
+    CONF.quite  ||  @info "OK."
+
+    return success
+end
 traitfunction(::Type{AllEntriesAreStandard}) = areallentriesstandard
 
 
