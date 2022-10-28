@@ -24,7 +24,7 @@ export AbstractBatchTrait
 export AllEntriesAreStandard
 export TheFilelikesAreUnique
 export FsBatch, batch
-
+export ensure!
 
 # from conf
 export CONF, Conf
