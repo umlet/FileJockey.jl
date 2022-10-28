@@ -10,6 +10,9 @@ struct AllEntriesAreStandard <: AbstractBatchTrait end
 areallentriesstandard(X::AbstractVector{<:AbstractFsEntry})::Bool = ( cn(isstandard, X) == length(X))
 traitfunction(::Type{AllEntriesAreStandard}) = areallentriesstandard
 
+
+
+
 # Filelikes (FsFiles or Symlink{FsFile}) have
 # - different paths, AND
 # - are different entries, i.e., no hardlinks to same file

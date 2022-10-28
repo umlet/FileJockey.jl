@@ -20,10 +20,13 @@ export ls, find, finditer
 
 
 # from fsbatch
+export AllEntriesAreStandard
 export TheFilelikesAreUnique
 export FsBatch, batch
 
 
+# from conf
+export CONF
 
 
 export ext, Ext
