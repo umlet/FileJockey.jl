@@ -10,9 +10,8 @@ struct AllEntriesAreStandard <: AbstractBatchTrait end
 function areallentriesstandard(X::AbstractVector{<:AbstractFsEntry})::Bool
     !CONF.quiet  &&  @info """
 Ensuring 'AllEntriesAreStandard'..
-Checks if all entries are standard entries:
-- files, dirs, symlinks to files, or symlinks to dirs;
-- BUT NOT: others (like FIFOs), symlinks to others, or broken symlinks.
+Checks if all entries are standard entries: files, dirs, symlinks to files, or symlinks to dirs.
+NOT allowed: others (like FIFOs, devices..), symlinks to others, or broken symlinks.
 """
     fs = X |> fl(!isstandard)
     success = length(fs) == 0
@@ -26,7 +25,7 @@ Checks if all entries are standard entries:
     if !CONF.quiet
         ss = fs |> tk(5) |> mp(string)
         length(fs) > 5  &&  push!(ss, "...")
-        pushfirst!(ss, "Entries contain non-standard ones:")
+        pushfirst!(ss, "Entries contain $(length(ss)) non-standard ones:")
         msg = join(ss, "\n")
         @error msg
     end
