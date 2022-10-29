@@ -49,7 +49,7 @@ using OrderedCollections
 using Crayons
 
 using AttoFunctionAliases
-using AttoHabits
+#using AttoHabits
 
 
 include("./fsentries.jl")
