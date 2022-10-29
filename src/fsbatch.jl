@@ -35,13 +35,14 @@ struct TheDirlikesAreDistinct <: AbstractBatchTrait end
 function arethedirlikesdistinct(X::AbstractVector{<:AbstractFsEntry})::Bool
     !CONF.quiet  &&  @info """
 Ensuring 'TheDirlikesAreDistinct'..
-Checks the soundness of the Dirlikes (Dirs and Symlinks-to-dirs) in this order:
-- Ensure that no two Symlink-to-Dirs point to the same target Dir.
-- Ensure that no Symlink-to-Dir target is a Dir already contained in the entries.
-- Ensure that no two Dirs in the entries are the same.
-(If all is met, one can 'follow()' all Symlink-to-dirs (i.e., replace them with their target),
-and end up with distinct Dirs. The order of the checks should facilitate debugging, 
-as few Symlink-to-dirs are most likely to cause many subsequent duplicate entries.)
+Checks if the Dirlikes (i.e., the Dirs and the Symlinks-to-dirs) contained in the entries are distinct:
+- Ensures that all Dirs are distinct (Dir set A).
+- Ensures that all target Dirs of the Symlink-to-Dirs are distinct (the targets are the Dir set B).
+- Ensures that sets A and B are disjoint.
+(Fails, e.g., if a 'find()' result contains a Symlink-to-dir pointing to another Dir in the same hierarchy;
+or if duplicates were erroneously added in a manual setup of the entries..)
+(If OK, one can 'follow()' all Symlink-to-dirs, i.e., replace them with their target, and end up with distinct Dirs.
+XXXXX It also clears Symlink-to-dirs of any responsability rules out the most common cause for duplicate File entries, most often caused by redundant Symlinks-to-dirs.)
 """
     ds = X |> fl(is(FsDir))
     dpaths = path.(ds)

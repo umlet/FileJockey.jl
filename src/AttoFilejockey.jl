@@ -44,7 +44,9 @@ export stats, info
 
 
 using Base.Filesystem
+
 using OrderedCollections
+using Crayons
 
 using AttoFunctionAliases
 using AttoHabits
