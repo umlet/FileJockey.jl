@@ -127,6 +127,9 @@ function pprint(colors::Bool=true)
     
     sym1 = nsymfiles > 0  ?  " ($(nsymfiles) of which symlinked)"  :  " (none symlinked)"
     sym2 = nsymdirs > 0   ?  " ($(nsymfiles) of which symlinken)"  :  " (none symlinked)"
+    csym1 = BLUE_FG(sym1)
+    csym2 = GREEN_FG(sym2)
+
 
     size1 = " -- $(fsizehuman(fsize)) -- $(fsize) bytes"
 
