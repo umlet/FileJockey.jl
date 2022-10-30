@@ -116,7 +116,7 @@ lpad(X::AbstractVector{<:AbstractString}) = ( maxlen = maximum(length.(X))  ;  r
 
 
 
-function pprint(nfiles, nsymfiles, ndirs, nsymdirs, noth, nsymoth; colors::Bool=true)
+function pprint(nfiles, nsymfiles, ndirs, nsymdirs, noth, nsymoth, nbrk; colors::Bool=true)
     fsize = 5676453653;
 
     start1,start2 = lpad(String[ tostr_thsep(nfiles), tostr_thsep(ndirs) ]) .* [" files ", " dirs  "]
@@ -135,12 +135,15 @@ function pprint(nfiles, nsymfiles, ndirs, nsymdirs, noth, nsymoth; colors::Bool=
     csep = DARK_GRAY_FG(sep)
 
     if noth+nsymoth == 0
-        oth = "0 dev/socket/fifo (none syml)"
+        oth = "(0 dev/socket/fifo; none syml)"
         coth = DARK_GRAY_FG(oth)
     else
         if nsymoth == 0
-            oth = "$(noth) dev/socket/fifo (none syml)"
-            coth = YELLOW_FG(oth)
+            oth0 = "$(noth) dev/socket/fifo "
+            oth1 = "(none syml)"
+
+            oth = oth0 * oth1
+            coth = YELLOW_FG(oth0, DARK_GRAY_FG(oth1))
         else
             oth0 = "$(noth) dev/socket/fifo "
             oth1 = "[$(nsymoth) syml]"
@@ -150,9 +153,17 @@ function pprint(nfiles, nsymfiles, ndirs, nsymdirs, noth, nsymoth; colors::Bool=
         end
     end
 
+    if nbrk == 0
+        brk = "(0 broken syml)"
+        cbrk = DARK_GRAY_FG(brk)
+    else
+        brk = "$(nbrk) broken syml"
+        cbrk = NEGATIVE(RED_FG(brk))
+    end
+
     if colors
         println(cstart1, csym1, csize1)
-        println(cstart2, csym2, csep, coth, csep)
+        println(cstart2, csym2, csep, coth, csep, cbrk)
     end
 
 end
