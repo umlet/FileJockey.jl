@@ -117,7 +117,7 @@ lpad(X::AbstractVector{<:AbstractString}) = ( maxlen = maximum(length.(X))  ;  r
 
 
 function pprint(colors::Bool=true)
-    nfiles = 15764; nsymfiles = 0
+    nfiles = 15764; nsymfiles = 134
     ndirs = 345; nsymdirs = 0
     fsize = 5676453653;
 
