@@ -131,7 +131,7 @@ function pprint(colors::Bool=true)
     size1 = " -- $(fsizehuman(fsize)) -- $(fsize) bytes"
 
     if colors
-        print(start1, sym1)
+        print(cstart1, csym1)
     end
 
 end
