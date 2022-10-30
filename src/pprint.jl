@@ -123,8 +123,8 @@ function pprint(nfiles, nsymfiles, ndirs, nsymdirs, noth, nsymoth, nbrk; colors:
     cstart1 = BLUE_FG(start1)
     cstart2 = GREEN_FG(start2)
     
-    sym1 = nsymfiles > 0   ?  "[$(nsymfiles) of which symlinked]"  :  "(none of which symlinked)"
-    sym2 = nsymdirs > 0    ?  "[$(nsymdirs) of which symlinked]"   :  "(none of which symlinked)"
+    sym1 = nsymfiles > 0   ?  "[$(nsymfiles) of which symlinked]"  :  "(none symlinked)"
+    sym2 = nsymdirs > 0    ?  "[$(nsymdirs) of which symlinked]"   :  "(none symlinked)"
     csym1 = nsymfiles > 0  ?  NEGATIVE(BLUE_FG(sym1))  :  DARK_GRAY_FG(sym1)
     csym2 = nsymdirs > 0   ?  NEGATIVE(GREEN_FG(sym2)) :  DARK_GRAY_FG(sym2)
 
@@ -135,7 +135,7 @@ function pprint(nfiles, nsymfiles, ndirs, nsymdirs, noth, nsymoth, nbrk; colors:
     csep = DARK_GRAY_FG(sep)
 
     if noth+nsymoth == 0
-        oth = "(0 dev/socket/fifo; none syml)"
+        oth = "(no dev/socket/fifo entries; none syml)"
         coth = DARK_GRAY_FG(oth)
     else
         if nsymoth == 0
@@ -154,7 +154,7 @@ function pprint(nfiles, nsymfiles, ndirs, nsymdirs, noth, nsymoth, nbrk; colors:
     end
 
     if nbrk == 0
-        brk = "(0 broken syml)"
+        brk = "(no broken syml)"
         cbrk = DARK_GRAY_FG(brk)
     else
         brk = "$(nbrk) broken syml"
