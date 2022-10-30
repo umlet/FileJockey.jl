@@ -134,7 +134,7 @@ function pprint(nsymfiles, nsymdirs; colors::Bool=true)
     csize1 = BLUE_FG(size1)
 
     sep = " :: "
-    csep = sep
+    csep = DARK_GRAY_FG(sep)
 
     if colors
         println(cstart1, csym1, csize1)
