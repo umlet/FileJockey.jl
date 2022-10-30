@@ -101,7 +101,7 @@ symlinks BROKEN                         $(nsyml2nonexist)
 end 
 
 
-lpad(s::AbtractString, upto::Int64) = ( upto < length(s)  &&  error("lpad '$upto' too small for string 's'")  ;  return " "^(upto-length(s)) * s )
+lpad(s::AbstractString, upto::Int64) = ( upto < length(s)  &&  error("lpad '$upto' too small for string 's'")  ;  return " "^(upto-length(s)) * s )
 lpad(upto::Int64) = x -> lpad(x, upto)
 
 lpad(X::AbstractVector{<:AbstractString}) = ( maxlen = maximum(length.(X))  ;  return X |> mp(lpad) )
