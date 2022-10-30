@@ -116,17 +116,15 @@ lpad(X::AbstractVector{<:AbstractString}) = ( maxlen = maximum(length.(X))  ;  r
 
 
 
-function pprint(nsymfiles, nsymdirs; colors::Bool=true)
-    nfiles = 15764
-    ndirs = 345
+function pprint(nfiles, nsymfiles, ndirs, nsymdirs, noth, nsymoth; colors::Bool=true)
     fsize = 5676453653;
 
     start1,start2 = lpad(String[ tostr_thsep(nfiles), tostr_thsep(ndirs) ]) .* [" files ", " dirs  "]
     cstart1 = BLUE_FG(start1)
     cstart2 = GREEN_FG(start2)
     
-    sym1 = nsymfiles > 0   ?  "($(nsymfiles) of which symlinked)"  :  "(none symlinked)"
-    sym2 = nsymdirs > 0    ?  "($(nsymdirs) of which symlinken)"   :  "(none symlinked)"
+    sym1 = nsymfiles > 0   ?  "[$(nsymfiles) of which symlinked]"  :  "(none symlinked)"
+    sym2 = nsymdirs > 0    ?  "[$(nsymdirs) of which symlinked]"   :  "(none symlinked)"
     csym1 = nsymfiles > 0  ?  NEGATIVE(BLUE_FG(sym1))  :  DARK_GRAY_FG(sym1)
     csym2 = nsymdirs > 0   ?  NEGATIVE(GREEN_FG(sym2)) :  DARK_GRAY_FG(sym2)
 
@@ -135,6 +133,19 @@ function pprint(nsymfiles, nsymdirs; colors::Bool=true)
 
     sep = " :: "
     csep = DARK_GRAY_FG(sep)
+
+    if noth+nsymoth == 0
+        oth = "(0 dev/socket/fifo)"
+        coth = DARK_GRAY_FG(oth)
+    else
+        if nsymoth == 0
+            oth = "$(noth) dev/socket/fifo"
+            coth = NEGATIVE(YELLOW_FG(oth))
+        else
+            oth = "$(noth) dev/socket/fifo [$(nsymoth) syml]"
+            coth = NEGATIVE(YELLOW_FG(oth))
+        end
+    end
 
     if colors
         println(cstart1, csym1, csize1)
