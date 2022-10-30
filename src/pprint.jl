@@ -131,11 +131,11 @@ function pprint(nfiles, nsymfiles, ndirs, nsymdirs, noth, nsymoth; colors::Bool=
     size1 = " -- $(fsizehuman(fsize)) -- $(tostr_thsep(fsize)) bytes"
     csize1 = BLUE_FG(size1)
 
-    sep = " :: "
+    sep = "  :::  "
     csep = DARK_GRAY_FG(sep)
 
     if noth+nsymoth == 0
-        oth = "(0 dev/socket/fifo)"
+        oth = "0 dev/socket/fifo"
         coth = DARK_GRAY_FG(oth)
     else
         if nsymoth == 0
