@@ -121,12 +121,12 @@ function pprint(colors::Bool=true)
     ndirs = 345; nsymdirs = 0
     fsize = 5676453653;
 
-    start1,start2 = lpad(String[ tostr_thsep(nfiles), tostr_thsep(ndirs) ]) .* [" files", " dirs "]
+    start1,start2 = lpad(String[ tostr_thsep(nfiles), tostr_thsep(ndirs) ]) .* [" files ", " dirs  "]
     cstart1 = BLUE_FG(start1)
     cstart2 = GREEN_FG(start2)
     
-    sym1 = nsymfiles > 0  ?  " ($(nsymfiles) of which symlinked)"  :  " (none symlinked)"
-    sym2 = nsymdirs > 0   ?  " ($(nsymfiles) of which symlinken)"  :  " (none symlinked)"
+    sym1 = nsymfiles > 0  ?  "($(nsymfiles) of which symlinked)"  :  "(none symlinked)"
+    sym2 = nsymdirs > 0   ?  "($(nsymfiles) of which symlinken)"  :  "(none symlinked)"
     csym1 = nsymfiles > 0  ?  NEGATIVE(BLUE_FG(sym1))  :  DARK_GRAY_FG(sym1)
     csym2 = GREEN_FG(sym2)
 
