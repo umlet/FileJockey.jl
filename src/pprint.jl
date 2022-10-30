@@ -118,7 +118,7 @@ lpad(X::AbstractVector{<:AbstractString}) = ( maxlen = maximum(length.(X))  ;  r
 
 function pprint(colors::Bool=true)
     nfiles = 15764; nsymfiles = 134
-    ndirs = 345; nsymdirs = 0
+    ndirs = 345; nsymdirs = 3
     fsize = 5676453653;
 
     start1,start2 = lpad(String[ tostr_thsep(nfiles), tostr_thsep(ndirs) ]) .* [" files ", " dirs  "]
