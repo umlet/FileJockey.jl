@@ -117,7 +117,7 @@ lpad(X::AbstractVector{<:AbstractString}) = ( maxlen = maximum(length.(X))  ;  r
 
 
 function pprint(colors::Bool=true)
-    nfiles = 15764; nsymfiles = 15
+    nfiles = 15764; nsymfiles = 0
     ndirs = 345; nsymdirs = 0
     fsize = 5676453653;
 
@@ -127,7 +127,7 @@ function pprint(colors::Bool=true)
     
     sym1 = nsymfiles > 0  ?  " ($(nsymfiles) of which symlinked)"  :  " (none symlinked)"
     sym2 = nsymdirs > 0   ?  " ($(nsymfiles) of which symlinken)"  :  " (none symlinked)"
-    csym1 = BLUE_FG(sym1)
+    csym1 = nsymfiles > 0  ?  BLUE_FG(sym1)  :  DARK_GRAY_FG(sym1)
     csym2 = GREEN_FG(sym2)
 
 
