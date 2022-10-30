@@ -1,7 +1,45 @@
 
 
 
+mutable struct FsStats  # mutable avoids some boilerplate in construction
+    nregfiles::Int64
+    nregdirs::Int64
+    nothers::Int64
+
+    nsyml2files::Int64
+    nsyml2dirs::Int64
+    nsyml2others::Int64
+    nsyml2nonexist::Int64  # shortcut for '2unknownnonexist'
+
+    # derived
+    nfilelikes::Int64
+    ndirlikes::Int64
+    notherlikes::Int64
+    FsStats() = new(0,0,0,  0,0,0,0,  0,0,0)
+end
 function stats(X::AbstractVector{<:AbstractFsEntry})
+    S = FsStats()
+    for x in X
+        S.nregfiles += x isa FsFile
+        S.nregdirs += x isa FsDir
+        S.nothers += x isa FsOther
+
+        S.nsyml2files += x isa FsSymlink{FsFile}
+        S.nsyml2dirs += x isa FsSymlink{FsDir}
+        S.nsyml2others += x isa FsSymlink{FsOther}
+        S.nsyml2nonexist += x isa FsSymlink{FsUnknownNonexist}
+    end
+
+    S.nfilelikes = S.nregfiles + S.nsyml2files
+    S.ndirlikes = S.nregdirs + S.nsyml2dirs
+    S.notherlikes = S.nothers + S.nsyml2others
+
+    return S
+end
+
+
+
+function statsOLD(X::AbstractVector{<:AbstractFsEntry})
     dtype = Dict{Type{<:AbstractFsEntry}, Int64}()
     dExt = Dict{Symbol, Dict{Union{String, Nothing}, Int64}}()
 
@@ -19,7 +57,7 @@ function stats(X::AbstractVector{<:AbstractFsEntry})
         dext[key] += 1
     end
 
-    return (dtype, dExt)
+    return (;dtype, dExt)
 end
 
 function info(X::AbstractVector{<:AbstractFsEntry})
@@ -116,8 +154,9 @@ lpad(X::AbstractVector{<:AbstractString}) = ( maxlen = maximum(length.(X))  ;  r
 
 
 
-function pprint(nfiles, nsymfiles, ndirs, nsymdirs, noth, nsymoth, nbrk; colors::Bool=true)
-    fsize = 5676453653;
+function pprint(batch::FsBatch; colors::Bool=true)
+    dtype,dExt = stats(batch._v)
+    
 
     start1,start2 = lpad(String[ tostr_thsep(nfiles), tostr_thsep(ndirs) ]) .* [" files ", " dirs  "]
     cstart1 = BLUE_FG(start1)

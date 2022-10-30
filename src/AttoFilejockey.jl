@@ -36,7 +36,7 @@ export ext, Ext
 export @ex_str
 export hasext, hasExt
 
-export stats, info
+export FsStats, stats, info
 
 # todo: temp!!!
 export pprint, lpad
