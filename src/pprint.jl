@@ -123,8 +123,8 @@ function pprint(nfiles, nsymfiles, ndirs, nsymdirs, noth, nsymoth; colors::Bool=
     cstart1 = BLUE_FG(start1)
     cstart2 = GREEN_FG(start2)
     
-    sym1 = nsymfiles > 0   ?  "[$(nsymfiles) of which symlinked]"  :  "(none symlinked)"
-    sym2 = nsymdirs > 0    ?  "[$(nsymdirs) of which symlinked]"   :  "(none symlinked)"
+    sym1 = nsymfiles > 0   ?  "[$(nsymfiles) of which symlinked]"  :  "(none of which symlinked)"
+    sym2 = nsymdirs > 0    ?  "[$(nsymdirs) of which symlinked]"   :  "(none of which symlinked)"
     csym1 = nsymfiles > 0  ?  NEGATIVE(BLUE_FG(sym1))  :  DARK_GRAY_FG(sym1)
     csym2 = nsymdirs > 0   ?  NEGATIVE(GREEN_FG(sym2)) :  DARK_GRAY_FG(sym2)
 
@@ -135,12 +135,12 @@ function pprint(nfiles, nsymfiles, ndirs, nsymdirs, noth, nsymoth; colors::Bool=
     csep = DARK_GRAY_FG(sep)
 
     if noth+nsymoth == 0
-        oth = "0 dev/socket/fifo"
+        oth = "0 dev/socket/fifo (none syml)"
         coth = DARK_GRAY_FG(oth)
     else
         if nsymoth == 0
-            oth = "$(noth) dev/socket/fifo"
-            coth = NEGATIVE(YELLOW_FG(oth))
+            oth = "$(noth) dev/socket/fifo (none syml)"
+            coth = YELLOW_FG(oth)
         else
             oth = "$(noth) dev/socket/fifo [$(nsymoth) syml]"
             coth = NEGATIVE(YELLOW_FG(oth))
@@ -149,7 +149,7 @@ function pprint(nfiles, nsymfiles, ndirs, nsymdirs, noth, nsymoth; colors::Bool=
 
     if colors
         println(cstart1, csym1, csize1)
-        println(cstart2, csym2, csep, coth)
+        println(cstart2, csym2, csep, coth, csep)
     end
 
 end
