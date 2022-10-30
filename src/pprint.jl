@@ -133,9 +133,12 @@ function pprint(nsymfiles, nsymdirs; colors::Bool=true)
     size1 = " -- $(fsizehuman(fsize)) -- $(tostr_thsep(fsize)) bytes"
     csize1 = BLUE_FG(size1)
 
+    sep = " :: "
+    csep = sep
+
     if colors
         println(cstart1, csym1, csize1)
-        println(cstart2, csym2)
+        println(cstart2, csym2, csep)
     end
 
 end
