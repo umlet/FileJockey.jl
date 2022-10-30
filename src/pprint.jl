@@ -101,3 +101,14 @@ symlinks BROKEN                         $(nsyml2nonexist)
 end 
 
 
+lpad(s::AbtractString, upto::Int64) = ( upto < length(s)  &&  error("lpad '$upto' too small for string 's'")  ;  return " "^(upto-length(s)) * s )
+lpad(upto::Int64) = x -> lpad(x, upto)
+
+lpad(X::AbstractVector{<:AbstractString}) = ( maxlen = maximum(length.(X))  ;  return X |> mp(lpad) )
+
+function pprint()
+    nfiles = 15764; nsymfiles = 15
+    ndirs = 345; nsymdirs = 0
+
+    lines = String[ tostr_thsep(nfiles), tostr_thsep(ndirs) ]
+end

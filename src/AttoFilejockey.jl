@@ -38,7 +38,8 @@ export hasext, hasExt
 
 export stats, info
 
-
+# todo: temp!!!
+export pprint, lpad
 
 
 
