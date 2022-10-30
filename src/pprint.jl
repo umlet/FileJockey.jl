@@ -130,11 +130,12 @@ function pprint(colors::Bool=true)
     csym1 = nsymfiles > 0  ?  BLUE_FG(sym1)  :  DARK_GRAY_FG(sym1)
     csym2 = GREEN_FG(sym2)
 
-
     size1 = " -- $(fsizehuman(fsize)) -- $(fsize) bytes"
 
+    csize1 = BLUE_FG(size1)
+
     if colors
-        print(cstart1, csym1)
+        print(cstart1, csym1, csize1)
     end
 
 end
