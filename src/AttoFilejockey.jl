@@ -47,7 +47,9 @@ export pprint, lpad
 using Base.Filesystem
 
 using OrderedCollections
+
 using Crayons
+using Crayons.Box
 
 using AttoFunctionAliases
 #using AttoHabits
