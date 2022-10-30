@@ -104,7 +104,14 @@ end
 lpad(s::AbstractString, upto::Int64) = ( upto < length(s)  &&  error("lpad '$upto' too small for string 's'")  ;  return " "^(upto-length(s)) * s )
 lpad(upto::Int64) = x -> lpad(x, upto)
 
-lpad(X::AbstractVector{<:AbstractString}) = ( maxlen = maximum(length.(X))  ;  return X |> mp(lpad(maxlen)) )
+lpad(X::AbstractVector{<:AbstractString}) = ( maxlen = maximum(length.(X))  ;  return [ lpad(x, maxlen) for x in X ] )
+
+
+function Base.:*(X::AbstractVector{<:AbstractString}, Y::AbstractVector{<:AbstractString})
+    length(X) != length(Y)  &&  error("length mismatch")
+    return [ x*y for (x,y) in zip(X, Y) ]
+end
+
 
 function pprint()
     nfiles = 15764; nsymfiles = 15
