@@ -142,8 +142,11 @@ function pprint(nfiles, nsymfiles, ndirs, nsymdirs, noth, nsymoth; colors::Bool=
             oth = "$(noth) dev/socket/fifo (none syml)"
             coth = YELLOW_FG(oth)
         else
-            oth = "$(noth) dev/socket/fifo [$(nsymoth) syml]"
-            coth = NEGATIVE(YELLOW_FG(oth))
+            oth0 = "$(noth) dev/socket/fifo "
+            oth1 = "[$(nsymoth) syml]"
+
+            oth = oth0 * oth1
+            coth = YELLOW_FG(oth0, NEGATIVE(oth1))
         end
     end
 
