@@ -122,6 +122,11 @@ function pprint()
 
     lines = String[ tostr_thsep(nfiles), tostr_thsep(ndirs) ]
     lines = lpad(lines)
-    lines = lines .* ["files", "dirs"]
+    lines = lines .* [" files", " dirs"]
+    
+    symf = nsymfiles > 0  ?  "(incl $(nsymfiles) syml)"  :  "(none symlinked)"
+    symd = nsymdirs > 0   ?  "(incl $(nsymfiles) syml)"  :  "(none symlinked)"
+    lines = lines .* [symf, symd]
+
     lines
 end
