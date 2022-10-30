@@ -107,10 +107,13 @@ lpad(upto::Int64) = x -> lpad(x, upto)
 lpad(X::AbstractVector{<:AbstractString}) = ( maxlen = maximum(length.(X))  ;  return [ lpad(x, maxlen) for x in X ] )
 
 
-function Base.:*(X::AbstractVector{<:AbstractString}, Y::AbstractVector{<:AbstractString})
-    length(X) != length(Y)  &&  error("length mismatch")
-    return [ x*y for (x,y) in zip(X, Y) ]
-end
+# NOT NEEDED <=> .*
+# function Base.:*(X::AbstractVector{<:AbstractString}, Y::AbstractVector{<:AbstractString})
+#     length(X) != length(Y)  &&  error("length mismatch")
+#     return [ x*y for (x,y) in zip(X, Y) ]
+# end
+
+
 
 
 function pprint()
@@ -119,4 +122,6 @@ function pprint()
 
     lines = String[ tostr_thsep(nfiles), tostr_thsep(ndirs) ]
     lines = lpad(lines)
+    lines = lines .* ["files", "dirs"]
+    lines
 end
