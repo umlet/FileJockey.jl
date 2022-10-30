@@ -135,7 +135,7 @@ function pprint(nfiles, nsymfiles, ndirs, nsymdirs, noth, nsymoth, nbrk; colors:
     csep = DARK_GRAY_FG(sep)
 
     if noth+nsymoth == 0
-        oth = "(no dev/socket/fifo entries; none syml)"
+        oth = "(no dev/socket/fifo; none syml)"
         coth = DARK_GRAY_FG(oth)
     else
         if nsymoth == 0
