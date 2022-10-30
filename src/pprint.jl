@@ -116,17 +116,22 @@ lpad(X::AbstractVector{<:AbstractString}) = ( maxlen = maximum(length.(X))  ;  r
 
 
 
-function pprint()
+function pprint(colors::Bool=true)
     nfiles = 15764; nsymfiles = 15
     ndirs = 345; nsymdirs = 0
+    fsize = 5676453653;
 
-    lines = String[ tostr_thsep(nfiles), tostr_thsep(ndirs) ]
-    lines = lpad(lines)
-    lines = lines .* [" files", " dirs"]
+    start1,start2 = lpad(String[ tostr_thsep(nfiles), tostr_thsep(ndirs) ]) .* [" files", " dirs "]
+    cstart1 = BLUE_FG(start1)
+    cstart2 = GREEN_FG(start2)
     
-    symf = nsymfiles > 0  ?  "(incl $(nsymfiles) syml)"  :  "(none symlinked)"
-    symd = nsymdirs > 0   ?  "(incl $(nsymfiles) syml)"  :  "(none symlinked)"
-    lines = lines .* [symf, symd]
+    sym1 = nsymfiles > 0  ?  " ($(nsymfiles) of which symlinked)"  :  " (none symlinked)"
+    sym2 = nsymdirs > 0   ?  " ($(nsymfiles) of which symlinken)"  :  " (none symlinked)"
 
-    lines
+    size1 = " -- $(fsizehuman(fsize)) -- $(fsize) bytes"
+
+    if colors
+        print(start1, sym1)
+    end
+
 end
