@@ -149,7 +149,7 @@ function pprint(nfiles, nsymfiles, ndirs, nsymdirs, noth, nsymoth; colors::Bool=
 
     if colors
         println(cstart1, csym1, csize1)
-        println(cstart2, csym2, csep)
+        println(cstart2, csym2, csep, coth)
     end
 
 end
