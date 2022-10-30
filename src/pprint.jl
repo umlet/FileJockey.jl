@@ -111,4 +111,5 @@ function pprint()
     ndirs = 345; nsymdirs = 0
 
     lines = String[ tostr_thsep(nfiles), tostr_thsep(ndirs) ]
+    lines = lpad(lines)
 end
