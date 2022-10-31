@@ -50,7 +50,7 @@ struct FsFile <: AbstractFsEntry
         return new(x.path, x.st)
     end
 end
-_show(io::IO, x::FsFile) = print(io, colorize("FsFile", x), """($(x.path), $(Base.Filesystem.filemode_string(x.st)), $(filesize(x.st)) bytes)""")
+_show(io::IO, x::FsFile) = print(io, colorizeas("FsFile", x), """($(x.path), $(Base.Filesystem.filemode_string(x.st)), $(filesize(x.st)) bytes)""")
 
 struct FsDir <: AbstractFsEntry
     path::PathCanon
@@ -60,7 +60,7 @@ struct FsDir <: AbstractFsEntry
     end
 end
 FsDir() = FsEntry(".")
-_show(io::IO, x::FsDir) = print(io, colorize("FsDir", x), """($(x.path), $(Base.Filesystem.filemode_string(x.st)))""")
+_show(io::IO, x::FsDir) = print(io, colorizeas("FsDir", x), """($(x.path), $(Base.Filesystem.filemode_string(x.st)))""")
 
 struct FsOther <: AbstractFsEntry
     path::PathCanon
@@ -69,7 +69,7 @@ struct FsOther <: AbstractFsEntry
         return new(x.path, x.st)
     end
 end
-_show(io::IO, x::FsOther) = print(io, colorize("FsOther", x), """($(x.path), $(Base.Filesystem.filemode_string(x.st)))""")
+_show(io::IO, x::FsOther) = print(io, colorizeas("FsOther", x), """($(x.path), $(Base.Filesystem.filemode_string(x.st)))""")
 
 struct FsSymlink{T} <: AbstractFsEntry
     path::PathCanon
