@@ -4,7 +4,7 @@ module AttoFilejockey
 # from fsentries
 export PathCanon, FsEntryCanon
 export AbstractFsEntry
-export FileEntry, FsDir, FsSymlink, FsOther, FsUnknownNonexist
+export FileEntry, DirEntry, FsSymlink, FsOther, FsUnknownNonexist
 export FsEntry
 export @fs_str
 
@@ -14,7 +14,7 @@ export isfilelike, isdirlike
 export follow
 
 
-# from fsdirs
+# from DirEntrys
 export fsreaddir, fswalkdir
 export ls, find, finditer
 
@@ -76,7 +76,7 @@ end
 # # just checks uniqueness of FsEntries (path & stat)
 # # hardlinks will differ here!
 # # non-unique entries occur if list was filled erroneously, or if symlinks-to-dirs point inside a subdir
-# function check_nonuniquepaths(fses::Vector{T}) where {T<:Union{FsFile, FsDir}}
+# function check_nonuniquepaths(fses::Vector{T}) where {T<:Union{FsFile, DirEntry}}
 #     d = OrderedDict{String, Int64}()
 #     for fse in fses
 #         !haskey(d, fse.path)  &&  ( d[fse.path] = 0 )
@@ -105,7 +105,7 @@ end
 # # export isafsfile
 
 # # isafsdir(fse::FsEntry) = false
-# # isafsdir(fse::FsDir) = true
+# # isafsdir(fse::DirEntry) = true
 # # isafsdir() = x -> isafsdir(x)
 # # export isafsdir
 
@@ -139,7 +139,7 @@ AttoFunctionAliases.ext(x::AbstractFsEntry) = ext(x.path.s)
 
 
 
-# function check_duplsyml2targets(fseregs::Vector{T}, symlinks::Vector{FsSymlink{T}}) where {T<:Union{FsDir, FsFile}}
+# function check_duplsyml2targets(fseregs::Vector{T}, symlinks::Vector{FsSymlink{T}}) where {T<:Union{DirEntry, FsFile}}
 #     RET = Vector{FsSymlink{T}}()    
 
 #     tmpset = Set(path.(fseregs))
@@ -156,10 +156,10 @@ AttoFunctionAliases.ext(x::AbstractFsEntry) = ext(x.path.s)
 
 #     function FsFilesUnique(X::Vector{FsEntry}; quiet=false)
 #         files::Vector{FsFile}                   = X |> flt(is(FsFile))
-#         dirs::Vector{FsDir}                     = X |> flt(is(FsDir))
+#         dirs::Vector{DirEntry}                     = X |> flt(is(DirEntry))
 #         others::Vector{FsOther}                 = X |> flt(is(FsOther))
 #         syml2files::Vector{FsSymlink{FsFile}}   = X |> flt(is(FsSymlink{FsFile}))
-#         syml2dirs::Vector{FsSymlink{FsDir}}     = X |> flt(is(FsSymlink{FsDir}))
+#         syml2dirs::Vector{FsSymlink{DirEntry}}     = X |> flt(is(FsSymlink{DirEntry}))
 #         syml2others::Vector{FsSymlink{FsOther}} = X |> flt(is(FsSymlink{FsOther}))
 #         syml2nonexists::Vector{FsSymlink{FsUnknownNonexist}} = X |> flt(is(FsSymlink{FsUnknownNonexist}))
 

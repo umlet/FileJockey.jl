@@ -2,7 +2,7 @@
 
 Base.Filesystem.islink(x::AbstractFsEntry) = islink(x.st)
 
-function fsreaddir(x::Union{FsDir, FsSymlink{FsDir}})
+function fsreaddir(x::Union{DirEntry, FsSymlink{DirEntry}})
     ss = readdir(x.path.s; join=false, sort=false)
     # now we are sure that x is a dirlike
     basepath = islink(x)  ?  x.target.path  :  x.path
@@ -16,7 +16,7 @@ fsreaddir(s::AbstractString=".") = fsreaddir(FsEntry(s))
 
 
 # #------------------------------------------------------------------------------
-# function _fswalkdir(x::Union{FsDir, FsSymlink{FsDir}}, RET::Vector{AbstractFsEntry})
+# function _fswalkdir(x::Union{DirEntry, FsSymlink{DirEntry}}, RET::Vector{AbstractFsEntry})
 #     push!(RET, x)
 #     fsecs = fsreaddir(x)
 #     for fsec in fsecs
@@ -44,7 +44,7 @@ Base.IteratorEltype(::Type{FsTreeIter}) = Base.HasEltype()
 Base.eltype(::Type{FsTreeIter}) = AbstractFsEntry
 Base.isdone(x::FsTreeIter, state=nothing) = length(x.state) == 0
 
-_treechildren(x::Union{FsDir, FsSymlink{FsDir}}) = fsreaddir(x)
+_treechildren(x::Union{DirEntry, FsSymlink{DirEntry}}) = fsreaddir(x)
 _treechildren(x::AbstractFsEntry) = AbstractFsEntry[]
 
 Base.iterate(x::FsTreeIter) = iterate(x, nothing)
@@ -62,8 +62,8 @@ fswalkdir(s::AbstractString=".") = fswalkdir(FsEntry(s))
 
 
 ls(x::AbstractFsEntry) = x
-ls(x::FsDir) = fsreaddir(x)
-ls(x::FsSymlink{FsDir}) = fsreaddir(x.target)
+ls(x::DirEntry) = fsreaddir(x)
+ls(x::FsSymlink{DirEntry}) = fsreaddir(x.target)
 
 ls(s::AbstractString=".") = ls(FsEntry(s))
 

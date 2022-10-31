@@ -10,12 +10,12 @@ function colorize(s::AbstractString, COLORS...)
     return RET
 end
 colorizeas(s::AbstractString, ::FileEntry) = colorize(s, GREEN_FG)
-colorizeas(s::AbstractString, ::FsDir) = colorize(s, BLUE_FG)
+colorizeas(s::AbstractString, ::DirEntry) = colorize(s, BLUE_FG)
 colorizeas(s::AbstractString, ::FsOther) = colorize(s, YELLOW_FG)
 #colorizeas(s::AbstractString, ::FsUnknownNonexist) = colorize(s, RED_FG)
 
 colorizeas(s::AbstractString, ::FsSymlink{FileEntry}) = colorize(s, GREEN_FG, NEGATIVE)
-colorizeas(s::AbstractString, ::FsSymlink{FsDir}) = colorize(s, BLUE_FG, NEGATIVE)
+colorizeas(s::AbstractString, ::FsSymlink{DirEntry}) = colorize(s, BLUE_FG, NEGATIVE)
 colorizeas(s::AbstractString, ::FsSymlink{FsOther}) = colorize(s, YELLOW_FG, NEGATIVE)
 colorizeas(s::AbstractString, ::FsSymlink{FsUnknownNonexist}) = colorize(s, RED_FG, NEGATIVE)
 
@@ -29,9 +29,9 @@ struct FsStats  # mutable avoids some boilerplate in construction
     # PARTITION for counting
     # - standard
     files::Vector{FileEntry}
-    dirs::Vector{FsDir}
+    dirs::Vector{DirEntry}
     syml2files::Vector{FsSymlink{FileEntry}}
-    syml2dirs::Vector{FsSymlink{FsDir}}
+    syml2dirs::Vector{FsSymlink{DirEntry}}
     # non-standard
     others::Vector{FsOther}
     syml2others::Vector{FsSymlink{FsOther}}
@@ -39,9 +39,9 @@ struct FsStats  # mutable avoids some boilerplate in construction
 
     # standard combinations
     stdsymltargetfiles::Vector{FileEntry}
-    stdsymltargetdirs::Vector{FsDir}
+    stdsymltargetdirs::Vector{DirEntry}
     FILES::Vector{FileEntry} 
-    DIR::Vector{FsDir} 
+    DIR::Vector{DirEntry} 
 
     # DEVICES 
     # - for check if on same device (e.g., for some handlink operations)
@@ -60,20 +60,20 @@ struct FsStats  # mutable avoids some boilerplate in construction
         # BASE
         # standard
         files::Vector{FileEntry} = FileEntry[]
-        dirs::Vector{FsDir} = FsDir[]
+        dirs::Vector{DirEntry} = DirEntry[]
         syml2files::Vector{FsSymlink{FileEntry}} = FsSymlink{FileEntry}[]
-        syml2dirs::Vector{FsSymlink{FsDir}} = FsSymlink{FsDir}[]
+        syml2dirs::Vector{FsSymlink{DirEntry}} = FsSymlink{DirEntry}[]
     
         # non-standard
-        others::Vector{FsOther} = FsSymlink{FsDir}[]
+        others::Vector{FsOther} = FsSymlink{DirEntry}[]
         syml2others::Vector{FsSymlink{FsOther}} = FsSymlink{FsOther}[]
         syml2nonexist::Vector{FsSymlink{FsUnknownNonexist}} = FsSymlink{FsUnknownNonexist}[]  # shortcut for '2unknownnonexist'
     
         for x in X
             x isa FileEntry  &&  push!(files, x)
-            x isa FsDir  &&  push!(dirs, x)
+            x isa DirEntry  &&  push!(dirs, x)
             x isa FsSymlink{FileEntry}  &&  ( push!(syml2files, x) )
-            x isa FsSymlink{FsDir}  &&  ( push!(syml2dirs, x) )
+            x isa FsSymlink{DirEntry}  &&  ( push!(syml2dirs, x) )
 
             x isa FsOther  &&  push!(others, x)
             x isa FsSymlink{FsOther}  &&  push!(syml2others, x)
@@ -82,10 +82,10 @@ struct FsStats  # mutable avoids some boilerplate in construction
 
         # combinations
         stdsymltargetfiles::Vector{FileEntry} = follow.(syml2files)
-        stdsymltargetdirs::Vector{FsDir} = follow.(syml2dirs)
+        stdsymltargetdirs::Vector{DirEntry} = follow.(syml2dirs)
 
         FILES::Vector{FileEntry} = [ files ; stdsymltargetfiles ]
-        DIRS::Vector{FsDir} = [ dirs ; stdsymltargetdirs ]
+        DIRS::Vector{DirEntry} = [ dirs ; stdsymltargetdirs ]
     
         # setregfiledevices::Set{UInt64} = Set{UInt64}( filedevice(stat(x)) for x in files )
         # setregdirdevices::Set{UInt64} = Set{UInt64}( filedevice(stat(x)) for x in dirs )
@@ -161,11 +161,11 @@ end
 
 function infoOLD(X::AbstractVector{<:AbstractFsEntry})
     nfile = X |> cn(is(FileEntry))
-    ndir = X |> cn(is(FsDir))
+    ndir = X |> cn(is(DirEntry))
     nother = X |> cn(is(FsOther))
 
     nsyml2file = X |> cn(is(FsSymlink{FileEntry}))
-    nsyml2dir = X |> cn(is(FsSymlink{FsDir}))
+    nsyml2dir = X |> cn(is(FsSymlink{DirEntry}))
     nsyml2other = X |> cn(is(FsSymlink{FsOther}))
     nsyml2nonexist = X |> cn(is(FsSymlink{FsUnknownNonexist}))
 

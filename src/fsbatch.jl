@@ -44,11 +44,11 @@ or if duplicates were erroneously added in a manual setup of the entries..)
 (If OK, one can 'follow()' all Symlink-to-dirs, i.e., replace them with their target, and end up with distinct Dirs.
 XXXXX It also clears Symlink-to-dirs of any responsability rules out the most common cause for duplicate File entries, most often caused by redundant Symlinks-to-dirs.)
 """
-    ds = X |> fl(is(FsDir))
+    ds = X |> fl(is(DirEntry))
     dpaths = path.(ds)
     dpathset = Set(dpaths)
 
-    sds = X |> fl(is(FsSymlink{FsDir}))
+    sds = X |> fl(is(FsSymlink{DirEntry}))
     sdproblems = sds |> fl(x -> x.target.path.s in dpathset)
 
     success = length(sdproblems) == 0
