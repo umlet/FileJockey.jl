@@ -77,7 +77,6 @@ struct FsStats  # mutable avoids some boilerplate in construction
             x isa FsOther  &&  push!(others, x)
             x isa FsSymlink{FsOther}  &&  push!(syml2others, x)
             x isa FsSymlink{FsUnknownNonexist}  &&  push!(syml2nonexist, x)
-            @assert false
         end
 
         # combinations
