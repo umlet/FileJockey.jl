@@ -86,7 +86,7 @@ struct FsStats  # mutable avoids some boilerplate in construction
         stdsymltargetdirs::Vector{FsDir} = follow.(syml2dirs)
 
         FILES::Vector{FsFile} = [ files ; stdsymltargetfiles ]
-        DIR::Vector{FsDir} = [ dirs ; stdsymltargetdirs ]
+        DIRS::Vector{FsDir} = [ dirs ; stdsymltargetdirs ]
     
         # setregfiledevices::Set{UInt64} = Set{UInt64}( filedevice(stat(x)) for x in files )
         # setregdirdevices::Set{UInt64} = Set{UInt64}( filedevice(stat(x)) for x in dirs )
