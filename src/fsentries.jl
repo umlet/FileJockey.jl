@@ -81,13 +81,13 @@ struct FsSymlink{T} <: AbstractFsEntry
 end
 _show(io::IO, x::FsSymlink) = print(io, colorizeas("$(typeof(x))", x), """$(typeof(x))($(x.path) -> "$(x.target.path)")""")
 
-struct FsUnknownNonexist <: AbstractFsEntry
+struct UnknownEntryNONEXIST <: AbstractFsEntry
     path::String
-    function FsUnknownNonexist(f::AbstractString)
+    function UnknownEntryNONEXIST(f::AbstractString)
         return new(f)
     end
 end
-#_show(io::IO, x::FsUnknownNonexist) = print(io, """FsUnknownNonexist(?$(x.path)?)""")
+#_show(io::IO, x::UnknownEntryNONEXIST) = print(io, """UnknownEntryNONEXIST(?$(x.path)?)""")
 
 
 # function _show(io::IO, X::AbstractVector{<:AbstractFsEntry})
@@ -103,7 +103,7 @@ end
 # Base.show(io::IO, X::AbstractVector{<:AbstractFsEntry}) = _show(io, X)
 
 
-# issymlinkbroken(x::FsSymlink{FsUnknownNonexist}) = true
+# issymlinkbroken(x::FsSymlink{UnknownEntryNONEXIST}) = true
 # issymlinkbroken(x::FsEntry) = false
 # export issymlinkbroken
 
@@ -120,7 +120,7 @@ function FsEntry(x::FsEntryCanon)
         @assert !islink(st_target)
 
         if !ispath(st_target)  # broken symlink
-            return FsSymlink{FsUnknownNonexist}(x, FsUnknownNonexist(s_readlink))
+            return FsSymlink{UnknownEntryNONEXIST}(x, UnknownEntryNONEXIST(s_readlink))
         end
 
         fse = FsEntry(s_path_target)
