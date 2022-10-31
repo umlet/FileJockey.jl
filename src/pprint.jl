@@ -9,6 +9,16 @@ function colorize(s::AbstractString, COLORS...)
     end
     return RET
 end
+colorizeas(s::AbstractString, ::FsFile) = colorize(s, GREEN_FG)
+colorizeas(s::AbstractString, ::FsDir) = colorize(s, BLUE_FG)
+colorizeas(s::AbstractString, ::FsOther) = colorize(s, YELLOW_FG)
+#colorizeas(s::AbstractString, ::FsUnknownNonexist) = colorize(s, RED_FG)
+
+colorizeas(s::AbstractString, ::FsSymlink{FsFile}) = colorize(s, GREEN_FG, NEGATIVE)
+colorizeas(s::AbstractString, ::FsSymlink{FsFile}) = colorize(s, BLUE_FG, NEGATIVE)
+colorizeas(s::AbstractString, ::FsSymlink{FsOther}) = colorize(s, YELLOW_FG, NEGATIVE)
+colorizeas(s::AbstractString, ::FsSymlink{FsUnknownNonexist}) = colorize(s, RED_FG, NEGATIVE)
+
 
 
 mutable struct FsStats  # mutable avoids some boilerplate in construction
