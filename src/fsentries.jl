@@ -43,14 +43,14 @@ Base.show(io::IO, ::MIME"text/plain", x::AbstractFsEntry) = _show(io, x)
 #Base.show(io::IO, x::AbstractFsEntry) = _show(io, x)
 
 
-struct FsFile <: AbstractFsEntry
+struct FileEntry <: AbstractFsEntry
     path::PathCanon
     st::StatStruct
-    function FsFile(x::FsEntryCanon)
+    function FileEntry(x::FsEntryCanon)
         return new(x.path, x.st)
     end
 end
-_show(io::IO, x::FsFile) = print(io, colorizeas("FsFile", x), """($(x.path), $(Base.Filesystem.filemode_string(x.st)), $(filesize(x.st)) bytes)""")
+_show(io::IO, x::FileEntry) = print(io, colorizeas("FileEntry", x), """($(x.path), $(Base.Filesystem.filemode_string(x.st)), $(filesize(x.st)) bytes)""")
 
 struct FsDir <: AbstractFsEntry
     path::PathCanon
@@ -127,7 +127,7 @@ function FsEntry(x::FsEntryCanon)
         return FsSymlink{typeof(fse)}(x, fse)
     end
 
-    isfile(x.st)  &&  return FsFile(x)
+    isfile(x.st)  &&  return FileEntry(x)
     isdir(x.st)   &&  return FsDir(x)
     return FsOther(x)
 end
@@ -142,13 +142,13 @@ end
 path(x::AbstractFsEntry) = x.path.s
 pathcanon(x::AbstractFsEntry) = x.path
 
-isfilelike(x::Union{FsFile, FsSymlink{FsFile}}) = true
+isfilelike(x::Union{FileEntry, FsSymlink{FileEntry}}) = true
 isfilelike(x::AbstractFsEntry) = false
 
 isdirlike(x::Union{FsDir, FsSymlink{FsDir}}) = true
 isdirlike(x::AbstractFsEntry) = false
 
-isstandard(x::Union{FsFile, FsDir, FsSymlink{FsFile}, FsSymlink{FsDir}}) = true
+isstandard(x::Union{FileEntry, FsDir, FsSymlink{FileEntry}, FsSymlink{FsDir}}) = true
 isstandard(x::AbstractFsEntry) = false
 
 follow(x::AbstractFsEntry) = x

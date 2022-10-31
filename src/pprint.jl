@@ -9,12 +9,12 @@ function colorize(s::AbstractString, COLORS...)
     end
     return RET
 end
-colorizeas(s::AbstractString, ::FsFile) = colorize(s, GREEN_FG)
+colorizeas(s::AbstractString, ::FileEntry) = colorize(s, GREEN_FG)
 colorizeas(s::AbstractString, ::FsDir) = colorize(s, BLUE_FG)
 colorizeas(s::AbstractString, ::FsOther) = colorize(s, YELLOW_FG)
 #colorizeas(s::AbstractString, ::FsUnknownNonexist) = colorize(s, RED_FG)
 
-colorizeas(s::AbstractString, ::FsSymlink{FsFile}) = colorize(s, GREEN_FG, NEGATIVE)
+colorizeas(s::AbstractString, ::FsSymlink{FileEntry}) = colorize(s, GREEN_FG, NEGATIVE)
 colorizeas(s::AbstractString, ::FsSymlink{FsDir}) = colorize(s, BLUE_FG, NEGATIVE)
 colorizeas(s::AbstractString, ::FsSymlink{FsOther}) = colorize(s, YELLOW_FG, NEGATIVE)
 colorizeas(s::AbstractString, ::FsSymlink{FsUnknownNonexist}) = colorize(s, RED_FG, NEGATIVE)
@@ -28,9 +28,9 @@ filedeviceinode(st::StatStruct)::Tuple{UInt64, UInt64} = (filedevice(st), filein
 struct FsStats  # mutable avoids some boilerplate in construction
     # PARTITION for counting
     # - standard
-    files::Vector{FsFile}
+    files::Vector{FileEntry}
     dirs::Vector{FsDir}
-    syml2files::Vector{FsSymlink{FsFile}}
+    syml2files::Vector{FsSymlink{FileEntry}}
     syml2dirs::Vector{FsSymlink{FsDir}}
     # non-standard
     others::Vector{FsOther}
@@ -38,9 +38,9 @@ struct FsStats  # mutable avoids some boilerplate in construction
     syml2nonexist::Vector{FsSymlink{FsUnknownNonexist}}  # shortcut for '2unknownnonexist'
 
     # standard combinations
-    stdsymltargetfiles::Vector{FsFile}
+    stdsymltargetfiles::Vector{FileEntry}
     stdsymltargetdirs::Vector{FsDir}
-    FILES::Vector{FsFile} 
+    FILES::Vector{FileEntry} 
     DIR::Vector{FsDir} 
 
     # DEVICES 
@@ -59,9 +59,9 @@ struct FsStats  # mutable avoids some boilerplate in construction
     function FsStats(X::AbstractVector{<:AbstractFsEntry})
         # BASE
         # standard
-        files::Vector{FsFile} = FsFile[]
+        files::Vector{FileEntry} = FileEntry[]
         dirs::Vector{FsDir} = FsDir[]
-        syml2files::Vector{FsSymlink{FsFile}} = FsSymlink{FsFile}[]
+        syml2files::Vector{FsSymlink{FileEntry}} = FsSymlink{FileEntry}[]
         syml2dirs::Vector{FsSymlink{FsDir}} = FsSymlink{FsDir}[]
     
         # non-standard
@@ -70,9 +70,9 @@ struct FsStats  # mutable avoids some boilerplate in construction
         syml2nonexist::Vector{FsSymlink{FsUnknownNonexist}} = FsSymlink{FsUnknownNonexist}[]  # shortcut for '2unknownnonexist'
     
         for x in X
-            x isa FsFile  &&  push!(files, x)
+            x isa FileEntry  &&  push!(files, x)
             x isa FsDir  &&  push!(dirs, x)
-            x isa FsSymlink{FsFile}  &&  ( push!(syml2files, x) )
+            x isa FsSymlink{FileEntry}  &&  ( push!(syml2files, x) )
             x isa FsSymlink{FsDir}  &&  ( push!(syml2dirs, x) )
 
             x isa FsOther  &&  push!(others, x)
@@ -81,10 +81,10 @@ struct FsStats  # mutable avoids some boilerplate in construction
         end
 
         # combinations
-        stdsymltargetfiles::Vector{FsFile} = follow.(syml2files)
+        stdsymltargetfiles::Vector{FileEntry} = follow.(syml2files)
         stdsymltargetdirs::Vector{FsDir} = follow.(syml2dirs)
 
-        FILES::Vector{FsFile} = [ files ; stdsymltargetfiles ]
+        FILES::Vector{FileEntry} = [ files ; stdsymltargetfiles ]
         DIRS::Vector{FsDir} = [ dirs ; stdsymltargetdirs ]
     
         # setregfiledevices::Set{UInt64} = Set{UInt64}( filedevice(stat(x)) for x in files )
@@ -160,11 +160,11 @@ function info(X::AbstractVector{<:AbstractFsEntry})
 end
 
 function infoOLD(X::AbstractVector{<:AbstractFsEntry})
-    nfile = X |> cn(is(FsFile))
+    nfile = X |> cn(is(FileEntry))
     ndir = X |> cn(is(FsDir))
     nother = X |> cn(is(FsOther))
 
-    nsyml2file = X |> cn(is(FsSymlink{FsFile}))
+    nsyml2file = X |> cn(is(FsSymlink{FileEntry}))
     nsyml2dir = X |> cn(is(FsSymlink{FsDir}))
     nsyml2other = X |> cn(is(FsSymlink{FsOther}))
     nsyml2nonexist = X |> cn(is(FsSymlink{FsUnknownNonexist}))

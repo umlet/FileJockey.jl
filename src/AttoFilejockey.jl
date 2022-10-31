@@ -4,7 +4,7 @@ module AttoFilejockey
 # from fsentries
 export PathCanon, FsEntryCanon
 export AbstractFsEntry
-export FsFile, FsDir, FsSymlink, FsOther, FsUnknownNonexist
+export FileEntry, FsDir, FsSymlink, FsOther, FsUnknownNonexist
 export FsEntry
 export @fs_str
 

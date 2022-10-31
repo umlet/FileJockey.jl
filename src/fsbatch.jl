@@ -74,7 +74,7 @@ traitfunction(::Type{TheDirlikesAreDistinct}) = arethedirlikesdistinct
 
 
 
-# Filelikes (FsFiles or Symlink{FsFile}) have
+# Filelikes (FileEntrys or Symlink{FileEntry}) have
 # - different paths, AND
 # - are different entries, i.e., no hardlinks to same file
 struct TheFilelikesAreUnique <: AbstractBatchTrait end
