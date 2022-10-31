@@ -62,14 +62,14 @@ end
 DirEntry() = FsEntry(".")
 _show(io::IO, x::DirEntry) = print(io, colorizeas("DirEntry", x), """($(x.path), $(Base.Filesystem.filemode_string(x.st)))""")
 
-struct FsOther <: AbstractFsEntry
+struct OtherEntry <: AbstractFsEntry
     path::PathCanon
     st::StatStruct
-    function FsOther(x::FsEntryCanon)
+    function OtherEntry(x::FsEntryCanon)
         return new(x.path, x.st)
     end
 end
-_show(io::IO, x::FsOther) = print(io, colorizeas("FsOther", x), """($(x.path), $(Base.Filesystem.filemode_string(x.st)))""")
+_show(io::IO, x::OtherEntry) = print(io, colorizeas("OtherEntry", x), """($(x.path), $(Base.Filesystem.filemode_string(x.st)))""")
 
 struct FsSymlink{T} <: AbstractFsEntry
     path::PathCanon
@@ -129,7 +129,7 @@ function FsEntry(x::FsEntryCanon)
 
     isfile(x.st)  &&  return FileEntry(x)
     isdir(x.st)   &&  return DirEntry(x)
-    return FsOther(x)
+    return OtherEntry(x)
 end
 FsEntry(s::AbstractString) = FsEntry(FsEntryCanon(s))
 

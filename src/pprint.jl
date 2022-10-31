@@ -11,12 +11,12 @@ function colorize(s::AbstractString, COLORS...)
 end
 colorizeas(s::AbstractString, ::FileEntry) = colorize(s, GREEN_FG)
 colorizeas(s::AbstractString, ::DirEntry) = colorize(s, BLUE_FG)
-colorizeas(s::AbstractString, ::FsOther) = colorize(s, YELLOW_FG)
+colorizeas(s::AbstractString, ::OtherEntry) = colorize(s, YELLOW_FG)
 #colorizeas(s::AbstractString, ::FsUnknownNonexist) = colorize(s, RED_FG)
 
 colorizeas(s::AbstractString, ::FsSymlink{FileEntry}) = colorize(s, GREEN_FG, NEGATIVE)
 colorizeas(s::AbstractString, ::FsSymlink{DirEntry}) = colorize(s, BLUE_FG, NEGATIVE)
-colorizeas(s::AbstractString, ::FsSymlink{FsOther}) = colorize(s, YELLOW_FG, NEGATIVE)
+colorizeas(s::AbstractString, ::FsSymlink{OtherEntry}) = colorize(s, YELLOW_FG, NEGATIVE)
 colorizeas(s::AbstractString, ::FsSymlink{FsUnknownNonexist}) = colorize(s, RED_FG, NEGATIVE)
 
 
@@ -33,8 +33,8 @@ struct FsStats  # mutable avoids some boilerplate in construction
     syml2files::Vector{FsSymlink{FileEntry}}
     syml2dirs::Vector{FsSymlink{DirEntry}}
     # non-standard
-    others::Vector{FsOther}
-    syml2others::Vector{FsSymlink{FsOther}}
+    others::Vector{OtherEntry}
+    syml2others::Vector{FsSymlink{OtherEntry}}
     syml2nonexist::Vector{FsSymlink{FsUnknownNonexist}}  # shortcut for '2unknownnonexist'
 
     # standard combinations
@@ -65,8 +65,8 @@ struct FsStats  # mutable avoids some boilerplate in construction
         syml2dirs::Vector{FsSymlink{DirEntry}} = FsSymlink{DirEntry}[]
     
         # non-standard
-        others::Vector{FsOther} = FsSymlink{DirEntry}[]
-        syml2others::Vector{FsSymlink{FsOther}} = FsSymlink{FsOther}[]
+        others::Vector{OtherEntry} = FsSymlink{DirEntry}[]
+        syml2others::Vector{FsSymlink{OtherEntry}} = FsSymlink{OtherEntry}[]
         syml2nonexist::Vector{FsSymlink{FsUnknownNonexist}} = FsSymlink{FsUnknownNonexist}[]  # shortcut for '2unknownnonexist'
     
         for x in X
@@ -75,8 +75,8 @@ struct FsStats  # mutable avoids some boilerplate in construction
             x isa FsSymlink{FileEntry}  &&  ( push!(syml2files, x) )
             x isa FsSymlink{DirEntry}  &&  ( push!(syml2dirs, x) )
 
-            x isa FsOther  &&  push!(others, x)
-            x isa FsSymlink{FsOther}  &&  push!(syml2others, x)
+            x isa OtherEntry  &&  push!(others, x)
+            x isa FsSymlink{OtherEntry}  &&  push!(syml2others, x)
             x isa FsSymlink{FsUnknownNonexist}  &&  push!(syml2nonexist, x)
         end
 
@@ -162,11 +162,11 @@ end
 function infoOLD(X::AbstractVector{<:AbstractFsEntry})
     nfile = X |> cn(is(FileEntry))
     ndir = X |> cn(is(DirEntry))
-    nother = X |> cn(is(FsOther))
+    nother = X |> cn(is(OtherEntry))
 
     nsyml2file = X |> cn(is(FsSymlink{FileEntry}))
     nsyml2dir = X |> cn(is(FsSymlink{DirEntry}))
-    nsyml2other = X |> cn(is(FsSymlink{FsOther}))
+    nsyml2other = X |> cn(is(FsSymlink{OtherEntry}))
     nsyml2nonexist = X |> cn(is(FsSymlink{FsUnknownNonexist}))
 
     ntot = nfile + ndir + nother     + nsyml2file + nsyml2dir + nsyml2other + nsyml2nonexist

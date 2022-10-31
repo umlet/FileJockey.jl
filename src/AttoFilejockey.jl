@@ -4,7 +4,7 @@ module AttoFilejockey
 # from fsentries
 export PathCanon, FsEntryCanon
 export AbstractFsEntry
-export FileEntry, DirEntry, FsSymlink, FsOther, FsUnknownNonexist
+export FileEntry, DirEntry, FsSymlink, OtherEntry, FsUnknownNonexist
 export FsEntry
 export @fs_str
 
@@ -157,10 +157,10 @@ AttoFunctionAliases.ext(x::AbstractFsEntry) = ext(x.path.s)
 #     function FsFilesUnique(X::Vector{FsEntry}; quiet=false)
 #         files::Vector{FsFile}                   = X |> flt(is(FsFile))
 #         dirs::Vector{DirEntry}                     = X |> flt(is(DirEntry))
-#         others::Vector{FsOther}                 = X |> flt(is(FsOther))
+#         others::Vector{OtherEntry}                 = X |> flt(is(OtherEntry))
 #         syml2files::Vector{FsSymlink{FsFile}}   = X |> flt(is(FsSymlink{FsFile}))
 #         syml2dirs::Vector{FsSymlink{DirEntry}}     = X |> flt(is(FsSymlink{DirEntry}))
-#         syml2others::Vector{FsSymlink{FsOther}} = X |> flt(is(FsSymlink{FsOther}))
+#         syml2others::Vector{FsSymlink{OtherEntry}} = X |> flt(is(FsSymlink{OtherEntry}))
 #         syml2nonexists::Vector{FsSymlink{FsUnknownNonexist}} = X |> flt(is(FsSymlink{FsUnknownNonexist}))
 
 #         @assert length(X) == length(files) + length(dirs) + length(others) + length(syml2files) + length(syml2dirs) + length(syml2others) + length(syml2nonexists)
