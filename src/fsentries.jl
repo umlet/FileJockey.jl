@@ -50,7 +50,7 @@ struct FsFile <: AbstractFsEntry
         return new(x.path, x.st)
     end
 end
-_show(io::IO, x::FsFile) = print(io, """FsFile($(x.path), $(Base.Filesystem.filemode_string(x.st)), $(filesize(x.st)) bytes)""")
+_show(io::IO, x::FsFile) = print(io, colorize("FsFile", GREEN_FG), """($(x.path), $(Base.Filesystem.filemode_string(x.st)), $(filesize(x.st)) bytes)""")
 
 struct FsDir <: AbstractFsEntry
     path::PathCanon
