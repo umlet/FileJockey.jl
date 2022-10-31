@@ -60,13 +60,13 @@ struct FsStats  # mutable avoids some boilerplate in construction
         # standard
         regfiles::Vector{FsFile} = FsFile[]
         regdirs::Vector{FsDir} = FsDir[]
-        syml2files::Vector{Symlink{FsFile}} = FsSymlink{FsFile}[]
-        syml2dirs::Vector{Symlink{FsDir}} = FsSymlink{FsDir}[]
+        syml2files::Vector{FsSymlink{FsFile}} = FsSymlink{FsFile}[]
+        syml2dirs::Vector{FsSymlink{FsDir}} = FsSymlink{FsDir}[]
     
         # non-standard
         others::Vector{FsOther} = FsSymlink{FsDir}[]
-        syml2others::Vector{Symlink{FsOther}} = FsSymlink{FsOther}[]
-        syml2nonexist::Vector{Symlink{FsUnknownNonexist}} = FsSymlink{FsUnknownNonexist}[]  # shortcut for '2unknownnonexist'
+        syml2others::Vector{FsSymlink{FsOther}} = FsSymlink{FsOther}[]
+        syml2nonexist::Vector{FsSymlink{FsUnknownNonexist}} = FsSymlink{FsUnknownNonexist}[]  # shortcut for '2unknownnonexist'
     
         for x in X
             x isa FsFile  &&  push!(regfiles, x)
