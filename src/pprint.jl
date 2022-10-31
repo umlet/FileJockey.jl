@@ -1,6 +1,12 @@
 
 
 
+function colorize(s::AbstractString, COL)
+    !CONF.colors  &&  return s
+    return COL(s)
+end
+
+
 mutable struct FsStats  # mutable avoids some boilerplate in construction
     nregfiles::Int64
     nregdirs::Int64

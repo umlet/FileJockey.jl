@@ -39,6 +39,7 @@ export hasext, hasExt
 export FsStats, stats, info
 
 # todo: temp!!!
+export colorize
 export pprint, lpad
 
 
