@@ -114,7 +114,7 @@ struct FsStats  # mutable avoids some boilerplate in construction
         )
     end    
 end
-stats(X::AbstractVector{y:AbstractFsEntry}) = FsStats(x)
+stats(X::AbstractVector{<:AbstractFsEntry}) = FsStats(X)
 
 
 function statsOLD(X::AbstractVector{<:AbstractFsEntry})
