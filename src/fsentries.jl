@@ -40,7 +40,7 @@ abstract type AbstractFsEntry end
 
 
 Base.show(io::IO, ::MIME"text/plain", x::AbstractFsEntry) = _show(io, x)
-Base.show(io::IO, x::AbstractFsEntry) = _show(io, x)
+#Base.show(io::IO, x::AbstractFsEntry) = _show(io, x)
 
 
 struct FsFile <: AbstractFsEntry
@@ -79,7 +79,7 @@ struct FsSymlink{T} <: AbstractFsEntry
         return new{T}(x.path, x.st, target)
     end
 end
-_show(io::IO, x::FsSymlink) = print(io, """$(typeof(x))($(x.path) -> $(x.target.path))""")
+_show(io::IO, x::FsSymlink) = print(io, """$(typeof(x))($(x.path) -> "$(x.target.path)")""")
 
 struct FsUnknownNonexist <: AbstractFsEntry
     path::String
