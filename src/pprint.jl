@@ -30,13 +30,13 @@ struct FsStats  # mutable avoids some boilerplate in construction
     # - standard
     regfiles::Vector{FsFile}
     regdirs::Vector{FsDir}
-    syml2files::Vector{Symlink{FsFile}}
-    syml2dirs::Vector{Symlink{FsDir}}
+    syml2files::Vector{FsSymlink{FsFile}}
+    syml2dirs::Vector{FsSymlink{FsDir}}
 
     # non-standard
     others::Vector{FsOther}
-    syml2others::Vector{Symlink{FsOther}}
-    syml2nonexist::Vector{Symlink{FsUnknownNonexist}}  # shortcut for '2unknownnonexist'
+    syml2others::Vector{FsSymlink{FsOther}}
+    syml2nonexist::Vector{FsSymlink{FsUnknownNonexist}}  # shortcut for '2unknownnonexist'
 
     # -----
     stdsymltargetfiles::Vector{FsFile}
@@ -60,13 +60,13 @@ struct FsStats  # mutable avoids some boilerplate in construction
         # standard
         regfiles::Vector{FsFile} = FsFile[]
         regdirs::Vector{FsDir} = FsDir[]
-        syml2files::Vector{Symlink{FsFile}} = Symlink{FsFile}[]
-        syml2dirs::Vector{Symlink{FsDir}} = Symlink{FsDir}[]
+        syml2files::Vector{Symlink{FsFile}} = FsSymlink{FsFile}[]
+        syml2dirs::Vector{Symlink{FsDir}} = FsSymlink{FsDir}[]
     
         # non-standard
-        others::Vector{FsOther} = Symlink{FsDir}[]
-        syml2others::Vector{Symlink{FsOther}} = Symlink{FsOther}[]
-        syml2nonexist::Vector{Symlink{FsUnknownNonexist}} = Symlink{FsUnknownNonexist}[]  # shortcut for '2unknownnonexist'
+        others::Vector{FsOther} = FsSymlink{FsDir}[]
+        syml2others::Vector{Symlink{FsOther}} = FsSymlink{FsOther}[]
+        syml2nonexist::Vector{Symlink{FsUnknownNonexist}} = FsSymlink{FsUnknownNonexist}[]  # shortcut for '2unknownnonexist'
     
         for x in X
             x isa FsFile  &&  push!(regfiles, x)
