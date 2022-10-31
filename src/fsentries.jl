@@ -60,7 +60,7 @@ struct FsDir <: AbstractFsEntry
     end
 end
 FsDir() = FsEntry(".")
-_show(io::IO, x::FsDir) = print(io, """FsDir($(x.path), $(Base.Filesystem.filemode_string(x.st)))""")
+_show(io::IO, x::FsDir) = print(io, colorize("FsDir", BLUE_FG), """($(x.path), $(Base.Filesystem.filemode_string(x.st)))""")
 
 struct FsOther <: AbstractFsEntry
     path::PathCanon
@@ -69,7 +69,7 @@ struct FsOther <: AbstractFsEntry
         return new(x.path, x.st)
     end
 end
-_show(io::IO, x::FsOther) = print(io, """FsOther($(x.path), $(Base.Filesystem.filemode_string(x.st)))""")
+_show(io::IO, x::FsOther) = print(io, colorize("FsOther", YELLOW_FG), """($(x.path), $(Base.Filesystem.filemode_string(x.st)))""")
 
 struct FsSymlink{T} <: AbstractFsEntry
     path::PathCanon

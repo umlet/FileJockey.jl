@@ -1,9 +1,13 @@
 
 
 
-function colorize(s::AbstractString, COL)
+function colorize(s::AbstractString, COLORS...)
     !CONF.colors  &&  return s
-    return COL(s)
+    RET = s
+    for COLOR in COLORS
+        RET = COLOR(RET)
+    end
+    return RET
 end
 
 
