@@ -20,42 +20,112 @@ colorizeas(s::AbstractString, ::FsSymlink{FsOther}) = colorize(s, YELLOW_FG, NEG
 colorizeas(s::AbstractString, ::FsSymlink{FsUnknownNonexist}) = colorize(s, RED_FG, NEGATIVE)
 
 
+filedevice(st::StatStruct)::UInt64 = st.device
+fileinode(st::StatStruct)::UInt64 = st.inode
+filedeviceinode(st::StatStruct)::Tuple{UInt64, UInt64} = (filedevice(st), fileinode(st))
 
-mutable struct FsStats  # mutable avoids some boilerplate in construction
-    nregfiles::Int64
-    nregdirs::Int64
-    nothers::Int64
 
-    nsyml2files::Int64
-    nsyml2dirs::Int64
-    nsyml2others::Int64
-    nsyml2nonexist::Int64  # shortcut for '2unknownnonexist'
+struct FsStats  # mutable avoids some boilerplate in construction
+    # PARTITION for counting
+    # - standard
+    regfiles::Vector{FsFile}
+    regdirs::Vector{FsDir}
+    syml2files::Vector{Symlink{FsFile}}
+    syml2dirs::Vector{Symlink{FsDir}}
 
-    # derived
-    nfilelikes::Int64
-    ndirlikes::Int64
-    notherlikes::Int64
-    FsStats() = new(0,0,0,  0,0,0,0,  0,0,0)
+    # non-standard
+    others::Vector{FsOther}
+    syml2others::Vector{Symlink{FsOther}}
+    syml2nonexist::Vector{Symlink{FsUnknownNonexist}}  # shortcut for '2unknownnonexist'
+
+    # -----
+    stdsymltargetfiles::Vector{FsFile}
+    stdsymltargetdirs::Vector{FsDir}
+
+    # DEVICES 
+    # - for check if on same device (e.g., for some handlink operations)
+    # setregfiledevices::Set{UInt64}
+    # setregdirdevices::Set{UInt64}
+    # setsymlink2filedevices::Set{UInt64}
+    # setsyml2dirdevices::Set{UInt64}
+
+    # setsymltargetfiledevices::Set{UInt64}
+    # setsymltargetdirdevices::Set{UInt64}
+
+    # - inodes to detect existing hardlinks
+
+
+    function FsStats(X::AbstractVector{<:AbstractFsEntry})
+        # BASE
+        # standard
+        regfiles::Vector{FsFile} = FsFile[]
+        regdirs::Vector{FsDir} = FsDir[]
+        syml2files::Vector{Symlink{FsFile}} = Symlink{FsFile}[]
+        syml2dirs::Vector{Symlink{FsDir}} = Symlink{FsDir}[]
+    
+        # non-standard
+        others::Vector{FsOther} = Symlink{FsDir}[]
+        syml2others::Vector{Symlink{FsOther}} = Symlink{FsOther}[]
+        syml2nonexist::Vector{Symlink{FsUnknownNonexist}} = Symlink{FsUnknownNonexist}[]  # shortcut for '2unknownnonexist'
+    
+        for x in X
+            x isa FsFile  &&  push!(regfiles, x)
+            x isa FsDir  &&  push!(regdirs, x)
+            x isa Symlink{FsFile}  &&  ( push!(syml2files, x) )
+            x isa Symlink{FsDir}  &&  ( push!(syml2dirs, x) )
+
+            x isa FsOther  &&  push!(others, x)
+            x isa Symlink{FsOther}  &&  push!(syml2others, x)
+            x isa Symlink{FsUnknownNonexist}  &&  push!(syml2nonexist, x)
+            @assert false
+        end
+
+        # combinations
+        stdsymltargetfiles::Vector{FsFile} = follow.(syml2files)
+        stdsymltargetdirs::Vector{FsDir} = follow.(syml2dirs)
+
+        # setregfiledevices::Set{UInt64} = Set{UInt64}( filedevice(stat(x)) for x in regfiles )
+        # setregdirdevices::Set{UInt64} = Set{UInt64}( filedevice(stat(x)) for x in regdirs )
+        # setsymlink2filedevices::Set{UInt64} = Set{UInt64}( filedevice(lstat(x)) for x in syml2files )   # ! lstat
+        # setsyml2dirdevices::Set{UInt64} = Set{UInt64}( filedevice(lstat(x)) for x in syml2dirs )        # ! lstat
+    
+        # setsymltargetfiledevices::Set{UInt64} = Set{UInt64}( filedevice(x) for x in regfiles )
+        # setsymltargetdirdevices::Set{UInt64} = Set{UInt64}( filedevice(x) for x in regfiles )
+
+        return new(
+            regfiles,
+            regdirs,
+            syml2files,
+            syml2dirs,
+            others,
+            syml2others,
+            syml2nonexist,
+
+            stdsymltargetfiles,
+            stdsymltargetdirs
+
+        )
+    end    
 end
-function stats(X::AbstractVector{<:AbstractFsEntry})
-    S = FsStats()
-    for x in X
-        S.nregfiles += x isa FsFile
-        S.nregdirs += x isa FsDir
-        S.nothers += x isa FsOther
+# function stats(X::AbstractVector{<:AbstractFsEntry})
+#     S = FsStats()
+#     for x in X
+#         S.nregfiles += x isa FsFile
+#         S.nregdirs += x isa FsDir
+#         S.nothers += x isa FsOther
 
-        S.nsyml2files += x isa FsSymlink{FsFile}
-        S.nsyml2dirs += x isa FsSymlink{FsDir}
-        S.nsyml2others += x isa FsSymlink{FsOther}
-        S.nsyml2nonexist += x isa FsSymlink{FsUnknownNonexist}
-    end
+#         S.nsyml2files += x isa FsSymlink{FsFile}
+#         S.nsyml2dirs += x isa FsSymlink{FsDir}
+#         S.nsyml2others += x isa FsSymlink{FsOther}
+#         S.nsyml2nonexist += x isa FsSymlink{FsUnknownNonexist}
+#     end
 
-    S.nfilelikes = S.nregfiles + S.nsyml2files
-    S.ndirlikes = S.nregdirs + S.nsyml2dirs
-    S.notherlikes = S.nothers + S.nsyml2others
+#     S.nfilelikes = S.nregfiles + S.nsyml2files
+#     S.ndirlikes = S.nregdirs + S.nsyml2dirs
+#     S.notherlikes = S.nothers + S.nsyml2others
 
-    return S
-end
+#     return S
+# end
 
 
 
