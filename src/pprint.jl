@@ -37,10 +37,9 @@ struct FsStats  # mutable avoids some boilerplate in construction
     syml2others::Vector{FsSymlink{FsOther}}
     syml2nonexist::Vector{FsSymlink{FsUnknownNonexist}}  # shortcut for '2unknownnonexist'
 
-    # -----
+    # standard combinations
     stdsymltargetfiles::Vector{FsFile}
     stdsymltargetdirs::Vector{FsDir}
-
     FILES::Vector{FsFile} 
     DIR::Vector{FsDir} 
 
