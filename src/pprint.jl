@@ -71,12 +71,12 @@ struct FsStats  # mutable avoids some boilerplate in construction
         for x in X
             x isa FsFile  &&  push!(regfiles, x)
             x isa FsDir  &&  push!(regdirs, x)
-            x isa Symlink{FsFile}  &&  ( push!(syml2files, x) )
-            x isa Symlink{FsDir}  &&  ( push!(syml2dirs, x) )
+            x isa FsSymlink{FsFile}  &&  ( push!(syml2files, x) )
+            x isa FsSymlink{FsDir}  &&  ( push!(syml2dirs, x) )
 
             x isa FsOther  &&  push!(others, x)
-            x isa Symlink{FsOther}  &&  push!(syml2others, x)
-            x isa Symlink{FsUnknownNonexist}  &&  push!(syml2nonexist, x)
+            x isa FsSymlink{FsOther}  &&  push!(syml2others, x)
+            x isa FsSymlink{FsUnknownNonexist}  &&  push!(syml2nonexist, x)
             @assert false
         end
 
