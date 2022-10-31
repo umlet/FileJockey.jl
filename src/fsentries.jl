@@ -29,9 +29,9 @@ struct FsEntryCanon
     end
 end
 FsEntryCanon(s::AbstractString=".") = FsEntryCanon(PathCanon(s))
-_show(io::IO, x::FsEntryCanon) = print(io, """FsEntryCanon($(x.path), $(Base.Filesystem.filemode_string(x.st)))""")
-Base.show(io::IO, ::MIME"text/plain", x::FsEntryCanon) = _show(io, x)
-Base.show(io::IO, x::FsEntryCanon) = _show(io, x)
+#_show(io::IO, x::FsEntryCanon) = print(io, """FsEntryCanon($(x.path), $(Base.Filesystem.filemode_string(x.st)))""")
+#Base.show(io::IO, ::MIME"text/plain", x::FsEntryCanon) = _show(io, x)
+#Base.show(io::IO, x::FsEntryCanon) = _show(io, x)
 
 
 
