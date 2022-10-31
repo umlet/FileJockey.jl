@@ -28,11 +28,10 @@ filedeviceinode(st::StatStruct)::Tuple{UInt64, UInt64} = (filedevice(st), filein
 struct FsStats  # mutable avoids some boilerplate in construction
     # PARTITION for counting
     # - standard
-    regfiles::Vector{FsFile}
-    regdirs::Vector{FsDir}
+    files::Vector{FsFile}
+    dirs::Vector{FsDir}
     syml2files::Vector{FsSymlink{FsFile}}
     syml2dirs::Vector{FsSymlink{FsDir}}
-
     # non-standard
     others::Vector{FsOther}
     syml2others::Vector{FsSymlink{FsOther}}
@@ -41,6 +40,9 @@ struct FsStats  # mutable avoids some boilerplate in construction
     # -----
     stdsymltargetfiles::Vector{FsFile}
     stdsymltargetdirs::Vector{FsDir}
+
+    FILES::Vector{FsFile} 
+    DIR::Vector{FsDir} 
 
     # DEVICES 
     # - for check if on same device (e.g., for some handlink operations)
@@ -58,8 +60,8 @@ struct FsStats  # mutable avoids some boilerplate in construction
     function FsStats(X::AbstractVector{<:AbstractFsEntry})
         # BASE
         # standard
-        regfiles::Vector{FsFile} = FsFile[]
-        regdirs::Vector{FsDir} = FsDir[]
+        files::Vector{FsFile} = FsFile[]
+        dirs::Vector{FsDir} = FsDir[]
         syml2files::Vector{FsSymlink{FsFile}} = FsSymlink{FsFile}[]
         syml2dirs::Vector{FsSymlink{FsDir}} = FsSymlink{FsDir}[]
     
@@ -69,8 +71,8 @@ struct FsStats  # mutable avoids some boilerplate in construction
         syml2nonexist::Vector{FsSymlink{FsUnknownNonexist}} = FsSymlink{FsUnknownNonexist}[]  # shortcut for '2unknownnonexist'
     
         for x in X
-            x isa FsFile  &&  push!(regfiles, x)
-            x isa FsDir  &&  push!(regdirs, x)
+            x isa FsFile  &&  push!(files, x)
+            x isa FsDir  &&  push!(dirs, x)
             x isa FsSymlink{FsFile}  &&  ( push!(syml2files, x) )
             x isa FsSymlink{FsDir}  &&  ( push!(syml2dirs, x) )
 
@@ -83,17 +85,20 @@ struct FsStats  # mutable avoids some boilerplate in construction
         stdsymltargetfiles::Vector{FsFile} = follow.(syml2files)
         stdsymltargetdirs::Vector{FsDir} = follow.(syml2dirs)
 
-        # setregfiledevices::Set{UInt64} = Set{UInt64}( filedevice(stat(x)) for x in regfiles )
-        # setregdirdevices::Set{UInt64} = Set{UInt64}( filedevice(stat(x)) for x in regdirs )
+        FILES::Vector{FsFile} = [ files ; stdsymltargetfiles ]
+        DIR::Vector{FsDir} = [ dirs ; stdsymltargetdirs ]
+    
+        # setregfiledevices::Set{UInt64} = Set{UInt64}( filedevice(stat(x)) for x in files )
+        # setregdirdevices::Set{UInt64} = Set{UInt64}( filedevice(stat(x)) for x in dirs )
         # setsymlink2filedevices::Set{UInt64} = Set{UInt64}( filedevice(lstat(x)) for x in syml2files )   # ! lstat
         # setsyml2dirdevices::Set{UInt64} = Set{UInt64}( filedevice(lstat(x)) for x in syml2dirs )        # ! lstat
     
-        # setsymltargetfiledevices::Set{UInt64} = Set{UInt64}( filedevice(x) for x in regfiles )
-        # setsymltargetdirdevices::Set{UInt64} = Set{UInt64}( filedevice(x) for x in regfiles )
+        # setsymltargetfiledevices::Set{UInt64} = Set{UInt64}( filedevice(x) for x in files )
+        # setsymltargetdirdevices::Set{UInt64} = Set{UInt64}( filedevice(x) for x in files )
 
         return new(
-            regfiles,
-            regdirs,
+            files,
+            dirs,
             syml2files,
             syml2dirs,
             others,
@@ -101,31 +106,15 @@ struct FsStats  # mutable avoids some boilerplate in construction
             syml2nonexist,
 
             stdsymltargetfiles,
-            stdsymltargetdirs
+            stdsymltargetdirs,
+
+            FILES,
+            DIRS
 
         )
     end    
 end
-# function stats(X::AbstractVector{<:AbstractFsEntry})
-#     S = FsStats()
-#     for x in X
-#         S.nregfiles += x isa FsFile
-#         S.nregdirs += x isa FsDir
-#         S.nothers += x isa FsOther
-
-#         S.nsyml2files += x isa FsSymlink{FsFile}
-#         S.nsyml2dirs += x isa FsSymlink{FsDir}
-#         S.nsyml2others += x isa FsSymlink{FsOther}
-#         S.nsyml2nonexist += x isa FsSymlink{FsUnknownNonexist}
-#     end
-
-#     S.nfilelikes = S.nregfiles + S.nsyml2files
-#     S.ndirlikes = S.nregdirs + S.nsyml2dirs
-#     S.notherlikes = S.nothers + S.nsyml2others
-
-#     return S
-# end
-
+stats(X::AbstractVector{y:AbstractFsEntry}) = FsStats(x)
 
 
 function statsOLD(X::AbstractVector{<:AbstractFsEntry})
