@@ -79,7 +79,7 @@ struct FsSymlink{T} <: AbstractFsEntry
         return new{T}(x.path, x.st, target)
     end
 end
-_show(io::IO, x::FsSymlink) = print(io, """$(typeof(x))($(x.path) -> "$(x.target.path)")""")
+_show(io::IO, x::FsSymlink) = print(io, colorizeas("$(typeof(x))", x), """$(typeof(x))($(x.path) -> "$(x.target.path)")""")
 
 struct FsUnknownNonexist <: AbstractFsEntry
     path::String
@@ -87,7 +87,7 @@ struct FsUnknownNonexist <: AbstractFsEntry
         return new(f)
     end
 end
-_show(io::IO, x::FsUnknownNonexist) = print(io, """FsUnknownNonexist(?$(x.path)?)""")
+#_show(io::IO, x::FsUnknownNonexist) = print(io, """FsUnknownNonexist(?$(x.path)?)""")
 
 
 # function _show(io::IO, X::AbstractVector{<:AbstractFsEntry})
