@@ -69,6 +69,8 @@ struct FsStats  # mutable avoids some boilerplate in construction
     setfiledevices::Set{UInt64}
     setfiledeviceinodes::Set{Tuple{UInt64, UInt64}}
 
+    setdirpaths::Set{String}
+
     function FsStats(X::AbstractVector{<:AbstractFsEntry})
         # BASE
         # standard
@@ -110,6 +112,7 @@ struct FsStats  # mutable avoids some boilerplate in construction
         setfiledevices::Set{UInt64} = Set{UInt64}( filedevice(stat(x)) for x in files )
         setfiledeviceinodes::Set{Tuple{UInt64, UInt64}} = Set{Tuple{UInt64, UInt64}}( (filedeviceinode(stat(x))) for x in files)
 
+        setdirpaths::Set{String} = Set{String}( path(x) for x in files )
 
         return new(
             fileentries,
@@ -133,7 +136,9 @@ struct FsStats  # mutable avoids some boilerplate in construction
 
             setfilepaths,
             setfiledevices,
-            setfiledeviceinodes
+            setfiledeviceinodes,
+
+            setdirpaths
         )
     end    
 end
@@ -152,6 +157,7 @@ nsetfilepaths(S::FsStats) = length(S.setfilepaths)
 nsetfiledevices(S::FsStats) = length(S.setfiledevices)
 nsetfiledeviceinodes(S::FsStats) = length(S.setfiledeviceinodes)
 
+nsetdirpaths(S::FsStat) = length(S.setdirpaths)
 
 function info(S::FsStats)
     # LINE 1
@@ -161,7 +167,7 @@ function info(S::FsStats)
     else
         push!(line, colorizeas("[ $(tostr_thsep(nfiles(S))) files ", FileEntry))
         if nsyml2fileentries(S) == 0
-            push!(line, DARK_GRAY_FG("( none symlinked )"))
+            push!(line, DARK_GRAY_FG("( none of which symlinked )"))
         else
             push!(line, colorizeas("( $(tostr_thsep(nsyml2fileentries(S))) symlinked )", Symlink{FileEntry}))
         end
@@ -183,14 +189,15 @@ function info(S::FsStats)
     else
         push!(line, colorizeas("[ $(tostr_thsep(ndirs(S))) dirs ", DirEntry))
         if nsyml2direntries(S) == 0
-            push!(line, DARK_GRAY_FG("( none symlinked )"))
+            push!(line, DARK_GRAY_FG("( none syml )"))
         else
             push!(line, colorizeas("( $(tostr_thsep(nsyml2direntries(S))) symlinked )", Symlink{DirEntry}))
         end
+        push!(line, DARK_GRAY_FG("( #paths:$(nsetfilepaths(S)) )"))
         push!(line, colorizeas(" ]", DirEntry))
     end
 
-    push!(line, " ")
+    push!(line, DARK_GRAY_FG(" :: "))
 
     if nothers(S) == 0
         push!(line, DARK_GRAY_FG("[ no others/dev,socker,fifo ]"))
@@ -198,7 +205,7 @@ function info(S::FsStats)
         push!(line, colorizeas("[ $(tostr_thsep(nothers(S))) others/dev,socket,fifo ]", OtherEntry))
     end
 
-    push!(line, " ")
+    push!(line, DARK_GRAY_FG(" :: "))
 
     if nunknowns(S) == 0
         push!(line, DARK_GRAY_FG("[ no unknown/broken ]"))
