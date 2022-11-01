@@ -51,7 +51,7 @@ struct FsStats  # mutable avoids some boilerplate in construction
     otherentries::Vector{OtherEntry}
     syml2otherentries::Vector{Symlink{OtherEntry}}
 
-    #unknownentriesNONEXIST::Vector{UnknownEntryNONEXIST}
+    unknownentriesNONEXIST::Vector{UnknownEntryNONEXIST}
     syml2unknownentriesNONEXIST::Vector{Symlink{UnknownEntryNONEXIST}}  # shortcut for '2unknownnonexist'
 
 
@@ -74,13 +74,14 @@ struct FsStats  # mutable avoids some boilerplate in construction
         # BASE
         # standard
         fileentries::Vector{FileEntry} = FileEntry[]
-        direntries::Vector{DirEntry} = DirEntry[]
         syml2fileentries::Vector{Symlink{FileEntry}} = Symlink{FileEntry}[]
+        direntries::Vector{DirEntry} = DirEntry[]
         syml2direntries::Vector{Symlink{DirEntry}} = Symlink{DirEntry}[]
     
         # non-standard
-        otherentries::Vector{OtherEntry} = Symlink{DirEntry}[]
+        otherentries::Vector{OtherEntry} = OtherEntry[]
         syml2otherentries::Vector{Symlink{OtherEntry}} = Symlink{OtherEntry}[]
+        unknownentriesNONEXIST::Vector{UnknownEntryNONEXIST} = UnknownEntryNONEXIST[]
         syml2unknownentriesNONEXIST::Vector{Symlink{UnknownEntryNONEXIST}} = Symlink{UnknownEntryNONEXIST}[]  # shortcut for '2unknownnonexist'
     
         for x in X
@@ -91,6 +92,7 @@ struct FsStats  # mutable avoids some boilerplate in construction
 
             x isa OtherEntry  &&  push!(otherentries, x)
             x isa Symlink{OtherEntry}  &&  push!(syml2otherentries, x)
+            x isa UnknownEntryNONEXIST  &&  push!(unknownentriesNONEXIST, x)
             x isa Symlink{UnknownEntryNONEXIST}  &&  push!(syml2unknownentriesNONEXIST, x)
         end
 
@@ -116,6 +118,7 @@ struct FsStats  # mutable avoids some boilerplate in construction
             syml2direntries,
             otherentries,
             syml2otherentries,
+            unknownentriesNONEXIST,
             syml2unknownentriesNONEXIST,
 
             symltarget_fileentries,
