@@ -112,7 +112,7 @@ struct FsStats  # mutable avoids some boilerplate in construction
         setfiledevices::Set{UInt64} = Set{UInt64}( filedevice(stat(x)) for x in files )
         setfiledeviceinodes::Set{Tuple{UInt64, UInt64}} = Set{Tuple{UInt64, UInt64}}( (filedeviceinode(stat(x))) for x in files)
 
-        setdirpaths::Set{String} = Set{String}( path(x) for x in files )
+        setdirpaths::Set{String} = Set{String}( path(x) for x in dirs )
 
         return new(
             fileentries,
