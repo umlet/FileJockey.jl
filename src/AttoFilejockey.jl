@@ -16,7 +16,7 @@ export follow
 
 # from DirEntrys
 export fsreaddir, fswalkdir
-export ls, find, finditer
+export ls, ll, find, eachentry, eachfile
 
 
 # from fsbatch
