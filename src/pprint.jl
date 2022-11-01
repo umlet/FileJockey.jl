@@ -127,8 +127,8 @@ stats(X::AbstractVector{<:AbstractFsEntry}) = FsStats(X)
 
 filesize(S::FsStats) = sum(filesize.(S.files))
 
-nfiles(S::FsStat) = length(S.files)
-nsyml2fileentries(S::FsStat) = length(S.syml2fileentries)
+nfiles(S::FsStats) = length(S.files)
+nsyml2fileentries(S::FsStats) = length(S.syml2fileentries)
 
 
 
