@@ -86,7 +86,7 @@ struct UnknownEntryNONEXIST <: AbstractFsEntry
     st::StatStruct  # zero entries
     function UnknownEntryNONEXIST(f::AbstractString)
         st = stat(f)
-        @assert !isbath(st)
+        @assert !ispath(st)
         return new(f, st)
     end
 end
