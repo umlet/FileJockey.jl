@@ -74,8 +74,8 @@ struct FsStats  # mutable avoids some boilerplate in construction
         stdsymltargetfileentries::Vector{FileEntry} = follow.(syml2fileentries)
         stdsymltargetdirentries::Vector{DirEntry} = follow.(syml2direntries)
 
-        files::Vector{FileEntry} = [ fileentries ; stdsymltargetfiles ]
-        dirs::Vector{DirEntry} = [ direntries ; stdsymltargetdirs ]
+        files::Vector{FileEntry} = [ fileentries ; stdsymltargetfileentries ]
+        dirs::Vector{DirEntry} = [ direntries ; stdsymltargetdirentries ]
     
         # setregfiledevices::Set{UInt64} = Set{UInt64}( filedevice(stat(x)) for x in files )
         # setregdirdevices::Set{UInt64} = Set{UInt64}( filedevice(stat(x)) for x in dirs )
