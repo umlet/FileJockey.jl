@@ -102,7 +102,7 @@ struct FsStats  # mutable avoids some boilerplate in construction
 
         files::Vector{FileEntry} = [ fileentries ; symltarget_fileentries ]
         dirs::Vector{DirEntry} = [ direntries ; symltarget_direntries ]
-        others::Vector{OtherEntry} = [ otherentries ; syml2otherentries ]
+        others::Vector{OtherEntry} = [ otherentries ; symltarget_otherentries ]
     
         setfilepaths::Set{String} = Set{String}( path(x) for x in files )
         setfiledevices::Set{UInt64} = Set{UInt64}( filedevice(stat(x)) for x in files )
