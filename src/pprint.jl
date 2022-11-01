@@ -61,7 +61,9 @@ struct FsStats  # mutable avoids some boilerplate in construction
     symltarget_unknownentriesNONEXIST::Vector{UnknownEntryNONEXIST}
 
     files::Vector{FileEntry} 
-    dirs::Vector{DirEntry} 
+    dirs::Vector{DirEntry}
+
+    setfiledevices::Set{UUint64}
 
     function FsStats(X::AbstractVector{<:AbstractFsEntry})
         # BASE
@@ -96,6 +98,8 @@ struct FsStats  # mutable avoids some boilerplate in construction
         files::Vector{FileEntry} = [ fileentries ; symltarget_fileentries ]
         dirs::Vector{DirEntry} = [ direntries ; symltarget_direntries ]
     
+        setfiledevices::Set{UUint64} = Set{UUint64}( filedevice(stat(x)) for x in files )
+
         # setregfiledevices::Set{UInt64} = Set{UInt64}( filedevice(stat(x)) for x in files )
         # setregdirdevices::Set{UInt64} = Set{UInt64}( filedevice(stat(x)) for x in dirs )
         # setsymlink2filedevices::Set{UInt64} = Set{UInt64}( filedevice(lstat(x)) for x in syml2files )   # ! lstat
@@ -119,7 +123,9 @@ struct FsStats  # mutable avoids some boilerplate in construction
             symltarget_unknownentriesNONEXIST,
 
             files,
-            dirs
+            dirs,
+
+            setfiledevices
         )
     end    
 end
