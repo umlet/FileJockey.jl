@@ -44,8 +44,8 @@ struct FsStats  # mutable avoids some boilerplate in construction
     # standard combinations
     symltarget_fileentries::Vector{FileEntry}
     symltarget_direntries::Vector{DirEntry}
-    symltarget_otherentries::Vector{OtherEntry}
-    symltarget_unknownentriesNONEXIST::Vector{UnknownEntryNONEXIST}
+    #symltarget_otherentries::Vector{OtherEntry}
+    #symltarget_unknownentriesNONEXIST::Vector{UnknownEntryNONEXIST}
 
     files::Vector{FileEntry} 
     dirs::Vector{DirEntry} 
