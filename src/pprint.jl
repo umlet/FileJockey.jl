@@ -29,9 +29,9 @@ struct FsStats  # mutable avoids some boilerplate in construction
     # PARTITION for counting
     # - standard
     fileentries::Vector{FileEntry}
-    dirs::Vector{DirEntry}
+    direntries::Vector{DirEntry}
     syml2fileentries::Vector{FsSymlink{FileEntry}}
-    syml2dirs::Vector{FsSymlink{DirEntry}}
+    syml2direntries::Vector{FsSymlink{DirEntry}}
     # non-standard
     others::Vector{OtherEntry}
     syml2others::Vector{FsSymlink{OtherEntry}}
@@ -47,7 +47,7 @@ struct FsStats  # mutable avoids some boilerplate in construction
         # BASE
         # standard
         fileentries::Vector{FileEntry} = FileEntry[]
-        dirs::Vector{DirEntry} = DirEntry[]
+        direntries::Vector{DirEntry} = DirEntry[]
         syml2fileentries::Vector{FsSymlink{FileEntry}} = FsSymlink{FileEntry}[]
         syml2dirs::Vector{FsSymlink{DirEntry}} = FsSymlink{DirEntry}[]
     
@@ -58,7 +58,7 @@ struct FsStats  # mutable avoids some boilerplate in construction
     
         for x in X
             x isa FileEntry  &&  push!(fileentries, x)
-            x isa DirEntry  &&  push!(dirs, x)
+            x isa DirEntry  &&  push!(direntries, x)
             x isa FsSymlink{FileEntry}  &&  ( push!(syml2fileentries, x) )
             x isa FsSymlink{DirEntry}  &&  ( push!(syml2dirs, x) )
 
