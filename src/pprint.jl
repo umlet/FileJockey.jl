@@ -153,7 +153,7 @@ nunknowns(S::FsStats) = length(S.unknowns)
 nsyml2fileentries(S::FsStats) = length(S.syml2fileentries)
 nsyml2direntries(S::FsStats) = length(S.syml2direntries)
 nsyml2otherentries(S::FsStats) = length(S.syml2otherentries)
-syml2unknownentriesNONEXIST(S::FsStats) = length(S.syml2unknownentriesNONEXIST)
+nsyml2unknownentriesNONEXIST(S::FsStats) = length(S.syml2unknownentriesNONEXIST)
 
 nsetfilepaths(S::FsStats) = length(S.setfilepaths)
 nsetfiledevices(S::FsStats) = length(S.setfiledevices)
