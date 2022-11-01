@@ -128,12 +128,14 @@ stats(X::AbstractVector{<:AbstractFsEntry}) = FsStats(X)
 Base.filesize(S::FsStats) = sum(filesize.(S.files))
 
 nfiles(S::FsStats) = length(S.files)
+ndirs(S::FsStats) = length(S.dirs)
 nsyml2fileentries(S::FsStats) = length(S.syml2fileentries)
 
 
 
 function info(S::FsStats)
-    line = Any[]
+    # LINE 1
+    line = []
     if nfiles(S) == 0
         push!(line, DARK_GRAY_FG("[ no files ]"))
     else
@@ -144,9 +146,23 @@ function info(S::FsStats)
             push!(line, colorizeas("( $(tostr_thsep(nsyml2fileentries(S))) symlinked )", Symlink{FileEntry}))
         end
         fsize = filesize(S)
-        push!(line, colorizeas(" -- $(fsizehuman(fsize)) -- $(tostr_thsep(fsize)) bytes ]", FileEntry))
+        if fsize <= 2^10
+            push!(line, colorizeas(" -- $(tostr_thsep(fsize)) bytes ]", FileEntry))
+        else
+            push!(line, colorizeas(" -- $(fsizehuman(fsize)) -- $(tostr_thsep(fsize)) bytes ]", FileEntry))
+        end
     end
     println(line...)
+
+    # LINE 2
+    line = []
+    if nfiles(S) == 0
+        push!(line, DARK_GRAY_FG("[ no dirs ]"))
+    else
+        push!(line, colorizeas("[ $(tostr_thsep(ndirs(S))) files ", FileDir))
+    end
+    println(line...)
+
 
 end
 info(X::AbstractVector{<:AbstractFsEntry}) = info(stats(X))
