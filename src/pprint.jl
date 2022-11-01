@@ -137,13 +137,14 @@ function info(S::FsStats)
     if nfiles(S) == 0
         push!(line, DARK_GRAY_FG("[ no files ]"))
     else
-        push!(line, colorizeas("[ $(tostr_thsep(nfiles(S))) ", FileEntry))
+        push!(line, colorizeas("[ $(tostr_thsep(nfiles(S))) files ", FileEntry))
         if nsyml2fileentries(S) == 0
             push!(line, DARK_GRAY_FG("( none symlinked )"))
         else
             push!(line, colorizeas("( $(tostr_thsep(nsyml2fileentries(S))) symlinked )", Symlink{FileEntry}))
         end
-
+        fsize = filesize(S)
+        push!(line, colorizeas(" -- $(fsizehuman(fsize)) -- $(tostr_thsep(fsize)) bytes ]", FileEntry))
     end
     println(line...)
 
