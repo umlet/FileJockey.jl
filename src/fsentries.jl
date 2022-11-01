@@ -71,15 +71,15 @@ struct OtherEntry <: AbstractFsEntry
 end
 _show(io::IO, x::OtherEntry) = print(io, colorizeas("OtherEntry", x), """($(x.path), $(Base.Filesystem.filemode_string(x.st)))""")
 
-struct FsSymlink{T} <: AbstractFsEntry
+struct Symlink{T} <: AbstractFsEntry
     path::PathCanon
     st::StatStruct  # stat of symlink!
     target::T
-    function FsSymlink{T}(x::FsEntryCanon, target::T) where {T<:AbstractFsEntry}
+    function Symlink{T}(x::FsEntryCanon, target::T) where {T<:AbstractFsEntry}
         return new{T}(x.path, x.st, target)
     end
 end
-_show(io::IO, x::FsSymlink) = print(io, colorizeas("$(typeof(x))", x), """$(typeof(x))($(x.path) -> "$(x.target.path)")""")
+_show(io::IO, x::Symlink) = print(io, colorizeas("$(typeof(x))", x), """$(typeof(x))($(x.path) -> "$(x.target.path)")""")
 
 struct UnknownEntryNONEXIST <: AbstractFsEntry
     path::String
@@ -106,7 +106,7 @@ _show(io::IO, x::UnknownEntryNONEXIST) = print(io, colorizeas("UnknownEntryNONEX
 # Base.show(io::IO, X::AbstractVector{<:AbstractFsEntry}) = _show(io, X)
 
 
-# issymlinkbroken(x::FsSymlink{UnknownEntryNONEXIST}) = true
+# issymlinkbroken(x::Symlink{UnknownEntryNONEXIST}) = true
 # issymlinkbroken(x::FsEntry) = false
 # export issymlinkbroken
 
@@ -123,11 +123,11 @@ function FsEntry(x::FsEntryCanon)
         @assert !islink(st_target)
 
         if !ispath(st_target)  # broken symlink
-            return FsSymlink{UnknownEntryNONEXIST}(x, UnknownEntryNONEXIST(s_readlink))
+            return Symlink{UnknownEntryNONEXIST}(x, UnknownEntryNONEXIST(s_readlink))
         end
 
         fse = FsEntry(s_path_target)
-        return FsSymlink{typeof(fse)}(x, fse)
+        return Symlink{typeof(fse)}(x, fse)
     end
 
     isfile(x.st)  &&  return FileEntry(x)
@@ -147,17 +147,17 @@ end
 path(x::AbstractFsEntry) = x.path.s
 pathcanon(x::AbstractFsEntry) = x.path
 
-# isfilelike(x::Union{FileEntry, FsSymlink{FileEntry}}) = true
+# isfilelike(x::Union{FileEntry, Symlink{FileEntry}}) = true
 # isfilelike(x::AbstractFsEntry) = false
 
-# isdirlike(x::Union{DirEntry, FsSymlink{DirEntry}}) = true
+# isdirlike(x::Union{DirEntry, Symlink{DirEntry}}) = true
 # isdirlike(x::AbstractFsEntry) = false
 
-isstandard(x::Union{FileEntry, DirEntry, FsSymlink{FileEntry}, FsSymlink{DirEntry}}) = true
+isstandard(x::Union{FileEntry, DirEntry, Symlink{FileEntry}, Symlink{DirEntry}}) = true
 isstandard(x::AbstractFsEntry) = false
 
 follow(x::AbstractFsEntry) = x
-follow(x::FsSymlink) = x.target
+follow(x::Symlink) = x.target
 
 
 
@@ -182,11 +182,11 @@ Base.Filesystem.lstat(x::PathCanon) = lstat(x.s)
 Base.Filesystem.stat(x::PathCanon) = stat(x.s)
 
 # stat returns target
-Base.Filesystem.stat(x::FsSymlink) = x.target.st
+Base.Filesystem.stat(x::Symlink) = x.target.st
 Base.Filesystem.stat(x::AbstractFsEntry) = x.st
 
 # lstat defaults to stat if no symlink
-Base.Filesystem.lstat(x::FsSymlink) = x.st
+Base.Filesystem.lstat(x::Symlink) = x.st
 Base.Filesystem.lstat(x::AbstractFsEntry) = stat(x)
 
 # stat & lstat should usually be sufficient to override

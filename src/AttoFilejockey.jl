@@ -4,7 +4,7 @@ module AttoFilejockey
 # from fsentries
 export PathCanon, FsEntryCanon
 export AbstractFsEntry
-export FileEntry, DirEntry, FsSymlink, OtherEntry, UnknownEntryNONEXIST
+export FileEntry, DirEntry, Symlink, OtherEntry, UnknownEntryNONEXIST
 export FsEntry
 export @fs_str
 
@@ -113,7 +113,7 @@ end
 AttoFunctionAliases.ext(x::AbstractFsEntry) = ext(x.path.s)
 
 # files and symlink to files
-# isfilelike(x::Union{FsFile, FsSymlink{FsFile}}) = true
+# isfilelike(x::Union{FsFile, Symlink{FsFile}}) = true
 # isfilelike(x::AbstractFsEntry) = false
 
 
@@ -139,8 +139,8 @@ AttoFunctionAliases.ext(x::AbstractFsEntry) = ext(x.path.s)
 
 
 
-# function check_duplsyml2targets(fseregs::Vector{T}, symlinks::Vector{FsSymlink{T}}) where {T<:Union{DirEntry, FsFile}}
-#     RET = Vector{FsSymlink{T}}()    
+# function check_duplsyml2targets(fseregs::Vector{T}, symlinks::Vector{Symlink{T}}) where {T<:Union{DirEntry, FsFile}}
+#     RET = Vector{Symlink{T}}()    
 
 #     tmpset = Set(path.(fseregs))
 #     for symlink in symlinks
@@ -158,10 +158,10 @@ AttoFunctionAliases.ext(x::AbstractFsEntry) = ext(x.path.s)
 #         files::Vector{FsFile}                   = X |> flt(is(FsFile))
 #         dirs::Vector{DirEntry}                     = X |> flt(is(DirEntry))
 #         others::Vector{OtherEntry}                 = X |> flt(is(OtherEntry))
-#         syml2files::Vector{FsSymlink{FsFile}}   = X |> flt(is(FsSymlink{FsFile}))
-#         syml2dirs::Vector{FsSymlink{DirEntry}}     = X |> flt(is(FsSymlink{DirEntry}))
-#         syml2others::Vector{FsSymlink{OtherEntry}} = X |> flt(is(FsSymlink{OtherEntry}))
-#         syml2nonexists::Vector{FsSymlink{UnknownEntryNONEXIST}} = X |> flt(is(FsSymlink{UnknownEntryNONEXIST}))
+#         syml2files::Vector{Symlink{FsFile}}   = X |> flt(is(Symlink{FsFile}))
+#         syml2dirs::Vector{Symlink{DirEntry}}     = X |> flt(is(Symlink{DirEntry}))
+#         syml2others::Vector{Symlink{OtherEntry}} = X |> flt(is(Symlink{OtherEntry}))
+#         syml2nonexists::Vector{Symlink{UnknownEntryNONEXIST}} = X |> flt(is(Symlink{UnknownEntryNONEXIST}))
 
 #         @assert length(X) == length(files) + length(dirs) + length(others) + length(syml2files) + length(syml2dirs) + length(syml2others) + length(syml2nonexists)
 

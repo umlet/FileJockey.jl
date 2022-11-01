@@ -5,7 +5,7 @@ abstract type AbstractBatchTrait end
 
 # fails if entries contain
 # - otherlike (regular or symlink)
-# - broken symlinks (FsSymlink{FsUnknwonNonexist})
+# - broken symlinks (Symlink{FsUnknwonNonexist})
 struct AllEntriesAreStandard <: AbstractBatchTrait end
 function areallentriesstandard(X::AbstractVector{<:AbstractFsEntry})::Bool
     !CONF.quiet  &&  @info """
@@ -48,7 +48,7 @@ XXXXX It also clears Symlink-to-dirs of any responsability rules out the most co
     dpaths = path.(ds)
     dpathset = Set(dpaths)
 
-    sds = X |> fl(is(FsSymlink{DirEntry}))
+    sds = X |> fl(is(Symlink{DirEntry}))
     sdproblems = sds |> fl(x -> x.target.path.s in dpathset)
 
     success = length(sdproblems) == 0
