@@ -136,6 +136,8 @@ nfiles(S::FsStats) = length(S.files)
 ndirs(S::FsStats) = length(S.dirs)
 nsyml2fileentries(S::FsStats) = length(S.syml2fileentries)
 nsyml2direntries(S::FsStats) = length(S.syml2direntries)
+
+nsetfilepaths(S::FsStats) = length(S.setfilepaths)
 nsetfiledevices(S::FsStats) = length(S.setfiledevices)
 nsetfiledeviceinodes(S::FsStats) = length(S.setfiledeviceinodes)
 
@@ -158,6 +160,7 @@ function info(S::FsStats)
         else
             push!(line, colorizeas(" -- $(fsizehuman(fsize)) -- $(tostr_thsep(fsize)) bytes ", FileEntry))
         end
+        push!(line, DARK_GRAY_FG("( #paths: $(nsetfilepaths(S))  #dev: $(nsetfiledevices(S))  #inode: $(nsetfiledeviceinodes) )"))
     end
     println(line...)
 
