@@ -31,17 +31,21 @@ struct FsStats  # mutable avoids some boilerplate in construction
     # PARTITION for counting
     # - standard
     fileentries::Vector{FileEntry}
-    direntries::Vector{DirEntry}
     syml2fileentries::Vector{FsSymlink{FileEntry}}
+    direntries::Vector{DirEntry}
     syml2direntries::Vector{FsSymlink{DirEntry}}
     # non-standard
     otherentries::Vector{OtherEntry}
     syml2otherentries::Vector{FsSymlink{OtherEntry}}
+
     syml2unknownentriesNONEXIST::Vector{FsSymlink{UnknownEntryNONEXIST}}  # shortcut for '2unknownnonexist'
 
+
     # standard combinations
-    stdsymltargetfileentries::Vector{FileEntry}
-    stdsymltargetdirentries::Vector{DirEntry}
+    symltarget_fileentries::Vector{FileEntry}
+    symltarget_direntries::Vector{DirEntry}
+    symltarget_otherentries::Vector{OtherEntry}
+    symltarget_unknownentriesNONEXIST::Vector{UnknownEntryNONEXIST}
 
     files::Vector{FileEntry} 
     dirs::Vector{DirEntry} 
@@ -71,19 +75,19 @@ struct FsStats  # mutable avoids some boilerplate in construction
         end
 
         # combinations
-        stdsymltargetfileentries::Vector{FileEntry} = follow.(syml2fileentries)
-        stdsymltargetdirentries::Vector{DirEntry} = follow.(syml2direntries)
+        symltarget_fileentries::Vector{FileEntry} = follow.(syml2fileentries)
+        symltarget_direntries::Vector{DirEntry} = follow.(syml2direntries)
 
-        files::Vector{FileEntry} = [ fileentries ; stdsymltargetfileentries ]
-        dirs::Vector{DirEntry} = [ direntries ; stdsymltargetdirentries ]
+        files::Vector{FileEntry} = [ fileentries ; symltarget_fileentries ]
+        dirs::Vector{DirEntry} = [ direntries ; symltarget_direntries ]
     
         # setregfiledevices::Set{UInt64} = Set{UInt64}( filedevice(stat(x)) for x in files )
         # setregdirdevices::Set{UInt64} = Set{UInt64}( filedevice(stat(x)) for x in dirs )
         # setsymlink2filedevices::Set{UInt64} = Set{UInt64}( filedevice(lstat(x)) for x in syml2files )   # ! lstat
         # setsyml2dirdevices::Set{UInt64} = Set{UInt64}( filedevice(lstat(x)) for x in syml2dirs )        # ! lstat
     
-        # setsymltargetfiledevices::Set{UInt64} = Set{UInt64}( filedevice(x) for x in files )
-        # setsymltargetdirdevices::Set{UInt64} = Set{UInt64}( filedevice(x) for x in files )
+        # setsymltarget_filedevices::Set{UInt64} = Set{UInt64}( filedevice(x) for x in files )
+        # setsymltarget_dirdevices::Set{UInt64} = Set{UInt64}( filedevice(x) for x in files )
 
         return new(
             fileentries,
@@ -94,8 +98,8 @@ struct FsStats  # mutable avoids some boilerplate in construction
             syml2otherentries,
             syml2unknownentriesNONEXIST,
 
-            stdsymltargetfileentries,
-            stdsymltargetdirentries,
+            symltarget_fileentries,
+            symltarget_direntries,
 
             files,
             dirs
