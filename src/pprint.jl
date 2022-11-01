@@ -160,7 +160,8 @@ function info(S::FsStats)
         else
             push!(line, colorizeas(" -- $(fsizehuman(fsize)) -- $(tostr_thsep(fsize)) bytes ", FileEntry))
         end
-        push!(line, DARK_GRAY_FG("( #paths: $(nsetfilepaths(S))  #dev: $(nsetfiledevices(S))  #inode: $(nsetfiledeviceinodes) )"))
+        push!(line, DARK_GRAY_FG("( #paths: $(nsetfilepaths(S))  #dev: $(nsetfiledevices(S))  #inodes: $(nsetfiledeviceinodes(S)) )"))
+        push!(line, colorizeas(" ]", FileEntry))
     end
     println(line...)
 
