@@ -33,7 +33,7 @@ export CONF, Conf
 
 
 export ext, Ext
-export @ex_str
+export @en_str
 export hasext, hasExt
 
 export FsStats, stats, info

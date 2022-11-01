@@ -1,6 +1,6 @@
 
 
-Base.Filesystem.islink(x::AbstractFsEntry) = islink(x.st)
+#Base.Filesystem.islink(x::AbstractFsEntry) = islink(x.st)
 
 
 function fsreaddir(x::Union{DirEntry, FsSymlink{DirEntry}})

@@ -83,8 +83,11 @@ _show(io::IO, x::FsSymlink) = print(io, colorizeas("$(typeof(x))", x), """$(type
 
 struct UnknownEntryNONEXIST <: AbstractFsEntry
     path::String
+    st::StatStruct  # zero entries
     function UnknownEntryNONEXIST(f::AbstractString)
-        return new(f)
+        st = stat(f)
+        @assert !ipbath(st)
+        return new(f, st)
     end
 end
 #_show(io::IO, x::UnknownEntryNONEXIST) = print(io, """UnknownEntryNONEXIST(?$(x.path)?)""")
@@ -133,10 +136,12 @@ function FsEntry(x::FsEntryCanon)
 end
 FsEntry(s::AbstractString) = FsEntry(FsEntryCanon(s))
 
-macro fs_str(s)
+
+
+
+macro en_str(s)
     FsEntry(s)
 end
-
 
 
 path(x::AbstractFsEntry) = x.path.s
