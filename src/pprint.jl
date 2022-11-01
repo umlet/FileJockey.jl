@@ -50,7 +50,6 @@ struct FsStats  # mutable avoids some boilerplate in construction
     # non-standard
     otherentries::Vector{OtherEntry}
     syml2otherentries::Vector{Symlink{OtherEntry}}
-
     unknownentriesNONEXIST::Vector{UnknownEntryNONEXIST}
     syml2unknownentriesNONEXIST::Vector{Symlink{UnknownEntryNONEXIST}}  # shortcut for '2unknownnonexist'
 
@@ -64,7 +63,7 @@ struct FsStats  # mutable avoids some boilerplate in construction
     files::Vector{FileEntry} 
     dirs::Vector{DirEntry}
     others::Vector{OtherEntry}
-    #unknownentriesNONEXIST::Vector{UnknownEntryNONEXIST}
+    unknown::Vector{UnknownEntryNONEXIST}
 
     setfilepaths::Set{String}
     setfiledevices::Set{UInt64}
@@ -105,7 +104,8 @@ struct FsStats  # mutable avoids some boilerplate in construction
         files::Vector{FileEntry} = [ fileentries ; symltarget_fileentries ]
         dirs::Vector{DirEntry} = [ direntries ; symltarget_direntries ]
         others::Vector{OtherEntry} = [ otherentries ; symltarget_otherentries ]
-    
+        unknown::Vector{UnknownEntryNONEXIST} = [ unknownentriesNONEXIST ; symltarget_unknownentriesNONEXIST ]
+
         setfilepaths::Set{String} = Set{String}( path(x) for x in files )
         setfiledevices::Set{UInt64} = Set{UInt64}( filedevice(stat(x)) for x in files )
         setfiledeviceinodes::Set{Tuple{UInt64, UInt64}} = Set{Tuple{UInt64, UInt64}}( (filedeviceinode(stat(x))) for x in files)
@@ -129,6 +129,7 @@ struct FsStats  # mutable avoids some boilerplate in construction
             files,
             dirs,
             others,
+            unknown,
 
             setfilepaths,
             setfiledevices,
