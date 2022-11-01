@@ -137,6 +137,7 @@ ndirs(S::FsStats) = length(S.dirs)
 nsyml2fileentries(S::FsStats) = length(S.syml2fileentries)
 nsyml2direntries(S::FsStats) = length(S.syml2direntries)
 nsetfiledevices(S::FsStats) = length(S.setfiledevices)
+nsetfiledeviceinodes(S::FsStats) = length(S.setfiledeviceinodes)
 
 
 function info(S::FsStats)
