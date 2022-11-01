@@ -184,7 +184,7 @@ function info(S::FsStats)
 
     # LINE 2
     line = []
-    if nfiles(S) == 0
+    if ndirs(S) == 0
         push!(line, DARK_GRAY_FG("[ no dirs ]"))
     else
         push!(line, colorizeas("[ $(tostr_thsep(ndirs(S))) dirs ", DirEntry))
@@ -193,7 +193,7 @@ function info(S::FsStats)
         else
             push!(line, colorizeas("( $(tostr_thsep(nsyml2direntries(S))) symlinked )", Symlink{DirEntry}))
         end
-        push!(line, DARK_GRAY_FG("( #paths:$(nsetfilepaths(S)) )"))
+        push!(line, DARK_GRAY_FG("( #paths:$(nsetdirpaths(S)) )"))
         push!(line, colorizeas(" ]", DirEntry))
     end
 
