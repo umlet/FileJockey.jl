@@ -194,7 +194,7 @@ function info(S::FsStats)
         else
             push!(line, colorizeas("( $(tostr_thsep(nsyml2direntries(S))) symlinked )", Symlink{DirEntry}))
         end
-        push!(line, DARK_GRAY_FG("( #paths:$(nsetdirpaths(S)) )"))
+        push!(line, DARK_GRAY_FG(" ( #paths:$(nsetdirpaths(S)) )"))
         push!(line, colorizeas(" ]", DirEntry))
     end
 
@@ -209,6 +209,7 @@ function info(S::FsStats)
         else
             push!(line, colorizeas("( $(tostr_thsep(nsyml2otherentries(S))) symlinked )", Symlink{OtherEntry}))
         end        
+        push!(line, colorizeas(" ]", OtherEntry))
     end
 
     push!(line, DARK_GRAY_FG(" :: "))
