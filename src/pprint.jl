@@ -203,7 +203,7 @@ function info(S::FsStats)
     if nunknowns(S) == 0
         push!(line, DARK_GRAY_FG("[ no unknown/broken ]"))
     else
-        push!(line, colorizeas("[ $(tostr_thsep(ndirs(S))) unknown/broken ]", OtherEntry))
+        push!(line, colorizeas("[ $(tostr_thsep(nunknowns(S))) unknown/broken ]", UnknownEntryNONEXIST))
     end
 
     println(line...)
