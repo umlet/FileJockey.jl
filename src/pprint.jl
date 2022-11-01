@@ -35,13 +35,14 @@ struct FsStats  # mutable avoids some boilerplate in construction
     syml2fileentries::Vector{FsSymlink{FileEntry}}
     syml2direntries::Vector{FsSymlink{DirEntry}}
     # non-standard
-    others::Vector{OtherEntry}
-    syml2others::Vector{FsSymlink{OtherEntry}}
-    syml2nonexist::Vector{FsSymlink{UnknownEntryNONEXIST}}  # shortcut for '2unknownnonexist'
+    otherentries::Vector{OtherEntry}
+    syml2otherentries::Vector{FsSymlink{OtherEntry}}
+    syml2unknownentriesNONEXIST::Vector{FsSymlink{UnknownEntryNONEXIST}}  # shortcut for '2unknownnonexist'
 
     # standard combinations
     stdsymltargetfileentries::Vector{FileEntry}
     stdsymltargetdirentries::Vector{DirEntry}
+
     files::Vector{FileEntry} 
     dirs::Vector{DirEntry} 
 
@@ -54,9 +55,9 @@ struct FsStats  # mutable avoids some boilerplate in construction
         syml2direntries::Vector{FsSymlink{DirEntry}} = FsSymlink{DirEntry}[]
     
         # non-standard
-        others::Vector{OtherEntry} = FsSymlink{DirEntry}[]
-        syml2others::Vector{FsSymlink{OtherEntry}} = FsSymlink{OtherEntry}[]
-        syml2nonexist::Vector{FsSymlink{UnknownEntryNONEXIST}} = FsSymlink{UnknownEntryNONEXIST}[]  # shortcut for '2unknownnonexist'
+        otherentries::Vector{OtherEntry} = FsSymlink{DirEntry}[]
+        syml2otherentries::Vector{FsSymlink{OtherEntry}} = FsSymlink{OtherEntry}[]
+        syml2unknownentriesNONEXIST::Vector{FsSymlink{UnknownEntryNONEXIST}} = FsSymlink{UnknownEntryNONEXIST}[]  # shortcut for '2unknownnonexist'
     
         for x in X
             x isa FileEntry  &&  push!(fileentries, x)
@@ -64,9 +65,9 @@ struct FsStats  # mutable avoids some boilerplate in construction
             x isa FsSymlink{FileEntry}  &&  ( push!(syml2fileentries, x) )
             x isa FsSymlink{DirEntry}  &&  ( push!(syml2direntries, x) )
 
-            x isa OtherEntry  &&  push!(others, x)
-            x isa FsSymlink{OtherEntry}  &&  push!(syml2others, x)
-            x isa FsSymlink{UnknownEntryNONEXIST}  &&  push!(syml2nonexist, x)
+            x isa OtherEntry  &&  push!(otherentries, x)
+            x isa FsSymlink{OtherEntry}  &&  push!(syml2otherentries, x)
+            x isa FsSymlink{UnknownEntryNONEXIST}  &&  push!(syml2unknownentriesNONEXIST, x)
         end
 
         # combinations
@@ -86,12 +87,12 @@ struct FsStats  # mutable avoids some boilerplate in construction
 
         return new(
             filesentries,
-            dirs,
+            direntries,
             syml2fileentries,
             syml2dirs,
-            others,
-            syml2others,
-            syml2nonexist,
+            otherentries,
+            syml2otherentries,
+            syml2unknownentriesNONEXIST,
 
             stdsymltargetfileentries,
             stdsymltargetdirentries,

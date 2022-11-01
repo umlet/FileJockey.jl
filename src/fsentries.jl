@@ -147,11 +147,11 @@ end
 path(x::AbstractFsEntry) = x.path.s
 pathcanon(x::AbstractFsEntry) = x.path
 
-isfilelike(x::Union{FileEntry, FsSymlink{FileEntry}}) = true
-isfilelike(x::AbstractFsEntry) = false
+# isfilelike(x::Union{FileEntry, FsSymlink{FileEntry}}) = true
+# isfilelike(x::AbstractFsEntry) = false
 
-isdirlike(x::Union{DirEntry, FsSymlink{DirEntry}}) = true
-isdirlike(x::AbstractFsEntry) = false
+# isdirlike(x::Union{DirEntry, FsSymlink{DirEntry}}) = true
+# isdirlike(x::AbstractFsEntry) = false
 
 isstandard(x::Union{FileEntry, DirEntry, FsSymlink{FileEntry}, FsSymlink{DirEntry}}) = true
 isstandard(x::AbstractFsEntry) = false
