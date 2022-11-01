@@ -91,8 +91,8 @@ struct FsStats  # mutable avoids some boilerplate in construction
 
         return new(
             fileentries,
-            direntries,
             syml2fileentries,
+            direntries,
             syml2direntries,
             otherentries,
             syml2otherentries,
