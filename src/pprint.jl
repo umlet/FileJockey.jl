@@ -122,7 +122,9 @@ struct FsStats  # mutable avoids some boilerplate in construction
             files,
             dirs,
 
-            setfiledevices
+            setfilepaths,
+            setfiledevices,
+            setfiledeviceinodes
         )
     end    
 end
