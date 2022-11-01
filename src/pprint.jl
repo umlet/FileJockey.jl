@@ -144,6 +144,7 @@ Base.filesize(S::FsStats) = sum(filesize.(S.files))
 nfiles(S::FsStats) = length(S.files)
 ndirs(S::FsStats) = length(S.dirs)
 nothers(S::FsStats) = length(S.others)
+nunknown(S::FsStats) = length(S.unknown)
 nsyml2fileentries(S::FsStats) = length(S.syml2fileentries)
 nsyml2direntries(S::FsStats) = length(S.syml2direntries)
 
@@ -189,6 +190,11 @@ function info(S::FsStats)
         push!(line, colorizeas(" ]", DirEntry))
     end
 
+    if nothers(S) == 0
+        push!(line, DARK_GRAY_FG("[ no others=dev/socker/fifo ]"))
+    else
+        push!(line, colorizeas("[ $(tostr_thsep(ndirs(S))) sev/socket/fifo ]", OtherEntry))
+    end
 
     println(line...)
 
