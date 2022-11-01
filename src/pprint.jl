@@ -51,6 +51,7 @@ struct FsStats  # mutable avoids some boilerplate in construction
     otherentries::Vector{OtherEntry}
     syml2otherentries::Vector{Symlink{OtherEntry}}
 
+    #unknownentriesNONEXIST::Vector{UnknownEntryNONEXIST}
     syml2unknownentriesNONEXIST::Vector{Symlink{UnknownEntryNONEXIST}}  # shortcut for '2unknownnonexist'
 
 
@@ -62,6 +63,8 @@ struct FsStats  # mutable avoids some boilerplate in construction
 
     files::Vector{FileEntry} 
     dirs::Vector{DirEntry}
+    others::Vector{OtherEntry}
+    #unknownentriesNONEXIST::Vector{UnknownEntryNONEXIST}
 
     setfilepaths::Set{String}
     setfiledevices::Set{UInt64}
@@ -99,6 +102,7 @@ struct FsStats  # mutable avoids some boilerplate in construction
 
         files::Vector{FileEntry} = [ fileentries ; symltarget_fileentries ]
         dirs::Vector{DirEntry} = [ direntries ; symltarget_direntries ]
+        others::Vector{OtherEntry} = [ otherentries ; syml2otherentries ]
     
         setfilepaths::Set{String} = Set{String}( path(x) for x in files )
         setfiledevices::Set{UInt64} = Set{UInt64}( filedevice(stat(x)) for x in files )
@@ -121,6 +125,7 @@ struct FsStats  # mutable avoids some boilerplate in construction
 
             files,
             dirs,
+            others,
 
             setfilepaths,
             setfiledevices,
@@ -134,6 +139,7 @@ Base.filesize(S::FsStats) = sum(filesize.(S.files))
 
 nfiles(S::FsStats) = length(S.files)
 ndirs(S::FsStats) = length(S.dirs)
+nothers(S::FsStats) = length(S.others)
 nsyml2fileentries(S::FsStats) = length(S.syml2fileentries)
 nsyml2direntries(S::FsStats) = length(S.syml2direntries)
 
@@ -160,7 +166,7 @@ function info(S::FsStats)
         else
             push!(line, colorizeas(" -- $(fsizehuman(fsize)) -- $(tostr_thsep(fsize)) bytes ", FileEntry))
         end
-        push!(line, DARK_GRAY_FG("( #paths: $(nsetfilepaths(S))  #dev: $(nsetfiledevices(S))  #inodes: $(nsetfiledeviceinodes(S)) )"))
+        push!(line, DARK_GRAY_FG("( #paths:$(nsetfilepaths(S))  #dev:$(nsetfiledevices(S))  #inodes:$(nsetfiledeviceinodes(S)) )"))
         push!(line, colorizeas(" ]", FileEntry))
     end
     println(line...)
@@ -176,7 +182,10 @@ function info(S::FsStats)
         else
             push!(line, colorizeas("( $(tostr_thsep(nsyml2direntries(S))) symlinked )", Symlink{DirEntry}))
         end
+        push!(line, colorizeas(" ]", DirEntry))
     end
+
+
     println(line...)
 
 
