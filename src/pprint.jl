@@ -1,4 +1,8 @@
 
+lpad(s::AbstractString, upto::Int64) = ( upto < length(s)  &&  error("lpad '$upto' too small for string 's'")  ;  return " "^(upto-length(s)) * s )
+lpad(upto::Int64) = x -> lpad(x, upto)
+
+lpad(X::AbstractVector{<:AbstractString}) = ( maxlen = maximum(length.(X))  ;  return [ lpad(x, maxlen) for x in X ] )
 
 
 function colorize(s::AbstractString, COLORS...)
@@ -12,14 +16,23 @@ end
 colorizeas(s::AbstractString, ::FileEntry) = colorize(s, GREEN_FG)
 colorizeas(s::AbstractString, ::DirEntry) = colorize(s, BLUE_FG)
 colorizeas(s::AbstractString, ::OtherEntry) = colorize(s, YELLOW_FG)
-#colorizeas(s::AbstractString, ::UnknownEntryNONEXIST) = colorize(s, RED_FG)
+    #=special case=# colorizeas(s::AbstractString, ::UnknownEntryNONEXIST) = colorize(s, RED_FG)
 
 colorizeas(s::AbstractString, ::FsSymlink{FileEntry}) = colorize(s, GREEN_FG, NEGATIVE)
 colorizeas(s::AbstractString, ::FsSymlink{DirEntry}) = colorize(s, BLUE_FG, NEGATIVE)
 colorizeas(s::AbstractString, ::FsSymlink{OtherEntry}) = colorize(s, YELLOW_FG, NEGATIVE)
 colorizeas(s::AbstractString, ::FsSymlink{UnknownEntryNONEXIST}) = colorize(s, RED_FG, NEGATIVE)
+#----------
+colorizeas(s::AbstractString, ::Type{FileEntry}) = colorize(s, GREEN_FG)
+colorizeas(s::AbstractString, ::Type{DirEntry}) = colorize(s, BLUE_FG)
+colorizeas(s::AbstractString, ::Type{OtherEntry}) = colorize(s, YELLOW_FG)
+    #=special case=# colorizeas(s::AbstractString, ::Type{UnknownEntryNONEXIST}) = colorize(s, RED_FG)
 
-colorizeas(s::AbstractString, ::UnknownEntryNONEXIST) = colorize(s, RED_FG)
+colorizeas(s::AbstractString, ::Type{FsSymlink{FileEntry}}) = colorize(s, GREEN_FG, NEGATIVE)
+colorizeas(s::AbstractString, ::Type{FsSymlink{DirEntry}}) = colorize(s, BLUE_FG, NEGATIVE)
+colorizeas(s::AbstractString, ::Type{FsSymlink{OtherEntry}}) = colorize(s, YELLOW_FG, NEGATIVE)
+colorizeas(s::AbstractString, ::Type{FsSymlink{UnknownEntryNONEXIST}}) = colorize(s, RED_FG, NEGATIVE)
+
 
 
 filedevice(st::StatStruct)::UInt64 = st.device
@@ -44,8 +57,8 @@ struct FsStats  # mutable avoids some boilerplate in construction
     # standard combinations
     symltarget_fileentries::Vector{FileEntry}
     symltarget_direntries::Vector{DirEntry}
-    #symltarget_otherentries::Vector{OtherEntry}
-    #symltarget_unknownentriesNONEXIST::Vector{UnknownEntryNONEXIST}
+    symltarget_otherentries::Vector{OtherEntry}
+    symltarget_unknownentriesNONEXIST::Vector{UnknownEntryNONEXIST}
 
     files::Vector{FileEntry} 
     dirs::Vector{DirEntry} 
@@ -77,6 +90,8 @@ struct FsStats  # mutable avoids some boilerplate in construction
         # combinations
         symltarget_fileentries::Vector{FileEntry} = follow.(syml2fileentries)
         symltarget_direntries::Vector{DirEntry} = follow.(syml2direntries)
+        symltarget_otherentries::Vector{OtherEntry} = follow.(syml2otherentries)
+        symltarget_unknownentriesNONEXIST::Vector{UnknownEntryNONEXIST} = follow.(syml2unknownentriesNONEXIST)
 
         files::Vector{FileEntry} = [ fileentries ; symltarget_fileentries ]
         dirs::Vector{DirEntry} = [ direntries ; symltarget_direntries ]
@@ -100,6 +115,8 @@ struct FsStats  # mutable avoids some boilerplate in construction
 
             symltarget_fileentries,
             symltarget_direntries,
+            symltarget_otherentries,
+            symltarget_unknownentriesNONEXIST,
 
             files,
             dirs
@@ -107,6 +124,33 @@ struct FsStats  # mutable avoids some boilerplate in construction
     end    
 end
 stats(X::AbstractVector{<:AbstractFsEntry}) = FsStats(X)
+
+
+function info(S::FsStats)
+    nfiles = length(S.files)
+    ndirs = length(S.dirs)
+end
+info(X::AbstractVector{<:AbstractFsEntry}) = info(stats(X))
+
+    start1,start2 = lpad(String[ tostr_thsep(nfiles), tostr_thsep(ndirs) ]) .* [" files ", " dirs  "]
+    cstart1 = colorizeaas(start1, FileEntry)
+    cstart2 = GREEN_FG(start2, DirEntry)
+
+end
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 function statsOLD(X::AbstractVector{<:AbstractFsEntry})
@@ -130,7 +174,8 @@ function statsOLD(X::AbstractVector{<:AbstractFsEntry})
     return (;dtype, dExt)
 end
 
-function info(X::AbstractVector{<:AbstractFsEntry})
+
+function infoNEWER(X::AbstractVector{<:AbstractFsEntry})
     dt,dE = stats(X)
 
     v = sort(collect(dE), by=x->sum(values(x[2])), rev=true)
@@ -188,9 +233,9 @@ symlinks BROKEN                         $(nsyml2nonexist)
 SUM                                     $(ntot)   
 
 --- by likeness:
-file-likes, regular and symlinks        $(nfile + nsyml2file)
-dir-likes, regular and symlinks         $(ndir + nsyml2dir)
-other, regular and symlinks             $(nother + nsyml2other)
+file-likes, regular and symlinked        $(nfile + nsyml2file)
+dir-likes, regular and symlinked         $(ndir + nsyml2dir)
+other, regular and symlinked             $(nother + nsyml2other)
 symlinks BROKEN                         $(nsyml2nonexist)
 
 --- file-likes, by extension:
@@ -209,10 +254,6 @@ symlinks BROKEN                         $(nsyml2nonexist)
 end 
 
 
-lpad(s::AbstractString, upto::Int64) = ( upto < length(s)  &&  error("lpad '$upto' too small for string 's'")  ;  return " "^(upto-length(s)) * s )
-lpad(upto::Int64) = x -> lpad(x, upto)
-
-lpad(X::AbstractVector{<:AbstractString}) = ( maxlen = maximum(length.(X))  ;  return [ lpad(x, maxlen) for x in X ] )
 
 
 # NOT NEEDED <=> .*
