@@ -159,7 +159,7 @@ function info(S::FsStats)
     if nfiles(S) == 0
         push!(line, DARK_GRAY_FG("[ no dirs ]"))
     else
-        push!(line, colorizeas("[ $(tostr_thsep(ndirs(S))) files ", FileDir))
+        push!(line, colorizeas("[ $(tostr_thsep(ndirs(S))) files ", DirEntry))
     end
     println(line...)
 
