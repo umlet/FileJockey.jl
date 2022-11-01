@@ -63,7 +63,7 @@ struct FsStats  # mutable avoids some boilerplate in construction
     files::Vector{FileEntry} 
     dirs::Vector{DirEntry}
     others::Vector{OtherEntry}
-    unknown::Vector{UnknownEntryNONEXIST}
+    unknowns::Vector{UnknownEntryNONEXIST}
 
     setfilepaths::Set{String}
     setfiledevices::Set{UInt64}
@@ -104,7 +104,7 @@ struct FsStats  # mutable avoids some boilerplate in construction
         files::Vector{FileEntry} = [ fileentries ; symltarget_fileentries ]
         dirs::Vector{DirEntry} = [ direntries ; symltarget_direntries ]
         others::Vector{OtherEntry} = [ otherentries ; symltarget_otherentries ]
-        unknown::Vector{UnknownEntryNONEXIST} = [ unknownentriesNONEXIST ; symltarget_unknownentriesNONEXIST ]
+        unknowns::Vector{UnknownEntryNONEXIST} = [ unknownentriesNONEXIST ; symltarget_unknownentriesNONEXIST ]
 
         setfilepaths::Set{String} = Set{String}( path(x) for x in files )
         setfiledevices::Set{UInt64} = Set{UInt64}( filedevice(stat(x)) for x in files )
@@ -129,7 +129,7 @@ struct FsStats  # mutable avoids some boilerplate in construction
             files,
             dirs,
             others,
-            unknown,
+            unknowns,
 
             setfilepaths,
             setfiledevices,
@@ -144,7 +144,7 @@ Base.filesize(S::FsStats) = sum(filesize.(S.files))
 nfiles(S::FsStats) = length(S.files)
 ndirs(S::FsStats) = length(S.dirs)
 nothers(S::FsStats) = length(S.others)
-nunknown(S::FsStats) = length(S.unknown)
+nunknowns(S::FsStats) = length(S.unknowns)
 nsyml2fileentries(S::FsStats) = length(S.syml2fileentries)
 nsyml2direntries(S::FsStats) = length(S.syml2direntries)
 
@@ -190,10 +190,20 @@ function info(S::FsStats)
         push!(line, colorizeas(" ]", DirEntry))
     end
 
+    push!(line, " ")
+
     if nothers(S) == 0
-        push!(line, DARK_GRAY_FG("[ no others=dev/socker/fifo ]"))
+        push!(line, DARK_GRAY_FG("[ no others/dev,socker,fifo ]"))
     else
-        push!(line, colorizeas("[ $(tostr_thsep(ndirs(S))) sev/socket/fifo ]", OtherEntry))
+        push!(line, colorizeas("[ $(tostr_thsep(nothers(S))) others/dev,socket,fifo ]", OtherEntry))
+    end
+
+    push!(line, " ")
+
+    if nunknowns(S) == 0
+        push!(line, DARK_GRAY_FG("[ no unknown/broken ]"))
+    else
+        push!(line, colorizeas("[ $(tostr_thsep(ndirs(S))) unknown/broken ]", OtherEntry))
     end
 
     println(line...)
