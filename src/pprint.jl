@@ -157,7 +157,7 @@ nsetfilepaths(S::FsStats) = length(S.setfilepaths)
 nsetfiledevices(S::FsStats) = length(S.setfiledevices)
 nsetfiledeviceinodes(S::FsStats) = length(S.setfiledeviceinodes)
 
-nsetdirpaths(S::FsStat) = length(S.setdirpaths)
+nsetdirpaths(S::FsStats) = length(S.setdirpaths)
 
 function info(S::FsStats)
     # LINE 1
