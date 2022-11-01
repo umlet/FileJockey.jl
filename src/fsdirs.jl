@@ -50,10 +50,10 @@ ls(s::AbstractString=".") = ls(FsEntry(s))
 ll(x::AbstractFsEntry) = collect(fswalkdir(x))
 ll(s::AbstractString=".") = ll(FsEntry(s))
 
-find(x) = ll(x)
+find(args...) = ll(args...)
 
 
-eachentry(x) = fswalkdir(x)
-eachfile(x) = eachentry(x) |> fl(isfile) |> mp(follow)
+eachentry(args...) = fswalkdir(args...)
+eachfile(args...) = eachentry(args...) |> fl(isfile) |> mp(follow)
 
 
