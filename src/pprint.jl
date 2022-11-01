@@ -38,8 +38,8 @@ struct FsStats  # mutable avoids some boilerplate in construction
     syml2nonexist::Vector{FsSymlink{UnknownEntryNONEXIST}}  # shortcut for '2unknownnonexist'
 
     # standard combinations
-    stdsymltargetfiles::Vector{FileEntry}
-    stdsymltargetdirs::Vector{DirEntry}
+    stdsymltargetfileentries::Vector{FileEntry}
+    stdsymltargetdirentries::Vector{DirEntry}
     files::Vector{FileEntry} 
     dirs::Vector{DirEntry} 
 
@@ -68,8 +68,8 @@ struct FsStats  # mutable avoids some boilerplate in construction
         end
 
         # combinations
-        stdsymltargetfiles::Vector{FileEntry} = follow.(syml2files)
-        stdsymltargetdirs::Vector{DirEntry} = follow.(syml2dirs)
+        stdsymltargetfileentries::Vector{FileEntry} = follow.(syml2fileentries)
+        stdsymltargetdirentries::Vector{DirEntry} = follow.(syml2direntries)
 
         files::Vector{FileEntry} = [ files ; stdsymltargetfiles ]
         dirs::Vector{DirEntry} = [ dirs ; stdsymltargetdirs ]
@@ -91,8 +91,8 @@ struct FsStats  # mutable avoids some boilerplate in construction
             syml2others,
             syml2nonexist,
 
-            stdsymltargetfiles,
-            stdsymltargetdirs,
+            stdsymltargetfileentries,
+            stdsymltargetdirentries,
 
             files,
             dirs
