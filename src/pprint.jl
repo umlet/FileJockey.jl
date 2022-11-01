@@ -129,14 +129,17 @@ stats(X::AbstractVector{<:AbstractFsEntry}) = FsStats(X)
 function info(S::FsStats)
     nfiles = length(S.files)
     ndirs = length(S.dirs)
+
+    line = Any[]
+    if nfiles != 0
+        push!(line, DARK_GRAY_FG("[ no files ]"))
+    else
+        push!(line, colorizeas("[ $(tostr_thsep(nfiles))", FileEntry))
+    end
+    println(line...)
+
 end
 info(X::AbstractVector{<:AbstractFsEntry}) = info(stats(X))
-
-    start1,start2 = lpad(String[ tostr_thsep(nfiles), tostr_thsep(ndirs) ]) .* [" files ", " dirs  "]
-    cstart1 = colorizeaas(start1, FileEntry)
-    cstart2 = GREEN_FG(start2, DirEntry)
-
-end
 
 
 
