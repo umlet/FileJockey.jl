@@ -153,6 +153,7 @@ nunknowns(S::FsStats) = length(S.unknowns)
 nsyml2fileentries(S::FsStats) = length(S.syml2fileentries)
 nsyml2direntries(S::FsStats) = length(S.syml2direntries)
 nsyml2otherentries(S::FsStats) = length(S.syml2otherentries)
+syml2unknownentriesNONEXIST(S::FsStats) = length(S.syml2unknownentriesNONEXIST)
 
 nsetfilepaths(S::FsStats) = length(S.setfilepaths)
 nsetfiledevices(S::FsStats) = length(S.setfiledevices)
@@ -190,7 +191,7 @@ function info(S::FsStats)
     else
         push!(line, colorizeas("[ $(tostr_thsep(ndirs(S))) dirs ", DirEntry))
         if nsyml2direntries(S) == 0
-            push!(line, DARK_GRAY_FG("( none syml )"))
+            push!(line, DARK_GRAY_FG("( no syml )"))
         else
             push!(line, colorizeas("( $(tostr_thsep(nsyml2direntries(S))) symlinked )", Symlink{DirEntry}))
         end
@@ -205,9 +206,9 @@ function info(S::FsStats)
     else
         push!(line, colorizeas("[ $(tostr_thsep(nothers(S))) dev,sock,fifo ", OtherEntry))
         if nsyml2otherentries(S) == 0
-            push!(line, DARK_GRAY_FG("( none syml )"))
+            push!(line, DARK_GRAY_FG("( no syml )"))
         else
-            push!(line, colorizeas("( $(tostr_thsep(nsyml2otherentries(S))) symlinked )", Symlink{OtherEntry}))
+            push!(line, colorizeas("( $(tostr_thsep(nsyml2otherentries(S))) syml )", Symlink{OtherEntry}))
         end        
         push!(line, colorizeas(" ]", OtherEntry))
     end
@@ -218,6 +219,11 @@ function info(S::FsStats)
         push!(line, DARK_GRAY_FG("[ no unknown/broken ]"))
     else
         push!(line, colorizeas("[ $(tostr_thsep(nunknowns(S))) unknown/broken ]", UnknownEntryNONEXIST))
+        if nsyml2unknownentriesNONEXIST(S) == 0
+            push!(line, DARK_GRAY_FG("( no syml )"))
+        else
+            push!(line, colorizeas("( $(tostr_thsep(nsyml2unknownentriesNONEXIST(S))) syml )", Symlink{OtherEntry}))
+        end        
     end
 
     println(line...)
