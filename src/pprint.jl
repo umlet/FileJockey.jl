@@ -125,16 +125,25 @@ struct FsStats  # mutable avoids some boilerplate in construction
 end
 stats(X::AbstractVector{<:AbstractFsEntry}) = FsStats(X)
 
+filesize(S::FsStat) = sum(filesize.(S.files))
+
+nfiles(S::FsStat) = length(S.files)
+nsyml2fileentries(S::FsStat) = length(S.syml2fileentries)
+
+
 
 function info(S::FsStats)
-    nfiles = length(S.files)
-    ndirs = length(S.dirs)
-
     line = Any[]
-    if nfiles != 0
+    if nfiles(S) == 0
         push!(line, DARK_GRAY_FG("[ no files ]"))
     else
-        push!(line, colorizeas("[ $(tostr_thsep(nfiles))", FileEntry))
+        push!(line, colorizeas("[ $(tostr_thsep(nfiles(S)))", FileEntry))
+        if nsyml2fileentries(S) == 0
+            push!(line, DARK_GRAY_FG("( none symlinked )"))
+        else
+            push!(line, colorizeas("( $(tostr_thsep(nsyml2fileentries(S)) symlinked )", Symlink{FileEntry}))
+        end
+
     end
     println(line...)
 
