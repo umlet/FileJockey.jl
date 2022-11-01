@@ -125,7 +125,7 @@ struct FsStats  # mutable avoids some boilerplate in construction
 end
 stats(X::AbstractVector{<:AbstractFsEntry}) = FsStats(X)
 
-filesize(S::FsStat) = sum(filesize.(S.files))
+filesize(S::FsStats) = sum(filesize.(S.files))
 
 nfiles(S::FsStat) = length(S.files)
 nsyml2fileentries(S::FsStat) = length(S.syml2fileentries)
