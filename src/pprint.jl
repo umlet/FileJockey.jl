@@ -49,7 +49,7 @@ struct FsStats  # mutable avoids some boilerplate in construction
         fileentries::Vector{FileEntry} = FileEntry[]
         direntries::Vector{DirEntry} = DirEntry[]
         syml2fileentries::Vector{FsSymlink{FileEntry}} = FsSymlink{FileEntry}[]
-        syml2dirs::Vector{FsSymlink{DirEntry}} = FsSymlink{DirEntry}[]
+        syml2direntries::Vector{FsSymlink{DirEntry}} = FsSymlink{DirEntry}[]
     
         # non-standard
         others::Vector{OtherEntry} = FsSymlink{DirEntry}[]
@@ -60,7 +60,7 @@ struct FsStats  # mutable avoids some boilerplate in construction
             x isa FileEntry  &&  push!(fileentries, x)
             x isa DirEntry  &&  push!(direntries, x)
             x isa FsSymlink{FileEntry}  &&  ( push!(syml2fileentries, x) )
-            x isa FsSymlink{DirEntry}  &&  ( push!(syml2dirs, x) )
+            x isa FsSymlink{DirEntry}  &&  ( push!(syml2direntries, x) )
 
             x isa OtherEntry  &&  push!(others, x)
             x isa FsSymlink{OtherEntry}  &&  push!(syml2others, x)
