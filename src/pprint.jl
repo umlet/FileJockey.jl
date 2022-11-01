@@ -87,8 +87,8 @@ struct FsStats  # mutable avoids some boilerplate in construction
     
         for x in X
             x isa FileEntry  &&  push!(fileentries, x)
-            x isa DirEntry  &&  push!(direntries, x)
             x isa Symlink{FileEntry}  &&  ( push!(syml2fileentries, x) )
+            x isa DirEntry  &&  push!(direntries, x)
             x isa Symlink{DirEntry}  &&  ( push!(syml2direntries, x) )
 
             x isa OtherEntry  &&  push!(otherentries, x)
@@ -152,6 +152,7 @@ nothers(S::FsStats) = length(S.others)
 nunknowns(S::FsStats) = length(S.unknowns)
 nsyml2fileentries(S::FsStats) = length(S.syml2fileentries)
 nsyml2direntries(S::FsStats) = length(S.syml2direntries)
+nsyml2otherentries(S::FsStats) = length(S.syml2otherentries)
 
 nsetfilepaths(S::FsStats) = length(S.setfilepaths)
 nsetfiledevices(S::FsStats) = length(S.setfiledevices)
@@ -200,9 +201,14 @@ function info(S::FsStats)
     push!(line, DARK_GRAY_FG(" :: "))
 
     if nothers(S) == 0
-        push!(line, DARK_GRAY_FG("[ no others/dev,socker,fifo ]"))
+        push!(line, DARK_GRAY_FG("[ no dev,sock,fifo.. ]"))
     else
-        push!(line, colorizeas("[ $(tostr_thsep(nothers(S))) others/dev,socket,fifo ]", OtherEntry))
+        push!(line, colorizeas("[ $(tostr_thsep(nothers(S))) dev,sock,fifo ", OtherEntry))
+        if nsyml2otherentries(S) == 0
+            push!(line, DARK_GRAY_FG("( none syml )"))
+        else
+            push!(line, colorizeas("( $(tostr_thsep(nsyml2otherentries(S))) symlinked )", Symlink{OtherEntry}))
+        end        
     end
 
     push!(line, DARK_GRAY_FG(" :: "))
