@@ -130,6 +130,7 @@ Base.filesize(S::FsStats) = sum(filesize.(S.files))
 nfiles(S::FsStats) = length(S.files)
 ndirs(S::FsStats) = length(S.dirs)
 nsyml2fileentries(S::FsStats) = length(S.syml2fileentries)
+nsyml2direntries(S::FsStats) = length(S.syml2direntries)
 
 
 
@@ -147,9 +148,9 @@ function info(S::FsStats)
         end
         fsize = filesize(S)
         if fsize <= 2^10
-            push!(line, colorizeas(" -- $(tostr_thsep(fsize)) bytes ]", FileEntry))
+            push!(line, colorizeas(" -- $(tostr_thsep(fsize)) bytes ", FileEntry))
         else
-            push!(line, colorizeas(" -- $(fsizehuman(fsize)) -- $(tostr_thsep(fsize)) bytes ]", FileEntry))
+            push!(line, colorizeas(" -- $(fsizehuman(fsize)) -- $(tostr_thsep(fsize)) bytes ", FileEntry))
         end
     end
     println(line...)
@@ -159,7 +160,12 @@ function info(S::FsStats)
     if nfiles(S) == 0
         push!(line, DARK_GRAY_FG("[ no dirs ]"))
     else
-        push!(line, colorizeas("[ $(tostr_thsep(ndirs(S))) files ", DirEntry))
+        push!(line, colorizeas("[ $(tostr_thsep(ndirs(S))) dirs ", DirEntry))
+        if nsyml2direntries(S) == 0
+            push!(line, DARK_GRAY_FG("( none symlinked )"))
+        else
+            push!(line, colorizeas("( $(tostr_thsep(nsyml2direntries(S))) symlinked )", Symlink{DirEntry}))
+        end
     end
     println(line...)
 
