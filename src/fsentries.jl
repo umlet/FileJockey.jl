@@ -86,11 +86,11 @@ struct UnknownEntryNONEXIST <: AbstractFsEntry
     st::StatStruct  # zero entries
     function UnknownEntryNONEXIST(f::AbstractString)
         st = stat(f)
-        @assert !ipbath(st)
+        @assert !isbath(st)
         return new(f, st)
     end
 end
-#_show(io::IO, x::UnknownEntryNONEXIST) = print(io, """UnknownEntryNONEXIST(?$(x.path)?)""")
+_show(io::IO, x::UnknownEntryNONEXIST) = print(io, colorizeas("UnknownEntryNONEXIST", x), """(???$(x.path)???)""")
 
 
 # function _show(io::IO, X::AbstractVector{<:AbstractFsEntry})

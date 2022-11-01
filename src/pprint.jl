@@ -19,6 +19,8 @@ colorizeas(s::AbstractString, ::FsSymlink{DirEntry}) = colorize(s, BLUE_FG, NEGA
 colorizeas(s::AbstractString, ::FsSymlink{OtherEntry}) = colorize(s, YELLOW_FG, NEGATIVE)
 colorizeas(s::AbstractString, ::FsSymlink{UnknownEntryNONEXIST}) = colorize(s, RED_FG, NEGATIVE)
 
+colorizeas(s::AbstractString, ::UnknownEntryNONEXIST) = colorize(s, RED_FG)
+
 
 filedevice(st::StatStruct)::UInt64 = st.device
 fileinode(st::StatStruct)::UInt64 = st.inode
