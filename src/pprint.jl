@@ -28,9 +28,9 @@ filedeviceinode(st::StatStruct)::Tuple{UInt64, UInt64} = (filedevice(st), filein
 struct FsStats  # mutable avoids some boilerplate in construction
     # PARTITION for counting
     # - standard
-    files::Vector{FileEntry}
+    fileentries::Vector{FileEntry}
     dirs::Vector{DirEntry}
-    syml2files::Vector{FsSymlink{FileEntry}}
+    syml2fileentries::Vector{FsSymlink{FileEntry}}
     syml2dirs::Vector{FsSymlink{DirEntry}}
     # non-standard
     others::Vector{OtherEntry}
@@ -40,28 +40,15 @@ struct FsStats  # mutable avoids some boilerplate in construction
     # standard combinations
     stdsymltargetfiles::Vector{FileEntry}
     stdsymltargetdirs::Vector{DirEntry}
-    FILES::Vector{FileEntry} 
-    DIR::Vector{DirEntry} 
-
-    # DEVICES 
-    # - for check if on same device (e.g., for some handlink operations)
-    # setregfiledevices::Set{UInt64}
-    # setregdirdevices::Set{UInt64}
-    # setsymlink2filedevices::Set{UInt64}
-    # setsyml2dirdevices::Set{UInt64}
-
-    # setsymltargetfiledevices::Set{UInt64}
-    # setsymltargetdirdevices::Set{UInt64}
-
-    # - inodes to detect existing hardlinks
-
+    files::Vector{FileEntry} 
+    dirs::Vector{DirEntry} 
 
     function FsStats(X::AbstractVector{<:AbstractFsEntry})
         # BASE
         # standard
-        files::Vector{FileEntry} = FileEntry[]
+        fileentries::Vector{FileEntry} = FileEntry[]
         dirs::Vector{DirEntry} = DirEntry[]
-        syml2files::Vector{FsSymlink{FileEntry}} = FsSymlink{FileEntry}[]
+        syml2fileentries::Vector{FsSymlink{FileEntry}} = FsSymlink{FileEntry}[]
         syml2dirs::Vector{FsSymlink{DirEntry}} = FsSymlink{DirEntry}[]
     
         # non-standard
@@ -70,9 +57,9 @@ struct FsStats  # mutable avoids some boilerplate in construction
         syml2nonexist::Vector{FsSymlink{UnknownEntryNONEXIST}} = FsSymlink{UnknownEntryNONEXIST}[]  # shortcut for '2unknownnonexist'
     
         for x in X
-            x isa FileEntry  &&  push!(files, x)
+            x isa FileEntry  &&  push!(fileentries, x)
             x isa DirEntry  &&  push!(dirs, x)
-            x isa FsSymlink{FileEntry}  &&  ( push!(syml2files, x) )
+            x isa FsSymlink{FileEntry}  &&  ( push!(syml2fileentries, x) )
             x isa FsSymlink{DirEntry}  &&  ( push!(syml2dirs, x) )
 
             x isa OtherEntry  &&  push!(others, x)
@@ -84,8 +71,8 @@ struct FsStats  # mutable avoids some boilerplate in construction
         stdsymltargetfiles::Vector{FileEntry} = follow.(syml2files)
         stdsymltargetdirs::Vector{DirEntry} = follow.(syml2dirs)
 
-        FILES::Vector{FileEntry} = [ files ; stdsymltargetfiles ]
-        DIRS::Vector{DirEntry} = [ dirs ; stdsymltargetdirs ]
+        files::Vector{FileEntry} = [ files ; stdsymltargetfiles ]
+        dirs::Vector{DirEntry} = [ dirs ; stdsymltargetdirs ]
     
         # setregfiledevices::Set{UInt64} = Set{UInt64}( filedevice(stat(x)) for x in files )
         # setregdirdevices::Set{UInt64} = Set{UInt64}( filedevice(stat(x)) for x in dirs )
@@ -96,9 +83,9 @@ struct FsStats  # mutable avoids some boilerplate in construction
         # setsymltargetdirdevices::Set{UInt64} = Set{UInt64}( filedevice(x) for x in files )
 
         return new(
-            files,
+            filesentries,
             dirs,
-            syml2files,
+            syml2fileentries,
             syml2dirs,
             others,
             syml2others,
@@ -107,9 +94,8 @@ struct FsStats  # mutable avoids some boilerplate in construction
             stdsymltargetfiles,
             stdsymltargetdirs,
 
-            FILES,
-            DIRS
-
+            files,
+            dirs
         )
     end    
 end
