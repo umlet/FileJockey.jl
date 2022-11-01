@@ -86,10 +86,10 @@ struct FsStats  # mutable avoids some boilerplate in construction
         # setsymltargetdirdevices::Set{UInt64} = Set{UInt64}( filedevice(x) for x in files )
 
         return new(
-            filesentries,
-            direntries,
+            fileentries,
+            dirntries,
             syml2fileentries,
-            syml2dirs,
+            syml2direntries,
             otherentries,
             syml2otherentries,
             syml2unknownentriesNONEXIST,
