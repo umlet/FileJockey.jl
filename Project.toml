@@ -1,9 +1,9 @@
-name = "AttoFilejockey"
+name = "FileDeejay"
 uuid = "bc1231ea-70fa-4965-b0b3-6932f742a22e"
 authors = ["Martin <martin@umlet.com>"]
-version = "0.1.0"
+version = "0.2.0"
 
 [deps]
-AttoFunctionAliases = "3b9ca5f2-f1fa-4f4c-81ef-0d48c36974eb"
+AttoPiper = "3b9ca5f2-f1fa-4f4c-81ef-0d48c36974eb"
 Crayons = "a8cc5b0e-0ffa-5ad4-8c14-923d3ee1735f"
 OrderedCollections = "bac558e1-5e72-5ebc-8fee-abe8a469f55d"
