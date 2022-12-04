@@ -2,7 +2,7 @@
 
 struct PathCanon
     s::String  # canonical; up to symlink basename
-    function PathCanon(x::PathCanon, relsegment::AbstractString)  # avoids realpath(); assumes existence and x being a dir
+    function PathCanon(x::PathCanon, relsegment::AbstractString)  # avoids realpath(); assumes existence of relsegment, and x being a dir
         @assert !occursin('/', relsegment)  # TODO WINDOWS
         return new(joinpath(x.s, relsegment))
     end
