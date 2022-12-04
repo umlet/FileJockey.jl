@@ -1,4 +1,4 @@
-module FileDeejay
+module FileJockey
 
 
 # from fsentries
@@ -52,8 +52,7 @@ using OrderedCollections
 using Crayons
 using Crayons.Box
 
-using AttoPiper
-#using AttoHabits
+using Juliettine
 
 
 include("./fsentries.jl")
@@ -110,7 +109,7 @@ end
 # # export isafsdir
 
 
-AttoPiper.ext(x::AbstractFsEntry) = ext(x.path.s)
+Juliettine.ext(x::AbstractFsEntry) = ext(x.path.s)
 
 # files and symlink to files
 # isfilelike(x::Union{FsFile, Symlink{FsFile}}) = true
