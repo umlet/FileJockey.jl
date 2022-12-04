@@ -1,46 +1,46 @@
 module FileJockey
 
 
-# from fsentries
-export PathCanon, FsEntryCanon
-export AbstractFsEntry
-export FileEntry, DirEntry, Symlink, OtherEntry, UnknownEntryNONEXIST
-export FsEntry
-export @fs_str
+# # from fsentries
+# export PathCanon, EntryCanon
+# export AbstractEntry
+# export FileEntry, DirEntry, Symlink, OtherEntry, UnknownEntryNONEXIST
+# export Entry
+# export @fs_str
 
-export path, pathcanon
-export isstandard
-export isfilelike, isdirlike
-export follow
-
-
-# from DirEntrys
-export fsreaddir, fswalkdir
-export ls, ll, find, eachentry, eachfile
+# export path, pathcanon
+# export isstandard
+# export isfilelike, isdirlike
+# export follow
 
 
-# from fsbatch
-export AbstractBatchTrait
-
-export AllEntriesAreStandard
-export TheDirlikesAreDistinct
-#export TheFilelikesAreUnique
-export FsBatch, batch
-export ensure!
-
-# from conf
-export CONF, Conf
+# # from DirEntrys
+# export fsreaddir, fswalkdir
+# export ls, ll, find, eachentry, eachfile
 
 
-export ext, Ext
-export @en_str
-export hasext, hasExt
+# # from fsbatch
+# export AbstractBatchTrait
 
-export FsStats, stats, info
+# export AllEntriesAreStandard
+# export TheDirlikesAreDistinct
+# #export TheFilelikesAreUnique
+# export FsBatch, batch
+# export ensure!
 
-# todo: temp!!!
-export colorize
-export pprint, lpad
+# # from conf
+# export CONF, Conf
+
+
+# export ext, Ext
+# export @en_str
+# export hasext, hasExt
+
+# export FsStats, stats, info
+
+# # todo: temp!!!
+# export colorize
+# export pprint, lpad
 
 
 
@@ -55,21 +55,31 @@ using Crayons.Box
 using Juliettine
 
 
-include("./fsentries.jl")
-include("./fsdirs.jl")
+include("conf.jl")
 
-include("./ext.jl")
-
-include("./fsbatch.jl")
-
-include("./conf.jl")
+include("entries.jl");      include("entries.jl_exports")
+include("trees.jl");        include("trees.jl_exports")
 
 include("./pprint.jl")
 
-function __init__()
-    @info "Initializing known file extensions"
-    initext()
-end
+
+# include("./ext.jl")
+
+# include("./fsbatch.jl")
+
+# include("./conf.jl")
+
+
+# function __init__()
+#     @info "Initializing known file extensions"
+#     initext()
+# end
+
+
+
+
+
+
 
 
 # # just checks uniqueness of FsEntries (path & stat)
@@ -98,27 +108,27 @@ end
 # hasext(ext::AbstractString) = x -> hasext(x, ext)
 # export hasext
 
-# # isafsfile(fse::FsEntry) = false  # NOTE false for symlinks; those should be "resolved" first
+# # isafsfile(fse::Entry) = false  # NOTE false for symlinks; those should be "resolved" first
 # # isafsfile(fse::FsFile) = true
 # # isafsfile() = x -> isafsfile(x)
 # # export isafsfile
 
-# # isafsdir(fse::FsEntry) = false
+# # isafsdir(fse::Entry) = false
 # # isafsdir(fse::DirEntry) = true
 # # isafsdir() = x -> isafsdir(x)
 # # export isafsdir
 
 
-Juliettine.ext(x::AbstractFsEntry) = ext(x.path.s)
+Juliettine.ext(x::AbstractEntry) = ext(x.path.s)
 
 # files and symlink to files
 # isfilelike(x::Union{FsFile, Symlink{FsFile}}) = true
-# isfilelike(x::AbstractFsEntry) = false
+# isfilelike(x::AbstractEntry) = false
 
 
 
 
-# # function excludesingle(X::Vector{FsEntry}, pathtoexclude::AbstractString)
+# # function excludesingle(X::Vector{Entry}, pathtoexclude::AbstractString)
 # #     paths = path.(X)
 # #     nfound = 0
 # #     ifound = -1
@@ -153,7 +163,7 @@ Juliettine.ext(x::AbstractFsEntry) = ext(x.path.s)
 # struct FsFilesUnique
 #     files::OrderedSet{FsFile}
 
-#     function FsFilesUnique(X::Vector{FsEntry}; quiet=false)
+#     function FsFilesUnique(X::Vector{Entry}; quiet=false)
 #         files::Vector{FsFile}                   = X |> flt(is(FsFile))
 #         dirs::Vector{DirEntry}                     = X |> flt(is(DirEntry))
 #         others::Vector{OtherEntry}                 = X |> flt(is(OtherEntry))

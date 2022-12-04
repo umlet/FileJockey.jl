@@ -71,7 +71,7 @@ struct FsStats  # mutable avoids some boilerplate in construction
 
     setdirpaths::Set{String}
 
-    function FsStats(X::AbstractVector{<:AbstractFsEntry})
+    function FsStats(X::AbstractVector{<:AbstractEntry})
         # BASE
         # standard
         fileentries::Vector{FileEntry} = FileEntry[]
@@ -142,7 +142,7 @@ struct FsStats  # mutable avoids some boilerplate in construction
         )
     end    
 end
-stats(X::AbstractVector{<:AbstractFsEntry}) = FsStats(X)
+stats(X::AbstractVector{<:AbstractEntry}) = FsStats(X)
 
 Base.filesize(S::FsStats) = sum(filesize.(S.files))
 
@@ -231,7 +231,7 @@ function info(S::FsStats)
 
 
 end
-info(X::AbstractVector{<:AbstractFsEntry}) = info(stats(X))
+info(X::AbstractVector{<:AbstractEntry}) = info(stats(X))
 
 
 
@@ -248,8 +248,8 @@ info(X::AbstractVector{<:AbstractFsEntry}) = info(stats(X))
 
 
 
-function statsOLD(X::AbstractVector{<:AbstractFsEntry})
-    dtype = Dict{Type{<:AbstractFsEntry}, Int64}()
+function statsOLD(X::AbstractVector{<:AbstractEntry})
+    dtype = Dict{Type{<:AbstractEntry}, Int64}()
     dExt = Dict{Symbol, Dict{Union{String, Nothing}, Int64}}()
 
     for x in X
@@ -270,7 +270,7 @@ function statsOLD(X::AbstractVector{<:AbstractFsEntry})
 end
 
 
-function infoNEWER(X::AbstractVector{<:AbstractFsEntry})
+function infoNEWER(X::AbstractVector{<:AbstractEntry})
     dt,dE = stats(X)
 
     v = sort(collect(dE), by=x->sum(values(x[2])), rev=true)
@@ -292,7 +292,7 @@ function infoNEWER(X::AbstractVector{<:AbstractFsEntry})
     end
 end
 
-function infoOLD(X::AbstractVector{<:AbstractFsEntry})
+function infoOLD(X::AbstractVector{<:AbstractEntry})
     nfile = X |> cn(is(FileEntry))
     ndir = X |> cn(is(DirEntry))
     nother = X |> cn(is(OtherEntry))
@@ -360,58 +360,58 @@ end
 
 
 
-function pprint(batch::FsBatch; colors::Bool=true)
-    S = stats(batch._v)
+# function pprint(batch::FsBatch; colors::Bool=true)
+#     S = stats(batch._v)
 
 
-    # dtype,dExt = stats(batch._v)
+#     # dtype,dExt = stats(batch._v)
 
-    # start1,start2 = lpad(String[ tostr_thsep(nfiles), tostr_thsep(ndirs) ]) .* [" files ", " dirs  "]
-    # cstart1 = BLUE_FG(start1)
-    # cstart2 = GREEN_FG(start2)
+#     # start1,start2 = lpad(String[ tostr_thsep(nfiles), tostr_thsep(ndirs) ]) .* [" files ", " dirs  "]
+#     # cstart1 = BLUE_FG(start1)
+#     # cstart2 = GREEN_FG(start2)
     
-    # sym1 = nsymfiles > 0   ?  "[$(nsymfiles) of which symlinked]"  :  "(none symlinked)"
-    # sym2 = nsymdirs > 0    ?  "[$(nsymdirs) of which symlinked]"   :  "(none symlinked)"
-    # csym1 = nsymfiles > 0  ?  NEGATIVE(BLUE_FG(sym1))  :  DARK_GRAY_FG(sym1)
-    # csym2 = nsymdirs > 0   ?  NEGATIVE(GREEN_FG(sym2)) :  DARK_GRAY_FG(sym2)
+#     # sym1 = nsymfiles > 0   ?  "[$(nsymfiles) of which symlinked]"  :  "(none symlinked)"
+#     # sym2 = nsymdirs > 0    ?  "[$(nsymdirs) of which symlinked]"   :  "(none symlinked)"
+#     # csym1 = nsymfiles > 0  ?  NEGATIVE(BLUE_FG(sym1))  :  DARK_GRAY_FG(sym1)
+#     # csym2 = nsymdirs > 0   ?  NEGATIVE(GREEN_FG(sym2)) :  DARK_GRAY_FG(sym2)
 
-    # size1 = " -- $(fsizehuman(fsize)) -- $(tostr_thsep(fsize)) bytes"
-    # csize1 = BLUE_FG(size1)
+#     # size1 = " -- $(fsizehuman(fsize)) -- $(tostr_thsep(fsize)) bytes"
+#     # csize1 = BLUE_FG(size1)
 
-    # sep = "  :::  "
-    # csep = DARK_GRAY_FG(sep)
+#     # sep = "  :::  "
+#     # csep = DARK_GRAY_FG(sep)
 
-    # if noth+nsymoth == 0
-    #     oth = "(no dev/socket/fifo; none syml)"
-    #     coth = DARK_GRAY_FG(oth)
-    # else
-    #     if nsymoth == 0
-    #         oth0 = "$(noth) dev/socket/fifo "
-    #         oth1 = "(none syml)"
+#     # if noth+nsymoth == 0
+#     #     oth = "(no dev/socket/fifo; none syml)"
+#     #     coth = DARK_GRAY_FG(oth)
+#     # else
+#     #     if nsymoth == 0
+#     #         oth0 = "$(noth) dev/socket/fifo "
+#     #         oth1 = "(none syml)"
 
-    #         oth = oth0 * oth1
-    #         coth = YELLOW_FG(oth0, DARK_GRAY_FG(oth1))
-    #     else
-    #         oth0 = "$(noth) dev/socket/fifo "
-    #         oth1 = "[$(nsymoth) syml]"
+#     #         oth = oth0 * oth1
+#     #         coth = YELLOW_FG(oth0, DARK_GRAY_FG(oth1))
+#     #     else
+#     #         oth0 = "$(noth) dev/socket/fifo "
+#     #         oth1 = "[$(nsymoth) syml]"
 
-    #         oth = oth0 * oth1
-    #         coth = YELLOW_FG(oth0, NEGATIVE(oth1))
-    #     end
-    # end
+#     #         oth = oth0 * oth1
+#     #         coth = YELLOW_FG(oth0, NEGATIVE(oth1))
+#     #     end
+#     # end
 
-    # if nbrk == 0
-    #     brk = "(no broken syml)"
-    #     cbrk = DARK_GRAY_FG(brk)
-    # else
-    #     brk = "$(nbrk) broken syml"
-    #     cbrk = NEGATIVE(RED_FG(brk))
-    # end
+#     # if nbrk == 0
+#     #     brk = "(no broken syml)"
+#     #     cbrk = DARK_GRAY_FG(brk)
+#     # else
+#     #     brk = "$(nbrk) broken syml"
+#     #     cbrk = NEGATIVE(RED_FG(brk))
+#     # end
 
-    # if colors
-    #     println(cstart1, csym1, csize1)
-    #     println(cstart2, csym2, csep, coth, csep, cbrk)
-    # end
+#     # if colors
+#     #     println(cstart1, csym1, csize1)
+#     #     println(cstart2, csym2, csep, coth, csep, cbrk)
+#     # end
 
-end
+# end
 

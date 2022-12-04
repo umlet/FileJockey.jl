@@ -19,69 +19,67 @@ struct PathCanon
 end
 
 
-struct FsEntryCanon
+struct EntryCanon
     path::PathCanon  
     st::StatStruct
-    function FsEntryCanon(path::PathCanon)
+    function EntryCanon(path::PathCanon)
         st = lstat(path)
         !ispath(st)  &&  error("file system entry '$(path.s)' not found")
         return new(path, st)
     end
 end
-FsEntryCanon(s::AbstractString=".") = FsEntryCanon(PathCanon(s))
-#_show(io::IO, x::FsEntryCanon) = print(io, """FsEntryCanon($(x.path), $(Base.Filesystem.filemode_string(x.st)))""")
-#Base.show(io::IO, ::MIME"text/plain", x::FsEntryCanon) = _show(io, x)
-#Base.show(io::IO, x::FsEntryCanon) = _show(io, x)
+EntryCanon(s::AbstractString=".") = EntryCanon(PathCanon(s))
 
 
 
 
-abstract type AbstractFsEntry end
+abstract type AbstractEntry end
 
 
-Base.show(io::IO, ::MIME"text/plain", x::AbstractFsEntry) = _show(io, x)
-#Base.show(io::IO, x::AbstractFsEntry) = _show(io, x)
+Base.show(io::IO, ::MIME"text/plain", x::AbstractEntry) = _show(io, x)
+#Base.show(io::IO, x::AbstractEntry) = _show(io, x)
 
 
-struct FileEntry <: AbstractFsEntry
+struct FileEntry <: AbstractEntry
     path::PathCanon
     st::StatStruct
-    function FileEntry(x::FsEntryCanon)
+    function FileEntry(x::EntryCanon)
         return new(x.path, x.st)
     end
 end
+FileEntry(s::AbstractString)::FileEntry = follow(Entry(s))
 _show(io::IO, x::FileEntry) = print(io, colorizeas("FileEntry", x), """($(x.path), $(Base.Filesystem.filemode_string(x.st)), $(filesize(x.st)) bytes)""")
 
-struct DirEntry <: AbstractFsEntry
+struct DirEntry <: AbstractEntry
     path::PathCanon
     st::StatStruct
-    function DirEntry(x::FsEntryCanon)
+    function DirEntry(x::EntryCanon)
         return new(x.path, x.st)
     end
 end
-DirEntry() = FsEntry(".")
+DirEntry() = Entry(".")
 _show(io::IO, x::DirEntry) = print(io, colorizeas("DirEntry", x), """($(x.path), $(Base.Filesystem.filemode_string(x.st)))""")
 
-struct OtherEntry <: AbstractFsEntry
+struct OtherEntry <: AbstractEntry
     path::PathCanon
     st::StatStruct
-    function OtherEntry(x::FsEntryCanon)
+    function OtherEntry(x::EntryCanon)
         return new(x.path, x.st)
     end
 end
 _show(io::IO, x::OtherEntry) = print(io, colorizeas("OtherEntry", x), """($(x.path), $(Base.Filesystem.filemode_string(x.st)))""")
 
-struct Symlink{T} <: AbstractFsEntry
+struct Symlink{T} <: AbstractEntry
     path::PathCanon
     st::StatStruct  # stat of symlink!
     target::T
-    function Symlink{T}(x::FsEntryCanon, target::T) where {T<:AbstractFsEntry}
+    function Symlink{T}(x::EntryCanon, target::T) where {T<:AbstractEntry}
         return new{T}(x.path, x.st, target)
     end
 end
 _show(io::IO, x::Symlink) = print(io, colorizeas("$(typeof(x))", x), """$(typeof(x))($(x.path) -> "$(x.target.path)")""")
 
-struct UnknownEntryNONEXIST <: AbstractFsEntry
+struct UnknownEntryNONEXIST <: AbstractEntry
     path::String
     st::StatStruct  # zero entries
     function UnknownEntryNONEXIST(f::AbstractString)
@@ -93,25 +91,9 @@ end
 _show(io::IO, x::UnknownEntryNONEXIST) = print(io, colorizeas("UnknownEntryNONEXIST", x), """(???$(x.path)???)""")
 
 
-# function _show(io::IO, X::AbstractVector{<:AbstractFsEntry})
-#     print("$(length(X))-element $(typeof(X)):")
-#     for x in Base.Iterators.take(X, 5)
-#         print("\n "); _show(io, x)
-#     end
-#     length(X) > 5  &&  print("\n ...")
-#     # println()
-#     # summary(X)
-# end
-# Base.show(io::IO, ::MIME"text/plain", X::AbstractVector{<:AbstractFsEntry}) = _show(io, X)
-# Base.show(io::IO, X::AbstractVector{<:AbstractFsEntry}) = _show(io, X)
 
 
-# issymlinkbroken(x::Symlink{UnknownEntryNONEXIST}) = true
-# issymlinkbroken(x::FsEntry) = false
-# export issymlinkbroken
-
-
-function FsEntry(x::FsEntryCanon)
+function Entry(x::EntryCanon)
     if islink(x.st)
         s_readlink = readlink(x.path.s)
         s_path_target = s_readlink
@@ -126,7 +108,7 @@ function FsEntry(x::FsEntryCanon)
             return Symlink{UnknownEntryNONEXIST}(x, UnknownEntryNONEXIST(s_readlink))
         end
 
-        fse = FsEntry(s_path_target)
+        fse = Entry(s_path_target)
         return Symlink{typeof(fse)}(x, fse)
     end
 
@@ -134,29 +116,29 @@ function FsEntry(x::FsEntryCanon)
     isdir(x.st)   &&  return DirEntry(x)
     return OtherEntry(x)
 end
-FsEntry(s::AbstractString) = FsEntry(FsEntryCanon(s))
+Entry(s::AbstractString) = Entry(EntryCanon(s))
 
 
 
 
-macro en_str(s)
-    FsEntry(s)
+macro fj_str(s)
+    Entry(s)
 end
 
 
-path(x::AbstractFsEntry) = x.path.s
-pathcanon(x::AbstractFsEntry) = x.path
+path(x::AbstractEntry) = x.path.s
+# pathcanon(x::AbstractEntry) = x.path
 
 # isfilelike(x::Union{FileEntry, Symlink{FileEntry}}) = true
-# isfilelike(x::AbstractFsEntry) = false
+# isfilelike(x::AbstractEntry) = false
 
 # isdirlike(x::Union{DirEntry, Symlink{DirEntry}}) = true
-# isdirlike(x::AbstractFsEntry) = false
+# isdirlike(x::AbstractEntry) = false
 
 isstandard(x::Union{FileEntry, DirEntry, Symlink{FileEntry}, Symlink{DirEntry}}) = true
-isstandard(x::AbstractFsEntry) = false
+isstandard(x::AbstractEntry) = false
 
-follow(x::AbstractFsEntry) = x
+follow(x::AbstractEntry) = x
 follow(x::Symlink) = x.target
 
 
@@ -171,9 +153,9 @@ follow(x::Symlink) = x.target
 
 
 
-Base.endswith(x::AbstractFsEntry, a) = endswith(x.path.s, a)
+Base.endswith(x::AbstractEntry, a) = endswith(x.path.s, a)
 
-Base.splitext(x::AbstractFsEntry) = splitext(x.path.s)
+Base.splitext(x::AbstractEntry) = splitext(x.path.s)
 
 
 
@@ -183,12 +165,12 @@ Base.Filesystem.stat(x::PathCanon) = stat(x.s)
 
 # stat returns target
 Base.Filesystem.stat(x::Symlink) = x.target.st
-Base.Filesystem.stat(x::AbstractFsEntry) = x.st
+Base.Filesystem.stat(x::AbstractEntry) = x.st
 
 # lstat defaults to stat if no symlink
 Base.Filesystem.lstat(x::Symlink) = x.st
-Base.Filesystem.lstat(x::AbstractFsEntry) = stat(x)
+Base.Filesystem.lstat(x::AbstractEntry) = stat(x)
 
 # stat & lstat should usually be sufficient to override
 # however, Base.Filesystem throws in a rather weird joinpath; so we override that as well
-Base.Filesystem.joinpath(x::AbstractFsEntry) = x
+Base.Filesystem.joinpath(x::AbstractEntry) = x

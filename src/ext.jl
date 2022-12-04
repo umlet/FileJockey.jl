@@ -37,10 +37,10 @@ macro ex_str(s)
     :(Ext($s))  # "Ext(s)" alone does not work..
 end
 
-hasext(x::AbstractFsEntry, s::AbstractString) = ext(x) == s
+hasext(x::AbstractEntry, s::AbstractString) = ext(x) == s
 hasext(s::AbstractString) = x -> ext(x) == s
 
-hasExt(x::AbstractFsEntry, s::Symbol) = Ext(x) == s
+hasExt(x::AbstractEntry, s::Symbol) = Ext(x) == s
 hasExt(s::Symbol) = x -> Ext(x) == s
 
 

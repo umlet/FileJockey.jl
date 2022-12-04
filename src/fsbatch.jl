@@ -7,7 +7,7 @@ abstract type AbstractBatchTrait end
 # - otherlike (regular or symlink)
 # - broken symlinks (Symlink{FsUnknwonNonexist})
 struct AllEntriesAreStandard <: AbstractBatchTrait end
-function areallentriesstandard(X::AbstractVector{<:AbstractFsEntry})::Bool
+function areallentriesstandard(X::AbstractVector{<:AbstractEntry})::Bool
     !CONF.quiet  &&  @info """
 Ensuring 'AllEntriesAreStandard'..
 - Checks if all entries are standard ones: Files, Dirs, Symlinks-to-files, or Symlinks-to-dirs.
@@ -32,7 +32,7 @@ traitfunction(::Type{AllEntriesAreStandard}) = areallentriesstandard
 
 
 struct TheDirlikesAreDistinct <: AbstractBatchTrait end
-function arethedirlikesdistinct(X::AbstractVector{<:AbstractFsEntry})::Bool
+function arethedirlikesdistinct(X::AbstractVector{<:AbstractEntry})::Bool
     !CONF.quiet  &&  @info """
 Ensuring 'TheDirlikesAreDistinct'..
 Checks if the Dirlikes (i.e., the Dirs and the Symlinks-to-dirs) contained in the entries are distinct:
@@ -78,7 +78,7 @@ traitfunction(::Type{TheDirlikesAreDistinct}) = arethedirlikesdistinct
 # - different paths, AND
 # - are different entries, i.e., no hardlinks to same file
 struct TheFilelikesAreUnique <: AbstractBatchTrait end
-function arethefilelikesunique(X::AbstractVector{<:AbstractFsEntry})::Bool
+function arethefilelikesunique(X::AbstractVector{<:AbstractEntry})::Bool
     v = X |> fl(isfilelike) |> mp(follow)
 
 
@@ -94,9 +94,9 @@ traitfunction(::Type{TheFilelikesAreUnique}) = havedistinctpaths
 
 #------------------------------------------------------------------------------
 struct FsBatch
-    _v::Vector{AbstractFsEntry}
+    _v::Vector{AbstractEntry}
     traits::Set{AbstractBatchTrait}
-    function FsBatch(X::AbstractVector{<:AbstractFsEntry})
+    function FsBatch(X::AbstractVector{<:AbstractEntry})
         return new(X, Set())
     end
 end

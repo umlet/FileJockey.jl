@@ -1,6 +1,6 @@
 
 
-#Base.Filesystem.islink(x::AbstractFsEntry) = islink(x.st)
+#Base.Filesystem.islink(x::AbstractEntry) = islink(x.st)
 
 
 function fsreaddir(x::Union{DirEntry, Symlink{DirEntry}})
@@ -8,25 +8,25 @@ function fsreaddir(x::Union{DirEntry, Symlink{DirEntry}})
     # now we are sure that x is a dirlike
     basepath = islink(x)  ?  x.target.path  :  x.path
     pcs = PathCanon.(Ref(basepath), ss)
-    fsecs = FsEntryCanon.(pcs)
-    fses = FsEntry.(fsecs)
+    fsecs = EntryCanon.(pcs)
+    fses = Entry.(fsecs)
     return fses
 end
-fsreaddir(s::AbstractString=".") = fsreaddir(FsEntry(s))
+fsreaddir(s::AbstractString=".") = fsreaddir(Entry(s))
 
 
 
 struct FsTreeIter
-    state::Vector{AbstractFsEntry}
-    FsTreeIter(x::AbstractFsEntry) = new([x])  # also works on files
+    state::Vector{AbstractEntry}
+    FsTreeIter(x::AbstractEntry) = new([x])  # also works on files
 end
 Base.IteratorSize(::Type{FsTreeIter}) = Base.SizeUnknown()
 Base.IteratorEltype(::Type{FsTreeIter}) = Base.HasEltype()
-Base.eltype(::Type{FsTreeIter}) = AbstractFsEntry
+Base.eltype(::Type{FsTreeIter}) = AbstractEntry
 Base.isdone(x::FsTreeIter, state=nothing) = length(x.state) == 0
 
 _treechildren(x::Union{DirEntry, Symlink{DirEntry}}) = fsreaddir(x)
-_treechildren(x::AbstractFsEntry) = AbstractFsEntry[]
+_treechildren(x::AbstractEntry) = AbstractEntry[]
 
 Base.iterate(x::FsTreeIter) = iterate(x, nothing)
 function Base.iterate(x::FsTreeIter, ::Nothing)
@@ -38,19 +38,19 @@ function Base.iterate(x::FsTreeIter, ::Nothing)
     return (item, nothing)
 end
 
-fswalkdir(x::AbstractFsEntry) = FsTreeIter(x)
-fswalkdir(s::AbstractString=".") = fswalkdir(FsEntry(s))
+fswalkdir(x::AbstractEntry) = FsTreeIter(x)
+fswalkdir(s::AbstractString=".") = fswalkdir(Entry(s))
 
 
-ls(x::AbstractFsEntry) = x
+ls(x::AbstractEntry) = x
 ls(x::DirEntry) = fsreaddir(x)
 ls(x::Symlink{DirEntry}) = fsreaddir(x.target)
-ls(s::AbstractString=".") = ls(FsEntry(s))
+ls(s::AbstractString=".") = ls(Entry(s))
 
-ll(x::AbstractFsEntry) = collect(fswalkdir(x))
-ll(s::AbstractString=".") = ll(FsEntry(s))
+ll(x::AbstractEntry) = collect(fswalkdir(x))
+ll(s::AbstractString=".") = ll(Entry(s))
 
-find(args...) = ll(args...)
+# find(args...) = ll(args...)
 
 
 eachentry(args...) = fswalkdir(args...)
