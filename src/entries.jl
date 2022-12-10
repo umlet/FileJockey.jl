@@ -47,7 +47,7 @@ struct FileEntry <: AbstractEntry
         return new(x.path, x.st)
     end
 end
-FileEntry(s::AbstractString)::FileEntry = follow(Entry(s))
+FileEntry(s::AbstractString)::FileEntry = Entry(s)
 _show(io::IO, x::FileEntry) = print(io, colorizeas("FileEntry", x), """($(x.path), $(Base.Filesystem.filemode_string(x.st)), $(filesize(x.st)) bytes)""")
 
 struct DirEntry <: AbstractEntry
@@ -57,7 +57,7 @@ struct DirEntry <: AbstractEntry
         return new(x.path, x.st)
     end
 end
-DirEntry() = Entry(".")
+DirEntry(s::AbstractString)::DirEntry = Entry(s)
 _show(io::IO, x::DirEntry) = print(io, colorizeas("DirEntry", x), """($(x.path), $(Base.Filesystem.filemode_string(x.st)))""")
 
 struct OtherEntry <: AbstractEntry
@@ -67,6 +67,7 @@ struct OtherEntry <: AbstractEntry
         return new(x.path, x.st)
     end
 end
+OtherEntry(s::AbstractString)::OtherEntry = Entry(s)
 _show(io::IO, x::OtherEntry) = print(io, colorizeas("OtherEntry", x), """($(x.path), $(Base.Filesystem.filemode_string(x.st)))""")
 
 struct Symlink{T} <: AbstractEntry
@@ -77,19 +78,20 @@ struct Symlink{T} <: AbstractEntry
         return new{T}(x.path, x.st, target)
     end
 end
-_show(io::IO, x::Symlink) = print(io, colorizeas("$(typeof(x))", x), """$(typeof(x))($(x.path) -> "$(x.target.path)")""")
+_show(io::IO, x::Symlink) = print(io, colorizeas("$(typeof(x))", x), """($(x.path) -> "$(x.target.path)")""")
 
 struct UnknownEntryNONEXIST <: AbstractEntry
     path::String
     st::StatStruct  # zero entries
-    function UnknownEntryNONEXIST(f::AbstractString)
-        st = stat(f)
-        @assert !ispath(st)
-        return new(f, st)
+    function UnknownEntryNONEXIST(f::AbstractString, st0::StatStruct)
+        #st = stat(f)
+        #@assert !ispath(st)
+        return new(f, st0)  # new(f, st)
     end
 end
 _show(io::IO, x::UnknownEntryNONEXIST) = print(io, colorizeas("UnknownEntryNONEXIST", x), """(???$(x.path)???)""")
 
+# ATTENTION: statstruct contains fname; do not use in identity checks!!!
 
 
 
@@ -105,7 +107,7 @@ function Entry(x::EntryCanon)
         @assert !islink(st_target)
 
         if !ispath(st_target)  # broken symlink
-            return Symlink{UnknownEntryNONEXIST}(x, UnknownEntryNONEXIST(s_readlink))
+            return Symlink{UnknownEntryNONEXIST}(x, UnknownEntryNONEXIST(s_readlink, st_target))  # keep original (possibly relative) link; no more ispath assert on rel path, as it could by incidence exist on call site
         end
 
         fse = Entry(s_path_target)

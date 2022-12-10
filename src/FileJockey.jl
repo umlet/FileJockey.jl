@@ -60,8 +60,12 @@ include("conf.jl")
 include("entries.jl");      include("entries.jl_exports")
 include("trees.jl");        include("trees.jl_exports")
 
-include("./pprint.jl")
+include("stats.jl")
 
+include("pprint.jl")
+
+
+include("dedup.jl")
 
 # include("./ext.jl")
 

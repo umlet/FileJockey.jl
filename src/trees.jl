@@ -41,19 +41,16 @@ end
 fswalkdir(x::AbstractEntry) = FsTreeIter(x)
 fswalkdir(s::AbstractString=".") = fswalkdir(Entry(s))
 
+eachentry(args...) = fswalkdir(args...)
+eachfile(args...) = eachentry(args...) |> fl(isfile) |> mp(follow)
 
-ls(x::AbstractEntry) = x
 ls(x::DirEntry) = fsreaddir(x)
 ls(x::Symlink{DirEntry}) = fsreaddir(x.target)
 ls(s::AbstractString=".") = ls(Entry(s))
+ls(x::AbstractEntry) = [x]
 
-ll(x::AbstractEntry) = collect(fswalkdir(x))
+ll(x::AbstractEntry) = fswalkdir(x) |> cl
 ll(s::AbstractString=".") = ll(Entry(s))
 
-# find(args...) = ll(args...)
-
-
-eachentry(args...) = fswalkdir(args...)
-eachfile(args...) = eachentry(args...) |> fl(isfile) |> mp(follow)
 
 
