@@ -1,52 +1,52 @@
 
 
-# factor our
-function counter(X; f::Function=identity)
-    RET = OrderedDict{Any, Int64}()
-    for x in X
-        key = f(x)
-        !haskey(RET, key)  &&  ( RET[key] = 0 )
-        RET[key] += 1
-    end
-    return RET
-end
-function duplicates(X)
-    dcnt = counter(X)
-    return filter(x->x[2]>1, dcnt) |> OrderedDict
-end
+# # factor our
+# function counter(X; f::Function=identity)
+#     RET = OrderedDict{Any, Int64}()
+#     for x in X
+#         key = f(x)
+#         !haskey(RET, key)  &&  ( RET[key] = 0 )
+#         RET[key] += 1
+#     end
+#     return RET
+# end
+# function duplicates(X)
+#     dcnt = counter(X)
+#     return filter(x->x[2]>1, dcnt) |> OrderedDict
+# end
 
 
-function check1a(S::FsStats)
-    msg = "Are the realpaths of all regular directories distint?\n        (should only occur on wrong manual input, not via single dir traversal)\n        "
-    entries = S.direntries;  nentries = length(entries)
-    nentries == 0  &&  ( @info msg * "none found -- OK";  return )
-    dups = duplicates(path.(entries))
-    length(dups) == 0  &&  ( @info msg * "$(tostr´(nentries)) '$(typeof(entries[1]))'s checked -- OK";  return )
+# function check1a(S::FsStats)
+#     msg = "Are the realpaths of all regular directories distint?\n        (should only occur on wrong manual input, not via single dir traversal)\n        "
+#     entries = S.direntries;  nentries = length(entries)
+#     nentries == 0  &&  ( @info msg * "none found -- OK";  return )
+#     dups = duplicates(path.(entries))
+#     length(dups) == 0  &&  ( @info msg * "$(tostr´(nentries)) '$(typeof(entries[1]))'s checked -- OK";  return )
 
-    erroruser("duplicate found: '$(first(dups)[1])'")
-end
-function check1b(S::FsStats)
-    msg = "Are the realpaths of all symlinks-to-directories distinct?\n        (should only occur on wrong manual input, not via single dir traversal)\n        "
-    entries = S.syml2direntries;  nentries = length(entries)
-    nentries == 0  &&  ( @info msg * "none found -- OK";  return )
-    dups = duplicates(path.(entries))
-    length(dups) == 0  &&  ( @info msg * "$(tostr´(nentries)) '$(typeof(entries[1]))'s checked -- OK";  return )
+#     erroruser("duplicate found: '$(first(dups)[1])'")
+# end
+# function check1b(S::FsStats)
+#     msg = "Are the realpaths of all symlinks-to-directories distinct?\n        (should only occur on wrong manual input, not via single dir traversal)\n        "
+#     entries = S.syml2direntries;  nentries = length(entries)
+#     nentries == 0  &&  ( @info msg * "none found -- OK";  return )
+#     dups = duplicates(path.(entries))
+#     length(dups) == 0  &&  ( @info msg * "$(tostr´(nentries)) '$(typeof(entries[1]))'s checked -- OK";  return )
 
-    erroruser("duplicate found: '$(first(dups)[1])'")
-end
-function check1c(S::FsStats)
-    msg = "Are the realpaths of all symlink target directories distinct?\n        (e.g., in dir traversal, several different symlinks point to the same target directory)\n        "
-    entries = S.symltarget_direntries;  nentries = length(entries)
-    nentries == 0  &&  ( @info msg * "none found -- OK";  return )
-    dups = duplicates(path.(entries))
-    length(dups) == 0  &&  ( @info msg * "$(tostr´(nentries)) '$(typeof(entries[1]))'s checked -- OK";  return )
+#     erroruser("duplicate found: '$(first(dups)[1])'")
+# end
+# function check1c(S::FsStats)
+#     msg = "Are the realpaths of all symlink target directories distinct?\n        (e.g., in dir traversal, several different symlinks point to the same target directory)\n        "
+#     entries = S.symltarget_direntries;  nentries = length(entries)
+#     nentries == 0  &&  ( @info msg * "none found -- OK";  return )
+#     dups = duplicates(path.(entries))
+#     length(dups) == 0  &&  ( @info msg * "$(tostr´(nentries)) '$(typeof(entries[1]))'s checked -- OK";  return )
 
-    duptarget = first(dups)[1]
-    symls = S.syml2direntries |> fl(x->path(follow(x))==duptarget)
-    length(symls) < 2  &&  error("UNREACHABLE")  # TODO
-    syml1,syml2 = first(symls, 2)
-    erroruser("symlinks '$(path(syml1))' and '$(path(syml2))' point to the same dir '$(duptarget)'")
-end
+#     duptarget = first(dups)[1]
+#     symls = S.syml2direntries |> fl(x->path(follow(x))==duptarget)
+#     length(symls) < 2  &&  error("UNREACHABLE")  # TODO
+#     syml1,syml2 = first(symls, 2)
+#     erroruser("symlinks '$(path(syml1))' and '$(path(syml2))' point to the same dir '$(duptarget)'")
+# end
 
 
 
@@ -113,7 +113,14 @@ msg = """Duplicate files in a tree are often due to symlinks-to-directories with
 
     check_3_dirs_distinctpaths(S)
 
-end
+    # TODO syml2files, allfiles..
 
-export dedup
+    return X
+end
+dedupfiles(X::AbstractVector{<:AbstractEntry}) = dedup(X) |> fl(isfile) |> mp(follow)
+
+
+
+
+include("dedup.jl_exports")
 

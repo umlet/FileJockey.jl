@@ -1,32 +1,5 @@
 
 
-function colorize(s::AbstractString, COLORS...)
-    !CONF.colors  &&  return s
-    RET = s
-    for COLOR in COLORS
-        RET = COLOR(RET)
-    end
-    return RET
-end
-colorizeas(s::AbstractString, ::FileEntry) = colorize(s, GREEN_FG)
-colorizeas(s::AbstractString, ::DirEntry) = colorize(s, BLUE_FG)
-colorizeas(s::AbstractString, ::OtherEntry) = colorize(s, YELLOW_FG)
-    #=special case=# colorizeas(s::AbstractString, ::UnknownEntryNONEXIST) = colorize(s, RED_FG)
-
-colorizeas(s::AbstractString, ::Symlink{FileEntry}) = colorize(s, GREEN_FG, NEGATIVE)
-colorizeas(s::AbstractString, ::Symlink{DirEntry}) = colorize(s, BLUE_FG, NEGATIVE)
-colorizeas(s::AbstractString, ::Symlink{OtherEntry}) = colorize(s, YELLOW_FG, NEGATIVE)
-colorizeas(s::AbstractString, ::Symlink{UnknownEntryNONEXIST}) = colorize(s, RED_FG, NEGATIVE)
-#----------
-colorizeas(s::AbstractString, ::Type{FileEntry}) = colorize(s, GREEN_FG)
-colorizeas(s::AbstractString, ::Type{DirEntry}) = colorize(s, BLUE_FG)
-colorizeas(s::AbstractString, ::Type{OtherEntry}) = colorize(s, YELLOW_FG)
-    #=special case=# colorizeas(s::AbstractString, ::Type{UnknownEntryNONEXIST}) = colorize(s, RED_FG)
-
-colorizeas(s::AbstractString, ::Type{Symlink{FileEntry}}) = colorize(s, GREEN_FG, NEGATIVE)
-colorizeas(s::AbstractString, ::Type{Symlink{DirEntry}}) = colorize(s, BLUE_FG, NEGATIVE)
-colorizeas(s::AbstractString, ::Type{Symlink{OtherEntry}}) = colorize(s, YELLOW_FG, NEGATIVE)
-colorizeas(s::AbstractString, ::Type{Symlink{UnknownEntryNONEXIST}}) = colorize(s, RED_FG, NEGATIVE)
 
 
 
@@ -141,16 +114,6 @@ stats(X::AbstractVector{<:AbstractEntry}) = FsStats(X)
 
 Base.filesize(S::FsStats) = sum(filesize.(S.files))
 
-# fileentries::Vector{FileEntry}
-# syml2fileentries::Vector{Symlink{FileEntry}}
-# direntries::Vector{DirEntry}
-# syml2direntries::Vector{Symlink{DirEntry}}
-# # non-standard
-# otherentries::Vector{OtherEntry}
-# syml2otherentries::Vector{Symlink{OtherEntry}}
-# unknownentriesNONEXIST::Vector{UnknownEntryNONEXIST}
-# syml2unknownentriesNONEXIST::Vector{Symlink{UnknownEntryNONEXIST}}  # shortcut for '2unknownnonexist'
-
 nfileentries(S::FsStats) = length(S.fileentries)
 nsyml2fileentries(S::FsStats) = length(S.syml2fileentries)
 ndirentries(S::FsStats) = length(S.direntries)
@@ -176,76 +139,5 @@ nsetfiledeviceinodes(S::FsStats) = length(S.setfiledeviceinodes)
 
 nsetdirpaths(S::FsStats) = length(S.setdirpaths)
 
-# function info(S::FsStats)
-#     # LINE 1
-#     line = []
-#     if nfiles(S) == 0
-#         push!(line, DARK_GRAY_FG("[ no files ]"))
-#     else
-#         push!(line, colorizeas("[ $(tostr_thsep(nfiles(S))) files ", FileEntry))
-#         if nsyml2fileentries(S) == 0
-#             push!(line, DARK_GRAY_FG("( none of which symlinked )"))
-#         else
-#             push!(line, colorizeas("( $(tostr_thsep(nsyml2fileentries(S))) symlinked )", Symlink{FileEntry}))
-#         end
-#         fsize = filesize(S)
-#         if fsize <= 2^10
-#             push!(line, colorizeas(" -- $(tostr_thsep(fsize)) bytes ", FileEntry))
-#         else
-#             push!(line, colorizeas(" -- $(fsizehuman(fsize)) -- $(tostr_thsep(fsize)) bytes ", FileEntry))
-#         end
-#         push!(line, DARK_GRAY_FG("( #paths:$(nsetfilepaths(S))  #dev:$(nsetfiledevices(S))  #inodes:$(nsetfiledeviceinodes(S)) )"))
-#         push!(line, colorizeas(" ]", FileEntry))
-#     end
-#     println(line...)
-
-#     # LINE 2
-#     line = []
-#     if ndirs(S) == 0
-#         push!(line, DARK_GRAY_FG("[ no dirs ]"))
-#     else
-#         push!(line, colorizeas("[ $(tostr_thsep(ndirs(S))) dirs ", DirEntry))
-#         if nsyml2direntries(S) == 0
-#             push!(line, DARK_GRAY_FG("( no syml )"))
-#         else
-#             push!(line, colorizeas("( $(tostr_thsep(nsyml2direntries(S))) symlinked )", Symlink{DirEntry}))
-#         end
-#         push!(line, DARK_GRAY_FG(" ( #paths:$(nsetdirpaths(S)) )"))
-#         push!(line, colorizeas(" ]", DirEntry))
-#     end
-
-#     push!(line, DARK_GRAY_FG(" :: "))
-
-#     if nothers(S) == 0
-#         push!(line, DARK_GRAY_FG("[ no dev,sock,fifo.. ]"))
-#     else
-#         push!(line, colorizeas("[ $(tostr_thsep(nothers(S))) dev,sock,fifo ", OtherEntry))
-#         if nsyml2otherentries(S) == 0
-#             push!(line, DARK_GRAY_FG("( no syml )"))
-#         else
-#             push!(line, colorizeas("( $(tostr_thsep(nsyml2otherentries(S))) syml )", Symlink{OtherEntry}))
-#         end        
-#         push!(line, colorizeas(" ]", OtherEntry))
-#     end
-
-#     push!(line, DARK_GRAY_FG(" :: "))
-
-#     if nunknowns(S) == 0
-#         push!(line, DARK_GRAY_FG("[ no unknown/broken ]"))
-#     else
-#         push!(line, colorizeas("[ $(tostr_thsep(nunknowns(S))) unknown/broken ", UnknownEntryNONEXIST))
-#         if nsyml2unknownentriesNONEXIST(S) == 0
-#             push!(line, DARK_GRAY_FG("( no syml )"))
-#         else
-#             push!(line, colorizeas("( $(tostr_thsep(nsyml2unknownentriesNONEXIST(S))) syml )", Symlink{UnknownEntryNONEXIST}))
-#         end        
-#         push!(line, colorizeas(" ]", UnknownEntryNONEXIST))
-#     end
-
-#     println(line...)
-
-
-# end
-# info(X::AbstractVector{<:AbstractEntry}) = info(stats(X))
 
 

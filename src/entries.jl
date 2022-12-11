@@ -48,7 +48,7 @@ struct FileEntry <: AbstractEntry
     end
 end
 FileEntry(s::AbstractString)::FileEntry = Entry(s)
-_show(io::IO, x::FileEntry) = print(io, colorizeas("FileEntry", x), """($(x.path), $(Base.Filesystem.filemode_string(x.st)), $(filesize(x.st)) bytes)""")
+_show(io::IO, x::FileEntry) = print(io, colorizeas("FileEntry", x), """("$(path(x))", $(Base.Filesystem.filemode_string(x.st)), $(filesize(x.st)) bytes)""")
 
 struct DirEntry <: AbstractEntry
     path::PathCanon
@@ -58,7 +58,7 @@ struct DirEntry <: AbstractEntry
     end
 end
 DirEntry(s::AbstractString)::DirEntry = Entry(s)
-_show(io::IO, x::DirEntry) = print(io, colorizeas("DirEntry", x), """($(x.path), $(Base.Filesystem.filemode_string(x.st)))""")
+_show(io::IO, x::DirEntry) = print(io, colorizeas("DirEntry", x), """("$(path(x))", $(Base.Filesystem.filemode_string(x.st)))""")
 
 struct OtherEntry <: AbstractEntry
     path::PathCanon
@@ -68,7 +68,7 @@ struct OtherEntry <: AbstractEntry
     end
 end
 OtherEntry(s::AbstractString)::OtherEntry = Entry(s)
-_show(io::IO, x::OtherEntry) = print(io, colorizeas("OtherEntry", x), """($(x.path), $(Base.Filesystem.filemode_string(x.st)))""")
+_show(io::IO, x::OtherEntry) = print(io, colorizeas("OtherEntry", x), """("$(path(x))", $(Base.Filesystem.filemode_string(x.st)))""")
 
 struct Symlink{T} <: AbstractEntry
     path::PathCanon
@@ -78,14 +78,12 @@ struct Symlink{T} <: AbstractEntry
         return new{T}(x.path, x.st, target)
     end
 end
-_show(io::IO, x::Symlink) = print(io, colorizeas("$(typeof(x))", x), """($(x.path) -> "$(x.target.path)")""")
+_show(io::IO, x::Symlink) = print(io, colorizeas("$(typeof(x))", x), """("$(path(x))" -> "$(path(x.target))")""")
 
 struct UnknownEntryNONEXIST <: AbstractEntry
-    path::String
+    path::String  # NOT path canon!
     st::StatStruct  # zero entries
-    function UnknownEntryNONEXIST(f::AbstractString, st0::StatStruct)
-        #st = stat(f)
-        #@assert !ispath(st)
+    function UnknownEntryNONEXIST(f::AbstractString, st0::StatStruct)  # CHECK maybe hide st0 inside?
         return new(f, st0)  # new(f, st)
     end
 end
@@ -129,13 +127,7 @@ end
 
 
 path(x::AbstractEntry) = x.path.s
-# pathcanon(x::AbstractEntry) = x.path
-
-# isfilelike(x::Union{FileEntry, Symlink{FileEntry}}) = true
-# isfilelike(x::AbstractEntry) = false
-
-# isdirlike(x::Union{DirEntry, Symlink{DirEntry}}) = true
-# isdirlike(x::AbstractEntry) = false
+path(x::UnknownEntryNONEXIST) = x.path
 
 isstandard(x::Union{FileEntry, DirEntry, Symlink{FileEntry}, Symlink{DirEntry}}) = true
 isstandard(x::AbstractEntry) = false
@@ -155,24 +147,12 @@ follow(x::Symlink) = x.target
 
 
 
-Base.endswith(x::AbstractEntry, a) = endswith(x.path.s, a)
-
-Base.splitext(x::AbstractEntry) = splitext(x.path.s)
 
 
 
-# OK, behaviour in line with lstat returning stat implicitly
-Base.Filesystem.lstat(x::PathCanon) = lstat(x.s)
-Base.Filesystem.stat(x::PathCanon) = stat(x.s)
 
-# stat returns target
-Base.Filesystem.stat(x::Symlink) = x.target.st
-Base.Filesystem.stat(x::AbstractEntry) = x.st
 
-# lstat defaults to stat if no symlink
-Base.Filesystem.lstat(x::Symlink) = x.st
-Base.Filesystem.lstat(x::AbstractEntry) = stat(x)
 
-# stat & lstat should usually be sufficient to override
-# however, Base.Filesystem throws in a rather weird joinpath; so we override that as well
-Base.Filesystem.joinpath(x::AbstractEntry) = x
+
+include("entries.jl_base")
+include("entries.jl_exports")

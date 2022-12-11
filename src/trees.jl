@@ -38,7 +38,7 @@ function Base.iterate(x::FsTreeIter, ::Nothing)
     return (item, nothing)
 end
 
-fswalkdir(x::AbstractEntry) = FsTreeIter(x)
+fswalkdir(x::AbstractEntry; skip_paths=String[]) = FsTreeIter(x)  # TODO skip_paths everywhere
 fswalkdir(s::AbstractString=".") = fswalkdir(Entry(s))
 
 eachentry(args...) = fswalkdir(args...)
@@ -54,3 +54,4 @@ ll(s::AbstractString=".") = ll(Entry(s))
 
 
 
+include("trees.jl_exports")
