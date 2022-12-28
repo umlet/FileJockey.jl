@@ -57,63 +57,67 @@
 
 
 
-function check_1_syml2dir_toknown(S::FsStats)
-    @info "Check 1: Symlinks to already-known dirs.."
+function check_11_syml2dir_toknown(S::FsStats)
+    msg = "1.1 Check if a symlink points to an already known regular dir.. "
     entries = S.syml2direntries |> fl(x->x.target in S.direntries);  nentries = length(entries)
-    nentries == 0  &&  ( @info "none found -- OK";  return true )
+    nentries == 0  &&  ( @info msg * "none found -- OK";  return true )
 
     e = first( sort(entries; by=x->length(path(x))) )
-    erroruser("Symlink to known dir detected: '$(path(e))' -> '$(path(e.target))'; remove or skip")
+    erroruser("Symlink to known regular dir detected: '$(path(e))' -> '$(path(e.target))'; remove or skip")
 end
 
-function check_2_syml2dirs_tosameexternal(S::FsStats)
-    @info "Check 2: Symlinks to external dirs.."
-    entries = S.syml2direntries |> fl(x->!(x.target in S.direntries));  nentries = length(entries)
-    nentries == 0  &&  ( @info "none found -- OK";  return true )
+function check_12_syml2dirs_tosameexternal(S::FsStats)
+    msg = "1.2 Check if two symlinks point to the same dir.. "
+    entries = S.syml2direntries #=|> fl(x->!(x.target in S.direntries))=#;  nentries = length(entries)
+    nentries == 0  &&  ( @info msg * "none found -- OK";  return true )
 
-    d = OrderedDict()  # target -> symlinks
-    for x in entries
-        key = path(x.target)
-        !haskey(d, key)  &&  ( d[key] = [] )
-        push!(d[key], x)
-    end
-    v = sort(cl(d); by=x->length(x[2])) |> fl(x->length(x[2])>1)
-    length(v) == 0  &&  ( @info "$(tostr´(nentries)) '$(typeof(entries[1]))'s checked -- OK";  return true )
+    d = group(entries;  fkey=path∘follow, fhaving=x->length(x)>=2)  # TODO improve anonymous function
+    length(d) == 0  &&  ( @info msg * "$(tostr´(nentries)) '$(typeof(entries[1]))'s checked -- OK";  return true )
 
-    targetpath,symlinks = first(v)
+    targetpath,symlinks = first(d)
     s = [ "'$(path(x))'" for x in symlinks ] |> jn(", ")
-    erroruser("Symlinks to same external dir detected: symlinks {$(s)} all point to same dir -> '$(targetpath)'; remove or skip ALL BUT ONE symlink")
+    erroruser("Symlinks to same dir detected: symlinks {$(s)} all point to same dir -> '$(targetpath)'; remove or skip ALL BUT ONE symlink")
 end
 
-function check_3_dirs_distinctpaths(S::FsStats)
-    @info "Check 3: All dirs (known and externally symlinked).. (possible input error)"
+function check_13_dirs_distinctpaths(S::FsStats)
+    msg = "1.3 Check if all dirs (known and symlinked) have distinct paths.. "
     entries = S.dirs;  nentries = length(entries)
-    nentries == 0  &&  ( @info "none found -- OK";  return true )
-    nsetdirpaths(S) == nentries  &&  ( @info "$(tostr´(nentries)) '$(typeof(entries[1]))'s checked -- OK";  return true )
+    nentries == 0  &&  ( @info msg * "none found -- OK";  return true )
+    nsetdirpaths(S) == nentries  &&  ( @info msg * "$(tostr´(nentries)) '$(typeof(entries[1]))'s checked -- OK";  return true )
 
     set = Set{String}()
     for s in path.(entries)
-        s in set  &&  erroruser("Duplicate dir found: '$(s)'; fix input (should not be possible via standard tree traversal)")
+        s in set  &&  erroruser("Duplicate dir found: '$(s)'; fix input (should not be possible via standard tree traversal and sane symlinks-to-dirs)")
         push!(set, s)
     end
-    @assert false
 end
+
+
+
+function check_21_syml2file_toknown(S::FsStats)
+    msg = "2.1 Check if a symlink points to an already known regular file.. "
+    entries = S.syml2fileentries |> fl(x->x.target in S.fileentries);  nentries = length(entries)
+    nentries == 0  &&  ( @info msg * "none found -- OK";  return true )
+
+    e = first( sort(entries; by=x->length(path(x))) )
+    erroruser("Symlink to known regular file detected: '$(path(e))' -> '$(path(e.target))'; remove or skip")
+end
+
 
 function dedup(X::AbstractVector{<:AbstractEntry})
     S = stats(X)
 
-msg = """Duplicate files in a tree are often due to symlinks-to-directories within it.
-(But skipping all symlinks can be wrong if a symlinked dir is 'external'/outside the tree.)
-"""
-    @info msg
 
-    check_1_syml2dir_toknown(S)
+    @info "1. Checking sanity of symlinks-to-dirs and dirs (most likely cause for duplicate files in a tree):"
 
-    check_2_syml2dirs_tosameexternal(S)
+    check_11_syml2dir_toknown(S)
+    check_12_syml2dirs_tosameexternal(S)
+    check_13_dirs_distinctpaths(S)
 
-    check_3_dirs_distinctpaths(S)
 
-    # TODO syml2files, allfiles..
+    @info "2. Checking sanity of symlinks-to-files and files:"
+
+    check_21_syml2file_toknown(S)
 
     return X
 end

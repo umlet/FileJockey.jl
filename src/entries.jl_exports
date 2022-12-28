@@ -8,6 +8,7 @@ export Entry
 export @fj_str
 
 export path
+export haspath
 
 export isstandard
 

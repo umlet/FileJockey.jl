@@ -1,7 +1,7 @@
 export fsreaddir, fswalkdir
 
 export ls
-export ll
+export ll, find
 
 export eachentry
 export eachfile

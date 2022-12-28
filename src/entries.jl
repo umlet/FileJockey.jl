@@ -129,6 +129,9 @@ end
 path(x::AbstractEntry) = x.path.s
 path(x::UnknownEntryNONEXIST) = x.path
 
+haspath(x::AbstractEntry, s::AbstractString) = path(x) == s
+haspath(s::AbstractString) = x -> haspath(x, s)
+
 isstandard(x::Union{FileEntry, DirEntry, Symlink{FileEntry}, Symlink{DirEntry}}) = true
 isstandard(x::AbstractEntry) = false
 

@@ -52,6 +52,7 @@ ls(x::AbstractEntry) = [x]
 ll(x::AbstractEntry) = fswalkdir(x) |> cl
 ll(s::AbstractString=".") = ll(Entry(s))
 
+find(args...) = ll(args...)
 
 
 include("trees.jl_exports")
