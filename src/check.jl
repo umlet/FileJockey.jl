@@ -62,11 +62,17 @@ function check_11_syml2dir_toknown(S::FsStats)
     entries = S.syml2direntries |> fl(x->x.target in S.direntries);  nentries = length(entries)
     nentries == 0  &&  ( @info msg * "none found -- OK";  return true )
 
+    # error!
+    @info msg
     e = first( sort(entries; by=x->length(path(x))) )
-    erroruser("Symlink to known regular dir detected: '$(path(e))' -> '$(path(e.target))'; remove or skip")
+    erroruser("""Symlink to known regular dir detected:
+    "$(path(e))" -> "$(path(e.target))"
+    => filter out the symlink with:
+
+    .. |> fl(!haspath("$(path(e))")) |> ..""")
 end
 
-function check_12_syml2dirs_tosameexternal(S::FsStats)
+function check_12_syml2dirs_tosameexternal(S::FsStats)  # after the previous test, they will point to unknown/external dirs
     msg = "1.2 Check if two symlinks point to the same dir.. "
     entries = S.syml2direntries #=|> fl(x->!(x.target in S.direntries))=#;  nentries = length(entries)
     nentries == 0  &&  ( @info msg * "none found -- OK";  return true )
@@ -74,9 +80,15 @@ function check_12_syml2dirs_tosameexternal(S::FsStats)
     d = group(entries;  fkey=path∘follow, fhaving=x->length(x)>=2)  # TODO improve anonymous function
     length(d) == 0  &&  ( @info msg * "$(tostr´(nentries)) '$(typeof(entries[1]))'s checked -- OK";  return true )
 
+    # error!
+    @info msg
     targetpath,symlinks = first(d)
-    s = [ "'$(path(x))'" for x in symlinks ] |> jn(", ")
-    erroruser("Symlinks to same dir detected: symlinks {$(s)} all point to same dir -> '$(targetpath)'; remove or skip ALL BUT ONE symlink")
+    s = [ "\"$(path(x))\" -> \"$(targetpath)\"" for x in symlinks ] |> jn("\n")
+    erroruser("""Symlinks to same dir detected:
+    $(s)
+    => filter out ALL BUT ONE of the symlinks; to filter out a symlink, use, e.g.:
+    
+    .. |> fl(!haspath("$(path(first(symlinks)))")) |> ..""")
 end
 
 function check_13_dirs_distinctpaths(S::FsStats)
@@ -85,12 +97,19 @@ function check_13_dirs_distinctpaths(S::FsStats)
     nentries == 0  &&  ( @info msg * "none found -- OK";  return true )
     nsetdirpaths(S) == nentries  &&  ( @info msg * "$(tostr´(nentries)) '$(typeof(entries[1]))'s checked -- OK";  return true )
 
+    # maybe error!
     set = Set{String}()
     for s in path.(entries)
-        s in set  &&  erroruser("Duplicate dir found: '$(s)'; fix input (should not be possible via standard tree traversal and sane symlinks-to-dirs)")
+        if s in set
+            @info msg
+            erroruser("""Duplicate dir found:
+            "$(s)"
+            => fix your input; this should not happen with standard tree traversal and sane symlinks-to-dirs""")
+        end
         push!(set, s)
     end
 end
+
 
 
 
@@ -99,12 +118,77 @@ function check_21_syml2file_toknown(S::FsStats)
     entries = S.syml2fileentries |> fl(x->x.target in S.fileentries);  nentries = length(entries)
     nentries == 0  &&  ( @info msg * "none found -- OK";  return true )
 
+    # error!
+    @info msg
     e = first( sort(entries; by=x->length(path(x))) )
-    erroruser("Symlink to known regular file detected: '$(path(e))' -> '$(path(e.target))'; remove or skip")
+    erroruser("""Symlink to known regular file detected:
+    "$(path(e))" -> "$(path(e.target))"
+    => filter out the symlink with:
+    
+    .. |> fl(!haspath("$(path(e))")) |> ..""")
+end
+
+function check_22_syml2files_tosameexternal(S::FsStats)
+    msg = "2.2 Check if two symlinks point to the same file.. "
+    entries = S.syml2fileentries #=|> fl(x->!(x.target in S.direntries))=#;  nentries = length(entries)
+    nentries == 0  &&  ( @info msg * "none found -- OK";  return true )
+
+    d = group(entries;  fkey=path∘follow, fhaving=x->length(x)>=2)
+    length(d) == 0  &&  ( @info msg * "$(tostr´(nentries)) '$(typeof(entries[1]))'s checked -- OK";  return true )
+
+    # error!
+    @info msg
+    targetpath,symlinks = first(d)
+    s = [ "\"$(path(x))\" -> \"$(targetpath)\"" for x in symlinks ] |> jn("\n")
+    erroruser("""Symlinks to same file detected:
+    $(s)
+    => filter out ALL BUT ONE of the symlinks; to filter out a symlink, use, e.g.:
+    
+    .. |> fl(!haspath("$(path(first(symlinks)))")) |> ..""")
+end
+
+function check_23_files_distinctpaths(S::FsStats)
+    msg = "2.3 Check if all files (known and symlinked) have distinct paths.. "
+    entries = S.files;  nentries = length(entries)
+    nentries == 0  &&  ( @info msg * "none found -- OK";  return true )
+    nsetfilepaths(S) == nentries  &&  ( @info msg * "$(tostr´(nentries)) '$(typeof(entries[1]))'s checked -- OK";  return true )
+
+    # maybe error!
+    set = Set{String}()
+    for s in path.(entries)
+        if s in set
+            @info msg
+            erroruser("""Duplicate file found:
+            "$(s)"
+            => fix your input; this should not happen with standard tree traversal and sane symlinks-to-dirs""")
+        end
+        push!(set, s)
+    end
 end
 
 
-function dedup(X::AbstractVector{<:AbstractEntry})
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+function checkdupl(X::AbstractVector{<:AbstractEntry})
     S = stats(X)
 
 
@@ -118,13 +202,15 @@ function dedup(X::AbstractVector{<:AbstractEntry})
     @info "2. Checking sanity of symlinks-to-files and files:"
 
     check_21_syml2file_toknown(S)
+    check_22_syml2files_tosameexternal(S)
+    check_23_files_distinctpaths(S)
 
     return X
 end
-dedupfiles(X::AbstractVector{<:AbstractEntry}) = dedup(X) |> fl(isfile) |> mp(follow)
+#dedupfiles(X::AbstractVector{<:AbstractEntry}) = dedup(X) |> fl(isfile) |> mp(follow)
 
 
 
 
-include("dedup.jl_exports")
+include("check.jl_exports")
 

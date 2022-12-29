@@ -4,4 +4,3 @@ export ls
 export ll, find
 
 export eachentry
-export eachfile

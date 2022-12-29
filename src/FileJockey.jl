@@ -19,7 +19,7 @@ include("stats.jl")
 
 include("pprint.jl")
 
-include("dedup.jl")
+include("check.jl")
 
 
 # include("./ext.jl")
