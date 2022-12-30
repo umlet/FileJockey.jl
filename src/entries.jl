@@ -70,6 +70,9 @@ end
 OtherEntry(s::AbstractString)::OtherEntry = Entry(s)
 _show(io::IO, x::OtherEntry) = print(io, colorizeas("OtherEntry", x), """("$(path(x))", $(Base.Filesystem.filemode_string(x.st)))""")
 
+
+
+
 struct Symlink{T} <: AbstractEntry
     path::PathCanon
     st::StatStruct  # stat of symlink!
@@ -121,9 +124,9 @@ Entry(s::AbstractString) = Entry(EntryCanon(s))
 
 
 
-macro fj_str(s)
-    Entry(s)
-end
+# macro fj_str(s)
+#     Entry(s)
+# end
 
 
 path(x::AbstractEntry) = x.path.s
@@ -139,6 +142,9 @@ follow(x::AbstractEntry) = x
 follow(x::Symlink) = x.target
 
 
+function getfiles(X::AbstractVector{<:AbstractEntry})
+    return X |> fl(isfile) |> mp(follow)
+end
 
 
 

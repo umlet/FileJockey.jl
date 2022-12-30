@@ -5,7 +5,7 @@ export AbstractEntry
 export FileEntry, DirEntry, OtherEntry, Symlink, UnknownEntryNONEXIST
 export Entry
 
-export @fj_str
+#export @fj_str
 
 export path
 export haspath
@@ -14,3 +14,4 @@ export isstandard
 
 export follow
 
+export getfiles

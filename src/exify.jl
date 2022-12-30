@@ -1,12 +1,9 @@
 
 
-#using FileDeejay
 
-using JSON
-using OrderedCollections
+#using JSON
+#using OrderedCollections
 
-using FileDeejay
-using Juliettine
 
 
 module Exey
@@ -78,6 +75,26 @@ function changeexifkeys(d::OrderedDict{String, Any})
     return RET
 end
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 function _exify_base(ss::Vector{<:AbstractString})  # ! all fs must be valid, readable filenames
     exiftool_options = [
         # "-S",           # very short output format: tagnames and no spaces -- OF NO USE WITH -json
@@ -106,6 +123,12 @@ _exify(f::FileEntry) = _exify([f])[1]
 _exify(s::AbstractString) = _exify(FileEntry(EntryCanon(s)))
 
 
-function exify(itr) 
-    return itr |> pt(100) |> mp(_exify) |> iflatten
-end
+exify(itr) =                itr |> pt(100) |> mp(_exify) |> iflatten
+exify(X::AbstractVector) =    X |> pt(100) |> mp(_exify) |> iflatten |> cl  # TODO mb use invoke w/ type Any?
+
+exify(x::AbstractEntry) = exify([x])
+exify(s::AbstractString) = exify(FileEntry(s))
+
+
+
+include("exify.jl_exports")

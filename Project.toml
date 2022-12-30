@@ -5,5 +5,6 @@ version = "0.2.0"
 
 [deps]
 Crayons = "a8cc5b0e-0ffa-5ad4-8c14-923d3ee1735f"
+JSON = "682c06a0-de6a-54ab-a142-c8b1cf79cde6"
 Juliettine = "f42a8b7e-ed28-475d-a83f-d1f832105fbf"
 OrderedCollections = "bac558e1-5e72-5ebc-8fee-abe8a469f55d"

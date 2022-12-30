@@ -65,11 +65,9 @@ function check_11_syml2dir_toknown(S::FsStats)
     # error!
     @info msg
     e = first( sort(entries; by=x->length(path(x))) )
-    erroruser("""Symlink to known regular dir detected:
+    erroruser("""Symlink to known regular dir detected (<syml-path> -> <target-path>):
     "$(path(e))" -> "$(path(e.target))"
-    => filter out the symlink with:
-
-    .. |> fl(!haspath("$(path(e))")) |> ..""")
+    => delete symlink, or add the <symlink-path> to the 'skip_paths' option.""")
 end
 
 function check_12_syml2dirs_tosameexternal(S::FsStats)  # after the previous test, they will point to unknown/external dirs
@@ -84,11 +82,9 @@ function check_12_syml2dirs_tosameexternal(S::FsStats)  # after the previous tes
     @info msg
     targetpath,symlinks = first(d)
     s = [ "\"$(path(x))\" -> \"$(targetpath)\"" for x in symlinks ] |> jn("\n")
-    erroruser("""Symlinks to same dir detected:
+    erroruser("""Symlinks to same dir detected (<syml-path> -> <target-path>):
     $(s)
-    => filter out ALL BUT ONE of the symlinks; to filter out a symlink, use, e.g.:
-    
-    .. |> fl(!haspath("$(path(first(symlinks)))")) |> ..""")
+    => for ALL BUT ONE of the symlinks: delete symlink, or add <symlink-path> to the 'skip_paths' option.""")
 end
 
 function check_13_dirs_distinctpaths(S::FsStats)
@@ -121,11 +117,9 @@ function check_21_syml2file_toknown(S::FsStats)
     # error!
     @info msg
     e = first( sort(entries; by=x->length(path(x))) )
-    erroruser("""Symlink to known regular file detected:
+    erroruser("""Symlink to known regular file detected (<syml-path> -> <target-path>):
     "$(path(e))" -> "$(path(e.target))"
-    => filter out the symlink with:
-    
-    .. |> fl(!haspath("$(path(e))")) |> ..""")
+    => delete symlink, or add the <symlink-path> to the 'skip_paths' option.""")
 end
 
 function check_22_syml2files_tosameexternal(S::FsStats)
@@ -140,11 +134,9 @@ function check_22_syml2files_tosameexternal(S::FsStats)
     @info msg
     targetpath,symlinks = first(d)
     s = [ "\"$(path(x))\" -> \"$(targetpath)\"" for x in symlinks ] |> jn("\n")
-    erroruser("""Symlinks to same file detected:
+    erroruser("""Symlinks to same file detected (<syml-path> -> <target-path>):
     $(s)
-    => filter out ALL BUT ONE of the symlinks; to filter out a symlink, use, e.g.:
-    
-    .. |> fl(!haspath("$(path(first(symlinks)))")) |> ..""")
+    => for ALL BUT ONE of the symlinks: delete symlink, or add <symlink-path> to the 'skip_paths' option.""")
 end
 
 function check_23_files_distinctpaths(S::FsStats)
@@ -188,7 +180,7 @@ end
 
 
 
-function checkdupl(X::AbstractVector{<:AbstractEntry})
+function checkdist(X::AbstractVector{<:AbstractEntry})
     S = stats(X)
 
 

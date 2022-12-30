@@ -3,6 +3,8 @@ module FileJockey
 
 using Base.Filesystem
 using OrderedCollections
+using JSON
+
 using Crayons
 using Crayons.Box
 
@@ -21,6 +23,7 @@ include("pprint.jl")
 
 include("check.jl")
 
+include("exify.jl")
 
 # include("./ext.jl")
 
