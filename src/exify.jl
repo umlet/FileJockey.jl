@@ -42,7 +42,7 @@ struct ExifData
         for (k,v) in d  _d[Symbol(k)] = v  end
 
         # shortcut keys, if unique
-        dtmp = Dict()
+        dtmp = OrderedDict()
         for (korig,_) in d
             ss = split(korig, '_')
             length(ss) != 2  &&  continue  # must be 2; >2 not possible; 1 possible for 'SourceFile'
@@ -77,7 +77,30 @@ end
 
 
 
+function info(x::ExifData)
+    len = keys(x._d) |> mp(string) |> mp(length) |> maximum
+    for (k,v) in x._d
+        println(rpad(k, len), " = ", v)
+    end
+end
 
+function _exif_date2sanedate(s::AbstractString)
+    length(s) != 19  &&  error("exif value of 'Time_CreateDate' has length != 19")
+    YYYY = s[1:4]
+    MM = s[6:7]
+    DD = s[9:10]
+    hh = s[12:13]
+    mm = s[15:16]
+    ss = s[18:19]
+    return YYYY * MM * DD * "_" * hh * mm * ss
+end
+
+function exif_create_datetime(x::ExifData)
+    if haskey(x._d, :Time_CreateDate)
+        s = x.Time_CreateDate
+    end
+    return _exif_date2sanedate(s)
+end
 
 
 
@@ -126,7 +149,7 @@ _exify(s::AbstractString) = _exify(FileEntry(EntryCanon(s)))
 exify(itr) =                itr |> pt(100) |> mp(_exify) |> iflatten
 exify(X::AbstractVector) =    X |> pt(100) |> mp(_exify) |> iflatten |> cl  # TODO mb use invoke w/ type Any?
 
-exify(x::AbstractEntry) = exify([x])
+exify(x::AbstractEntry) = exify([x]) |> first
 exify(s::AbstractString) = exify(FileEntry(s))
 
 

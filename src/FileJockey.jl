@@ -25,14 +25,14 @@ include("check.jl")
 
 include("exify.jl")
 
-# include("./ext.jl")
+include("ext.jl")
 
 
 
-# function __init__()
-#     @info "Initializing known file extensions"
-#     initext()
-# end
+function __init__()
+    @info "Initializing known file extensions"
+    initext()
+end
 
 
 
