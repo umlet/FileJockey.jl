@@ -160,26 +160,6 @@ end
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 function checkdist(X::AbstractVector{<:AbstractEntry})
     S = stats(X)
 
@@ -202,6 +182,51 @@ end
 #dedupfiles(X::AbstractVector{<:AbstractEntry}) = dedup(X) |> fl(isfile) |> mp(follow)
 
 
+# TODO intermediate step; check for hardlinks
+# issame..
+
+function isduplicate(x::FileEntry, y::FileEntry)
+    filesize(x) != filesize(y)  &&  ( return false )
+    scmd = "cmp $(path(x)) $(path(y))"
+    R = exe(scmd; fail=false, splitlines=false)
+    R.exitcode == 0  &&  return true
+    # non-zero exit:
+    occursin(" differ: ", R.out)  &&  return false
+    # other, unexpected 'cmp' error; panic
+    error("unexpected exit of 'cmp': stdout = '$(R.out)'; stderr = '$(R.err)'")
+end
+
+
+function checkdupl(X::AbstractVector{<:FileEntry})
+    RET = Vector{Vector{FileEntry}}()
+
+    d = group(X; fkey=filesize, Tkey=Int64, Tval=FileEntry, fhaving=x->length(x)>=2) 
+    for (s,fs) in d
+        @info "Checking files of same size $(s):"
+        for f in fs  println(path(f))  end
+
+        REF_FS = Vector{Vector{FileEntry}}()
+        for f in fs
+            length(REF_FS) == 0  &&  ( push!(REF_FS, FileEntry[f]);  continue )
+            for ref_fs in REF_FS
+                ref_f = ref_fs[1]
+                if isduplicate(ref_f, f)
+                    push!(ref_fs, f)
+                    @info "duplicate found!"
+                    break # ref check can end here
+                else
+                    push!(REF_FS, FileEntry[f])
+                    @info "DUPLICATE DISMISSED"
+                    break # ref check MUST end here, as otherwise loop gets longer!!!
+                end
+            end
+        end
+        for ref_fs in REF_FS
+            length(ref_fs) >= 2  &&  push!(RET, ref_fs)
+        end
+    end    
+    return nothing
+end
 
 
 include("check.jl_exports")

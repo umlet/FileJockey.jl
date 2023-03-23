@@ -6,28 +6,28 @@
 
 
 
-module Exey
-export exe
-function exe(scmd::String; fail=true, okexits=[], splitlines=true)
-    cmd = Cmd(["bash", "-c", scmd])
-    bufout = IOBuffer()                                                     ; buferr = IOBuffer()
-    process = run(pipeline(ignorestatus(cmd), stdout=bufout, stderr=buferr))
-    exitcode = process.exitcode
+# module Exey
+# export exe
+# function exe(scmd::String; fail=true, okexits=[], splitlines=true)
+#     cmd = Cmd(["bash", "-c", scmd])
+#     bufout = IOBuffer()                                                     ; buferr = IOBuffer()
+#     process = run(pipeline(ignorestatus(cmd), stdout=bufout, stderr=buferr))
+#     exitcode = process.exitcode
     
-    sout = String(take!(bufout))                                            ; serr = String(take!(buferr))
-    close(bufout)                                                           ; close(buferr)
+#     sout = String(take!(bufout))                                            ; serr = String(take!(buferr))
+#     close(bufout)                                                           ; close(buferr)
 
-    fail  &&  exitcode != 0  &&  !(exitcode in okexits)  &&  error("exe: OS system command failed: '$(scmd)'; stderr:\n$(serr)")
+#     fail  &&  exitcode != 0  &&  !(exitcode in okexits)  &&  error("exe: OS system command failed: '$(scmd)'; stderr:\n$(serr)")
 
-    if splitlines
-        length(sout) > 0  &&  last(sout) == '\n'  &&  (sout = chop(sout))   ; length(serr) > 0  &&  last(serr) == '\n'  &&  (serr = chop(serr))
-        souts = sout != "" ? split(sout, '\n') : String[]                   ; serrs = serr != "" ? split(serr, '\n') : String[]
-        return (; exitcode, souts, serrs)
-    end
-    return (; exitcode, sout, serr)
-end
-end
-using .Exey
+#     if splitlines
+#         length(sout) > 0  &&  last(sout) == '\n'  &&  (sout = chop(sout))   ; length(serr) > 0  &&  last(serr) == '\n'  &&  (serr = chop(serr))
+#         souts = sout != "" ? split(sout, '\n') : String[]                   ; serrs = serr != "" ? split(serr, '\n') : String[]
+#         return (; exitcode, souts, serrs)
+#     end
+#     return (; exitcode, sout, serr)
+# end
+# end
+# using .Exey
 
 
 
@@ -63,12 +63,14 @@ function Base.getproperty(x::ExifData, sym::Symbol)
     sym == :_d  &&  ( return getfield(x, sym) )
     return x._d[sym]
 end
+Base.propertynames(x::ExifData) = Tuple(keys(x._d))
+
 
 function changeexifkeys(d::OrderedDict{String, Any})
     RET = OrderedDict{String, Any}()
     for (k,v) in d
-        occursin('_', k)  &&  error("exif dict key '$(key)' contains '_'")
-        count(':', k) >= 2  &&  error("exif dict key '$(key)' contains 2+ colons")
+        occursin('_', k)  &&  error("exif dict key '$(k)' contains '_'")
+        count(':', k) >= 2  &&  error("exif dict key '$(k)' contains 2+ colons")
         k2 = replace(k, ':'=>'_')
         RET[k2] = v
     end

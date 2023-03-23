@@ -141,3 +141,4 @@ nsetdirpaths(S::FsStats) = length(S.setdirpaths)
 
 
 
+include("stats.jl_exports")
