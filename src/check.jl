@@ -201,6 +201,9 @@ function checkdupl(X::AbstractVector{<:FileEntry})
     RET = Vector{Vector{FileEntry}}()
 
     d = group(X; fkey=filesize, Tkey=Int64, Tval=FileEntry, fhaving=x->length(x)>=2) 
+    ncand = values(d) .|> length |> sum
+
+    nnodup = 0
     for (s,fs) in d
         @info "Checking files of same size $(s):"
         for f in fs  println(path(f))  end
@@ -222,12 +225,84 @@ function checkdupl(X::AbstractVector{<:FileEntry})
             end
         end
         for ref_fs in REF_FS
-            length(ref_fs) >= 2  &&  push!(RET, ref_fs)
+            @assert length(ref_fs) > 0
+            if length(ref_fs) >= 2  
+                push!(RET, ref_fs)
+            else
+                nnodup += 1
+            end
         end
-    end    
-    return nothing
+    end
+
+    ndupes = 0
+    length(RET) > 0  &&  ( ndupes = RET .|> length |> sum )
+    dstat = group(RET; fkey=length, fval=x->1, freduce=sum)
+
+    DICT_RET = OrderedDict{FileEntry, Vector{FileEntry}}()
+    for x in RET
+        k = x[1]
+        v = x[2:end]
+        @assert length(v) > 0
+        DICT_RET[k] = v
+    end
+
+    size_saving = 0
+    nremove = 0
+    if length(DICT_RET) > 0  
+        size_saving = values(DICT_RET) |> mp(x->sum(filesize, x)) |> sum
+        nremove = values(DICT_RET) .|> length |> sum
+    end
+
+    println()
+    @info "checked $(length(X)) files"
+    @info "found $(ncand) candidate dupes via size check"
+    @info "false dupe alarm for $(nnodup) files"
+    @info "expected dupes: $(ncand-nnodup)"
+    @info "---"
+    @info "dupes: $(ndupes)"
+    for (s,n) in dstat
+        @info "  sets of size $(s): $(n) [removable: $((s-1)*n)]"
+    end
+    @info "---"
+    @info "removable files: $(nremove)"
+    @info "..with disk space: $(tostr´(size_saving)) bytes"
+
+    return DICT_RET
 end
 
+function script_dedup(X::OrderedDict{FileEntry, Vector{FileEntry}})
+    RET = String[]
+
+    push!(RET, "#!/bin/bash")
+    
+    append!(RET, ["","","","",""])
+    push!(RET, "DRYRUN=1")
+    append!(RET, ["","","","",""])
+
+    i = 1
+    for (f,fs) in X
+        push!(RET, "############ CMP step")
+        push!(RET, "# ORIG/KEEP: $(path(f))")        
+        push!(RET, "echo '$(i): checking dupes of $(path(f))..'")
+        foreach(x->push!(RET, "cmp $(path(f)) $(path(x))  ||  { exit 99; }"), fs)
+        push!(RET, "echo 'OK'")
+        i += 1
+    end    
+
+    append!(RET, ["","","","",""])
+    push!(RET, "[[ \$DRYRUN == 1 ]]  &&  { echo 'dryrun completed successfully; exiting before rm..';  exit 0; }")
+    append!(RET, ["","","","",""])
+
+    i = 1
+    for (f,fs) in X
+        push!(RET, "############ RM step")
+        push!(RET, "# ORIG/KEEP: $(path(f))")
+        push!(RET, "echo '$(i): removing dupes of $(path(f))..'")
+        foreach(x->push!(RET, "rm $(path(x))  ||  { exit 99; }"), fs)
+        i += 1
+    end
+    return RET
+end
 
 include("check.jl_exports")
 

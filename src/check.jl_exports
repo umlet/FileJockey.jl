@@ -4,3 +4,4 @@ export checkdist
 
 export checkdupl
 
+export script_dedup
