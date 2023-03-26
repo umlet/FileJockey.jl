@@ -22,3 +22,6 @@ Base.Filesystem.lstat(x::AbstractEntry) = stat(x)
 # however, Base.Filesystem throws in a rather weird joinpath; so we override that as well
 Base.Filesystem.joinpath(x::AbstractEntry) = x
 
+
+Base.Filesystem.basename(x::FileEntry) = basename(x.path.s)
+

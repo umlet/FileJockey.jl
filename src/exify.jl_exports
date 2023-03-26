@@ -1,6 +1,13 @@
+
+
 export exify
+
 export ExifData
 
-export exif_create_datetime
+export exif_sane_datetime
+export exif_sane_date
+export exif_sane_year
+export exif_sane_yearmonth
 
-export exe   # TODO J
+export hardlinker
+
