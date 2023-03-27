@@ -111,7 +111,10 @@ function _date2sanedatetime(s::AbstractString)
 end
 
 function exif_sane_datetime(x::ExifData)
-    haskey(x._d, :Time__CreateDate)  &&  ( return _date2sanedatetime(x.Time__CreateDate) )
+    if haskey(x._d, :Time__CreateDate)  
+        s = _date2sanedatetime(x.Time__CreateDate)
+        !startswith(s, "0000")  &&  ( return s )  # '0000' observed for existing CreateDate in a .mov file
+    end
     haskey(x._d, :Time__FileModifyDate)  &&  ( return _date2sanedatetime(x.Time__FileModifyDate) )
     return "unknown"
 end
