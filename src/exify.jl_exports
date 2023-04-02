@@ -4,10 +4,10 @@ export exify
 
 export ExifData
 
-export exif_sane_datetime
-export exif_sane_date
-export exif_sane_year
-export exif_sane_yearmonth
+export exif2shortdatetime
+export exif2shortdate
+export exif2shortyear
+export exif2shortyearmonth
 
 export hardlinker
 

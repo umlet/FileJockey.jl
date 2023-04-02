@@ -2,6 +2,7 @@ module FileJockey
 
 
 using Base.Filesystem
+using UUIDs
 using OrderedCollections
 using JSON
 
@@ -18,7 +19,6 @@ include("entries.jl")
 include("trees.jl")
 
 include("stats.jl")
-
 include("pprint.jl")
 
 include("check.jl")

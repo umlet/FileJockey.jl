@@ -1,64 +1,8 @@
 
 
-# # factor our
-# function counter(X; f::Function=identity)
-#     RET = OrderedDict{Any, Int64}()
-#     for x in X
-#         key = f(x)
-#         !haskey(RET, key)  &&  ( RET[key] = 0 )
-#         RET[key] += 1
-#     end
-#     return RET
-# end
-# function duplicates(X)
-#     dcnt = counter(X)
-#     return filter(x->x[2]>1, dcnt) |> OrderedDict
-# end
-
-
-# function check1a(S::FsStats)
-#     msg = "Are the realpaths of all regular directories distint?\n        (should only occur on wrong manual input, not via single dir traversal)\n        "
-#     entries = S.direntries;  nentries = length(entries)
-#     nentries == 0  &&  ( @info msg * "none found -- OK";  return )
-#     dups = duplicates(path.(entries))
-#     length(dups) == 0  &&  ( @info msg * "$(tostr´(nentries)) '$(typeof(entries[1]))'s checked -- OK";  return )
-
-#     erroruser("duplicate found: '$(first(dups)[1])'")
-# end
-# function check1b(S::FsStats)
-#     msg = "Are the realpaths of all symlinks-to-directories distinct?\n        (should only occur on wrong manual input, not via single dir traversal)\n        "
-#     entries = S.syml2direntries;  nentries = length(entries)
-#     nentries == 0  &&  ( @info msg * "none found -- OK";  return )
-#     dups = duplicates(path.(entries))
-#     length(dups) == 0  &&  ( @info msg * "$(tostr´(nentries)) '$(typeof(entries[1]))'s checked -- OK";  return )
-
-#     erroruser("duplicate found: '$(first(dups)[1])'")
-# end
-# function check1c(S::FsStats)
-#     msg = "Are the realpaths of all symlink target directories distinct?\n        (e.g., in dir traversal, several different symlinks point to the same target directory)\n        "
-#     entries = S.symltarget_direntries;  nentries = length(entries)
-#     nentries == 0  &&  ( @info msg * "none found -- OK";  return )
-#     dups = duplicates(path.(entries))
-#     length(dups) == 0  &&  ( @info msg * "$(tostr´(nentries)) '$(typeof(entries[1]))'s checked -- OK";  return )
-
-#     duptarget = first(dups)[1]
-#     symls = S.syml2direntries |> fl(x->path(follow(x))==duptarget)
-#     length(symls) < 2  &&  error("UNREACHABLE")  # TODO
-#     syml1,syml2 = first(symls, 2)
-#     erroruser("symlinks '$(path(syml1))' and '$(path(syml2))' point to the same dir '$(duptarget)'")
-# end
-
-
-
-
-
-
-
-
-
 
 function check_11_syml2dir_toknown(S::FsStats)
-    msg = "1.1 Check if a symlink points to an already known regular dir.. "
+    msg = "  Check if a symlink points to an already known regular dir.. "
     entries = S.syml2direntries |> fl(x->x.target in S.direntries);  nentries = length(entries)
     nentries == 0  &&  ( @info msg * "none found -- OK";  return true )
 
@@ -71,7 +15,7 @@ function check_11_syml2dir_toknown(S::FsStats)
 end
 
 function check_12_syml2dirs_tosameexternal(S::FsStats)  # after the previous test, they will point to unknown/external dirs
-    msg = "1.2 Check if two symlinks point to the same dir.. "
+    msg = "  Check if two symlinks point to the same dir.. "
     entries = S.syml2direntries #=|> fl(x->!(x.target in S.direntries))=#;  nentries = length(entries)
     nentries == 0  &&  ( @info msg * "none found -- OK";  return true )
 
@@ -88,7 +32,7 @@ function check_12_syml2dirs_tosameexternal(S::FsStats)  # after the previous tes
 end
 
 function check_13_dirs_distinctpaths(S::FsStats)
-    msg = "1.3 Check if all dirs (known and symlinked) have distinct paths.. "
+    msg = "  Check if all dirs (known and symlinked) have distinct paths.. "
     entries = S.dirs;  nentries = length(entries)
     nentries == 0  &&  ( @info msg * "none found -- OK";  return true )
     nsetdirpaths(S) == nentries  &&  ( @info msg * "$(tostr´(nentries)) '$(typeof(entries[1]))'s checked -- OK";  return true )
@@ -110,7 +54,7 @@ end
 
 
 function check_21_syml2file_toknown(S::FsStats)
-    msg = "2.1 Check if a symlink points to an already known regular file.. "
+    msg = "  Check if a symlink points to an already known regular file.. "
     entries = S.syml2fileentries |> fl(x->x.target in S.fileentries);  nentries = length(entries)
     nentries == 0  &&  ( @info msg * "none found -- OK";  return true )
 
@@ -123,7 +67,7 @@ function check_21_syml2file_toknown(S::FsStats)
 end
 
 function check_22_syml2files_tosameexternal(S::FsStats)
-    msg = "2.2 Check if two symlinks point to the same file.. "
+    msg = "  Check if two symlinks point to the same file.. "
     entries = S.syml2fileentries #=|> fl(x->!(x.target in S.direntries))=#;  nentries = length(entries)
     nentries == 0  &&  ( @info msg * "none found -- OK";  return true )
 
@@ -140,7 +84,7 @@ function check_22_syml2files_tosameexternal(S::FsStats)
 end
 
 function check_23_files_distinctpaths(S::FsStats)
-    msg = "2.3 Check if all files (known and symlinked) have distinct paths.. "
+    msg = "  Check if all files (known and symlinked) have distinct paths.. "
     entries = S.files;  nentries = length(entries)
     nentries == 0  &&  ( @info msg * "none found -- OK";  return true )
     nsetfilepaths(S) == nentries  &&  ( @info msg * "$(tostr´(nentries)) '$(typeof(entries[1]))'s checked -- OK";  return true )
@@ -160,18 +104,17 @@ end
 
 
 
-function checkdist(X::AbstractVector{<:AbstractEntry})
+function checksamepaths(X::AbstractVector{<:AbstractEntry})
     S = stats(X)
 
-
-    @info "1. Checking sanity of symlinks-to-dirs and dirs (most likely cause for duplicate files in a tree):"
+    @info "Checking sanity of symlinks-to-dirs and dirs (most likely cause for duplicate files in a tree):"
 
     check_11_syml2dir_toknown(S)
     check_12_syml2dirs_tosameexternal(S)
     check_13_dirs_distinctpaths(S)
 
 
-    @info "2. Checking sanity of symlinks-to-files and files:"
+    @info "Checking sanity of symlinks-to-files and files:"
 
     check_21_syml2file_toknown(S)
     check_22_syml2files_tosameexternal(S)
@@ -180,6 +123,33 @@ function checkdist(X::AbstractVector{<:AbstractEntry})
     return X
 end
 #dedupfiles(X::AbstractVector{<:AbstractEntry}) = dedup(X) |> fl(isfile) |> mp(follow)
+
+
+
+
+
+
+
+
+
+
+
+
+
+function checksamefiles(X::AbstractVector{FileEntry})
+    S = stats(X)
+
+    if nsetfiledeviceinodes(S) == nfiles(S)
+        @info "Checking for same files (hardslinks).. OK: all files are distinct; no hardlinks found"
+        return X
+    end
+
+    erroruser("same files/hardslinks found; use getsamefiles() to identify")
+end
+
+
+
+
 
 
 # TODO intermediate step; check for hardlinks
@@ -197,7 +167,7 @@ function isduplicate(x::FileEntry, y::FileEntry)
 end
 
 
-function checkdupl(X::AbstractVector{<:FileEntry})
+function getduplfiles(X::AbstractVector{<:FileEntry})
     RET = Vector{Vector{FileEntry}}()
 
     d = group(X; fkey=filesize, Tkey=Int64, Tval=FileEntry, fhaving=x->length(x)>=2) 
@@ -205,7 +175,7 @@ function checkdupl(X::AbstractVector{<:FileEntry})
 
     nnodup = 0
     for (s,fs) in d
-        @info "Checking files of same size $(s):"
+        @info "Checking potential duplicate files of same size $(s):"
         for f in fs  println(path(f))  end
 
         REF_FS = Vector{Vector{FileEntry}}()
@@ -215,11 +185,11 @@ function checkdupl(X::AbstractVector{<:FileEntry})
                 ref_f = ref_fs[1]
                 if isduplicate(ref_f, f)
                     push!(ref_fs, f)
-                    @info "duplicate found!"
+                    @info "DUPLICATE FOUND!"
                     break # ref check can end here
                 else
                     push!(REF_FS, FileEntry[f])
-                    @info "DUPLICATE DISMISSED"
+                    @info "OK: contents differ; duplicate dismissed"
                     break # ref check MUST end here, as otherwise loop gets longer!!!
                 end
             end
@@ -269,6 +239,18 @@ function checkdupl(X::AbstractVector{<:FileEntry})
 
     return DICT_RET
 end
+
+function checkduplfiles(X::AbstractVector{<:FileEntry})
+    d = getduplfiles(X)
+    length(d) == 0  &&  ( return X )
+    erroruser("duplicate files found; use getduplfiles() to identify")
+end
+
+
+
+
+
+
 
 function script_dedup(X::OrderedDict{FileEntry, Vector{FileEntry}})
     RET = String[]

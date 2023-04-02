@@ -1,37 +1,6 @@
 
 
 
-#using JSON
-#using OrderedCollections
-
-
-
-# module Exey
-# export exe
-# function exe(scmd::String; fail=true, okexits=[], splitlines=true)
-#     cmd = Cmd(["bash", "-c", scmd])
-#     bufout = IOBuffer()                                                     ; buferr = IOBuffer()
-#     process = run(pipeline(ignorestatus(cmd), stdout=bufout, stderr=buferr))
-#     exitcode = process.exitcode
-    
-#     sout = String(take!(bufout))                                            ; serr = String(take!(buferr))
-#     close(bufout)                                                           ; close(buferr)
-
-#     fail  &&  exitcode != 0  &&  !(exitcode in okexits)  &&  error("exe: OS system command failed: '$(scmd)'; stderr:\n$(serr)")
-
-#     if splitlines
-#         length(sout) > 0  &&  last(sout) == '\n'  &&  (sout = chop(sout))   ; length(serr) > 0  &&  last(serr) == '\n'  &&  (serr = chop(serr))
-#         souts = sout != "" ? split(sout, '\n') : String[]                   ; serrs = serr != "" ? split(serr, '\n') : String[]
-#         return (; exitcode, souts, serrs)
-#     end
-#     return (; exitcode, sout, serr)
-# end
-# end
-# using .Exey
-
-
-
-
 
 struct ExifData
     _d::OrderedDict{Symbol, Any}
@@ -80,6 +49,7 @@ end
 
 
 
+
 function info(x::ExifData, grep=nothing)
     len = keys(x._d) |> mp(string) |> mp(length) |> maximum
     for (k,v) in x._d
@@ -98,7 +68,7 @@ end
 
 
 
-function _date2sanedatetime(s::AbstractString)
+function _date2shortdatetime(s::AbstractString)
     # time with and without time zone correction
     length(s) in (19, 25)  ||  error("invalid date format in '$(s)'")
     YYYY = s[1:4]
@@ -110,31 +80,37 @@ function _date2sanedatetime(s::AbstractString)
     return YYYY * MM * DD * "_" * hh * mm * ss
 end
 
-function exif_sane_datetime(x::ExifData)
+function exif2shortdatetime(x::ExifData)
     if haskey(x._d, :Time__CreateDate)  
-        s = _date2sanedatetime(x.Time__CreateDate)
+        s = _date2shortdatetime(x.Time__CreateDate)
         !startswith(s, "0000")  &&  ( return s )  # '0000' observed for existing CreateDate in a .mov file
     end
-    haskey(x._d, :Time__FileModifyDate)  &&  ( return _date2sanedatetime(x.Time__FileModifyDate) )
+    if haskey(x._d, :Time__FileModifyDate)  
+        s = _date2shortdatetime(x.Time__FileModifyDate)
+        !startswith(s, "0000")  &&  ( return _date2shortdatetime(x.Time__FileModifyDate) )
+    end
     return "unknown"
 end
-function exif_sane_date(x::ExifData)
-    s = exif_sane_datetime(x)
+function exif2shortdate(x::ExifData)
+    s = exif2shortdatetime(x)
     s == "unknown"  &&  ( return s )
     s = split(s, "_")[1]
     @assert length(s) == 8
     return s
 end
-function exif_sane_year(x::ExifData)
-    s = exif_sane_date(x)
+function exif2shortyear(x::ExifData)
+    s = exif2shortdate(x)
     s == "unknown"  &&  ( return s )
     return s[1:4]
 end
-function exif_sane_yearmonth(x::ExifData)
-    s = exif_sane_date(x)
+function exif2shortyearmonth(x::ExifData)
+    s = exif2shortdate(x)
     s == "unknown"  &&  ( return s )
     return s[1:6]
 end
+
+
+
 
 
 
@@ -144,9 +120,9 @@ function _dnames_and_hardlink(f::FileEntry, x::ExifData, dname)
     RET_dnames_full = String[]
 
     fname_base = basename(f)
-    lname_base = exif_sane_datetime(x) * "___" * fname_base
+    lname_base = exif2shortdatetime(x) * "___" * fname_base * "___" * string(uuid4())
 
-    dname_rel_1 = exif_sane_year(x)
+    dname_rel_1 = exif2shortyear(x)
     dname_full_1 = joinpath(dname, dname_rel_1)
     push!(RET_dnames_full, dname_full_1)
     if dname_rel_1 == "unknown"
@@ -154,7 +130,7 @@ function _dnames_and_hardlink(f::FileEntry, x::ExifData, dname)
         return (RET_dnames_full, RET_lname_full)
     end
 
-    dname_rel_2 = exif_sane_yearmonth(x)
+    dname_rel_2 = exif2shortyearmonth(x)
     dname_full_2 = joinpath(dname_full_1, dname_rel_2)
     push!(RET_dnames_full, dname_full_2)
     RET_lname_full = joinpath(dname_full_2, lname_base)

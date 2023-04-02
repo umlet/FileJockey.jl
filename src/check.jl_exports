@@ -1,7 +1,14 @@
 
 
-export checkdist
+export checksamepaths
 
-export checkdupl
+export checksamefiles
+export getsamefiles
+
+export checkduplfiles
+export getduplfiles
+
+
+
 
 export script_dedup

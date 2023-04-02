@@ -36,7 +36,7 @@ EntryCanon(s::AbstractString=".") = EntryCanon(PathCanon(s))
 abstract type AbstractEntry end
 
 
-Base.show(io::IO, ::MIME"text/plain", x::AbstractEntry) = _show(io, x)
+#Base.show(io::IO, ::MIME"text/plain", x::AbstractEntry) = _show(io, x)
 #Base.show(io::IO, x::AbstractEntry) = _show(io, x)
 
 

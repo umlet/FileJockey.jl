@@ -25,3 +25,10 @@ Base.Filesystem.joinpath(x::AbstractEntry) = x
 
 Base.Filesystem.basename(x::FileEntry) = basename(x.path.s)
 
+
+
+#####
+
+Base.show(io::IO, ::MIME"text/plain", x::AbstractEntry) = _show(io, x)
+
+Base.show(io::IO, ::MIME"text/plain", x::AbstractVector{<:AbstractEntry}) = _show(io, x)

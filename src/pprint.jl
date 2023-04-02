@@ -28,7 +28,11 @@ colorizeas(s::AbstractString, ::Type{Symlink{OtherEntry}}) = colorize(s, YELLOW_
 colorizeas(s::AbstractString, ::Type{Symlink{UnknownEntryNONEXIST}}) = colorize(s, RED_FG, NEGATIVE)
 
 
-function info(S::FsStats)
+
+
+
+
+function describe(S::FsStats)
     # LINE 1
     line = []
     if nfiles(S) == 0
@@ -46,7 +50,7 @@ function info(S::FsStats)
         else
             push!(line, colorizeas(" -- $(fsizehuman(fsize)) -- $(tostr´(fsize)) bytes ", FileEntry))
         end
-        push!(line, DARK_GRAY_FG("( #paths:$(nsetfilepaths(S))  #dev:$(nsetfiledevices(S))  #inodes:$(nsetfiledeviceinodes(S)) )"))
+        push!(line, DARK_GRAY_FG("( #paths:$(nsetfilepaths(S))  #dev:$(nsetfiledevices(S))  #inodes&dev:$(nsetfiledeviceinodes(S)) )"))
         push!(line, colorizeas(" ]", FileEntry))
     end
     println(line...)
@@ -97,11 +101,23 @@ function info(S::FsStats)
     println(line...)
 end
 
-info(X::AbstractVector{<:AbstractEntry}) = info(stats(X))
+describe(X::AbstractVector{<:AbstractEntry}) = describe(stats(X))
 
 
 
-
+function _show(io::IO, X::AbstractVector{<:AbstractEntry})
+    println("$(length(X))-element Vector{AbstractEntry}:")
+    tmp = tk(X, 11)
+    for x in tk_(tmp, 10)
+        print(" ")
+        _show(io, x)
+        println()
+    end
+    length(tmp) == 11  &&  println(" ⋮")
+    println()
+    println("describe(..):")
+    describe(X)
+end
 
 
 
