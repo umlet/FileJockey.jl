@@ -238,8 +238,8 @@ _exify(f::FileEntry) = _exify([f])[1]
 _exify(s::AbstractString) = _exify(FileEntry(EntryCanon(s)))
 
 
-exify(itr) =                itr |> pt(100) |> mp(_exify) |> iflatten
-exify(X::AbstractVector) =    X |> pt(100) |> mp(_exify) |> iflatten |> cl  # TODO mb use invoke w/ type Any?
+exify(itr) =                itr |> pt(100) |> mp(_exify) |> flatten_
+exify(X::AbstractVector) =    X |> pt(100) |> mp(_exify) |> flatten_ |> cl  # TODO mb use invoke w/ type Any?
 
 exify(x::AbstractEntry) = exify([x]) |> first
 exify(s::AbstractString) = exify(FileEntry(s))
