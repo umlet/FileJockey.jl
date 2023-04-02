@@ -195,8 +195,14 @@ function _exify_base(ss::Vector{<:AbstractString})  # ! all fs must be valid, re
     ]
     # what does prevent XXX reading text files? -fast??? TODO
 
-    scmd = "exiftool" * " " * join(exiftool_options, " ") * " " * join(ss, " ")
-    s = exe(scmd; splitlines=false)[2]
+    #scmd = "exiftool" * " " * join(exiftool_options, " ") * " " * join(ss, " ")
+    #s = exe(scmd; splitlines=false)[2]
+
+    cmds = ["exiftool"]
+    append!(cmds, exiftool_options)
+    append!(cmds, ss)
+    s = exe(cmds; splitlines=false)[2]
+
     js = JSON.parse(s; dicttype=OrderedDict)
     return changeexifkeys.(js)
 end

@@ -113,9 +113,9 @@ function _show(io::IO, X::AbstractVector{<:AbstractEntry})
         _show(io, x)
         println()
     end
-    length(tmp) == 11  &&  println(" ⋮")
+    length(tmp) == 11  &&  println(" ...")
     println()
-    println("describe(..):")
+    println("describe():")
     describe(X)
 end
 
