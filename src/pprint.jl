@@ -7,8 +7,8 @@ function colorize(s::AbstractString, COLORS...)
     end
     return RET
 end
-colorizeas(s::AbstractString, ::FileEntry) = colorize(s, GREEN_FG)
-colorizeas(s::AbstractString, ::DirEntry) = colorize(s, BLUE_FG)
+colorizeas(s::AbstractString, ::FileEntry) = colorize(s, LIGHT_GREEN_FG)
+colorizeas(s::AbstractString, ::DirEntry) = colorize(s, LIGHT_BLUE_FG)
 colorizeas(s::AbstractString, ::OtherEntry) = colorize(s, YELLOW_FG)
     #=special case=# colorizeas(s::AbstractString, ::UnknownEntryNONEXIST) = colorize(s, RED_FG)
 
@@ -17,8 +17,8 @@ colorizeas(s::AbstractString, ::Symlink{DirEntry}) = colorize(s, BLUE_FG, NEGATI
 colorizeas(s::AbstractString, ::Symlink{OtherEntry}) = colorize(s, YELLOW_FG, NEGATIVE)
 colorizeas(s::AbstractString, ::Symlink{UnknownEntryNONEXIST}) = colorize(s, RED_FG, NEGATIVE)
 #----------
-colorizeas(s::AbstractString, ::Type{FileEntry}) = colorize(s, GREEN_FG)
-colorizeas(s::AbstractString, ::Type{DirEntry}) = colorize(s, BLUE_FG)
+colorizeas(s::AbstractString, ::Type{FileEntry}) = colorize(s, LIGHT_GREEN_FG)
+colorizeas(s::AbstractString, ::Type{DirEntry}) = colorize(s, LIGHT_BLUE_FG)
 colorizeas(s::AbstractString, ::Type{OtherEntry}) = colorize(s, YELLOW_FG)
     #=special case=# colorizeas(s::AbstractString, ::Type{UnknownEntryNONEXIST}) = colorize(s, RED_FG)
 
