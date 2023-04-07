@@ -30,7 +30,7 @@ include("ext.jl")
 
 
 function __init__()
-    @info "Initializing known file extensions"
+    #@info "Initializing known file extensions"
     initext()
 end
 
