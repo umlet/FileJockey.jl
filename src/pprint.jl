@@ -57,6 +57,30 @@ function describe(S::FsStats)
 
     # LINE 2
     line = []
+    if nfiles(S) > 0
+        _d = group(S.files; fkey=Ext)
+        d = sortbyval(_d; by=length, rev=true)
+        push!(line, "{ ")
+        for (k,v) in d
+            push!(line, ":" * string(k) * " ")
+            _d2 = group(v, fkey=ext)
+            d2 =  sortbyval(_d2; by=length, rev=true)
+            for (k2,v2) in d2
+                if k2 === nothing
+                    push!(line, string(length(v2)) * "<> ")
+                else
+                    push!(line, string(length(v2)) * "/\"" * k2 *"\" ")
+                end
+            end
+        end
+        push!(line, "}")
+
+        println(line...)
+    end
+
+
+    # LINE 3
+    line = []
     if ndirs(S) == 0
         push!(line, DARK_GRAY_FG("[ no dirs ]"))
     else
@@ -115,7 +139,7 @@ function _show(io::IO, X::AbstractVector{<:AbstractEntry})
     end
     length(tmp) == 11  &&  println(" ...")
     println()
-    println("describe():")
+    #println("describe():")
     describe(X)
 end
 

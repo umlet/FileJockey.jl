@@ -2,18 +2,24 @@
 
 struct PathCanon
     s::String  # canonical; up to symlink basename
-    function PathCanon(x::PathCanon, relsegment::AbstractString)  # avoids realpath(); assumes existence of relsegment, and x being a dir
+    # fast
+    # avoids slow realpath(); assumes existence of relsegment, and x being a dir; used internally only from dir walk
+    function PathCanon(x::PathCanon, relsegment::AbstractString)
         @assert !occursin('/', relsegment)  # TODO WINDOWS
         return new(joinpath(x.s, relsegment))
     end
-    function PathCanon(s::AbstractString=".")
+    # slow
+    function PathCanon(s::AbstractString)
         s == ""  &&  error("path must be non-empty string")
-        # make sure trailing slashes do not trigger treat-link-as-dir logic
-        s = rstrip(s, '/')  # TODO WINDOWS
-        s == ""  &&  ( s = "/" )
 
+        # remove trailing or duplicate path delimiters for Linux&Windows
+        s = s |> splitpath |> joinpath
         path = isabspath(s)  ?  s  :  abspath(s)
-        path = islink(path)  ?  joinpath(realpath(dirname(path)), basename(path))  :  realpath(path)
+
+        st = lstat(path)  # works even if no read access rights; TODO check access rights later
+        !ispath(st)  &&  erroruser("files system entry '$path' not found")
+        path = islink(st)  ?  joinpath(realpath(dirname(path)), basename(path))  :  realpath(path)
+
         return new(path)
     end
 end
@@ -28,7 +34,7 @@ struct EntryCanon
         return new(path, st)
     end
 end
-EntryCanon(s::AbstractString=".") = EntryCanon(PathCanon(s))
+EntryCanon(s::AbstractString) = EntryCanon(PathCanon(s))
 
 
 

@@ -40,8 +40,8 @@ end
 hasext(x::AbstractEntry, s::AbstractString) = ext(x) == s
 hasext(s::AbstractString) = x -> ext(x) == s
 
-hasExt(x::AbstractEntry, s::Symbol) = Ext(x) == s
-hasExt(s::Symbol) = x -> Ext(x) == s
+hasext(x::AbstractEntry, s::Symbol) = Ext(x) == s
+hasext(s::Symbol) = x -> Ext(x) == s
 
 
 
