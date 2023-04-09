@@ -154,7 +154,7 @@ function hardlinker(F::AbstractVector{<:FileEntry}, X::AbstractVector{ExifData},
     tmp = stat.(F) |> mp(filedevice) |> Set
     @assert length(tmp) != 0
     length(tmp) > 1  &&  erroruser("input files do not reside on the same device")
-    first(tmp) != filedevice(d)  &&  erroruser("target path for hardlinks not on same device as input files")
+    first(tmp) != filedevice(stat(d))  &&  erroruser("target path for hardlinks not on same device as input files")
 
     #check for unique target filenames
     length(Set(lnames_full)) != length(lnames_full)  &&   erroruser("hardlink paths are not unique; maybe use uuid4() in link names")
