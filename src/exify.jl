@@ -171,12 +171,15 @@ function hardlinker(F::AbstractVector{<:FileEntry}, X::AbstractVector{ExifData},
         isdir(dname_full)  &&  continue
         mkdir(dname_full)
     end
-    @info "$(length(dnames_full)) new, intermediate dirs created"
-    
+
+    # create hardlinks
     for (f,lname_full) in zip(F, lnames_full)
         println(path(f), " <-- ", lname_full, " created")
         hardlink(path(f), lname_full)
     end
+
+
+    @info "$(length(dnames_full)) new, intermediate dirs created"
     @info "$(length(lnames_full)) hardlinks created"
     return nothing
 end
