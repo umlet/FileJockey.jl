@@ -240,7 +240,7 @@ function getdupl(X::AbstractVector{<:FileEntry})
 end
 
 function checkdupl(X::AbstractVector{<:FileEntry})
-    d = getduplfiles(X)
+    d = getdupl(X)
     length(d) == 0  &&  ( return X )
     erroruser("duplicate files found; use getduplfiles() to identify")
 end
