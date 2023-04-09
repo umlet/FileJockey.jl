@@ -70,6 +70,6 @@ ll(args...) = ls(args...)
 find(x::AbstractEntry; skip_paths=String[]) = fswalkdir(x; skip_paths=skip_paths) |> cl
 find(s::AbstractString="."; skip_paths=String[]) = find(Entry(s); skip_paths=skip_paths)
 
-find(X::AbstractVector; skip_paths=String[]) = find.(X; skip_paths=skip_paths)
+find(X::AbstractVector; skip_paths=String[]) = find.(X; skip_paths=skip_paths) |> flatten
 
 include("trees.jl_exports")
