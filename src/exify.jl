@@ -120,7 +120,9 @@ function _dnames_and_hardlink(f::FileEntry, x::ExifData, dname)
     RET_dnames_full = String[]
 
     fname_base = basename(f)
-    lname_base = exif2shortdatetime(x) * "___" * fname_base * "___" * string(uuid4())
+    sext = ext(fname_base)
+    sext = sext === nothing  ?  ""  :  "." * sext
+    lname_base = exif2shortdatetime(x) * "___exifuse" * string(uuid4()) * sext
 
     dname_rel_1 = exif2shortyear(x)
     dname_full_1 = joinpath(dname, dname_rel_1)
