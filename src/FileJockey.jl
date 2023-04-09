@@ -53,7 +53,7 @@ end
 
 Juliettine.ext(x::AbstractEntry) = ext(x.path.s)
 
-
+Juliettine.save(io::IO, x::AbstractEntry) = save(io, path(x))
 
 
 
