@@ -1,12 +1,12 @@
 
 
-export checksamepaths
+export checkpaths
 
-export checksamefiles
-export getsamefiles
+export checksame
+export getsame
 
-export checkduplfiles
-export getduplfiles
+export checkdupl
+export getdupl
 
 
 

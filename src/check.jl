@@ -104,7 +104,7 @@ end
 
 
 
-function checksamepaths(X::AbstractVector{<:AbstractEntry})
+function checkpaths(X::AbstractVector{<:AbstractEntry})
     S = stats(X)
 
     @info "Checking sanity of symlinks-to-dirs and dirs (most likely cause for duplicate files in a tree):"
@@ -136,7 +136,7 @@ end
 
 
 
-function checksamefiles(X::AbstractVector{FileEntry})
+function checksame(X::AbstractVector{FileEntry})
     S = stats(X)
 
     if nsetfiledeviceinodes(S) == nfiles(S)
@@ -144,17 +144,16 @@ function checksamefiles(X::AbstractVector{FileEntry})
         return X
     end
 
-    erroruser("same files/hardslinks found; use getsamefiles() to identify")
+    erroruser("same files/hardslinks found; use getsame() to identify")
 end
 
+# TODO getsame
 
 
 
 
 
-# TODO intermediate step; check for hardlinks
-# issame..
-
+# TODO better name
 function isduplicate(x::FileEntry, y::FileEntry)
     filesize(x) != filesize(y)  &&  ( return false )
     scmd = "cmp $(path(x)) $(path(y))"
@@ -167,7 +166,7 @@ function isduplicate(x::FileEntry, y::FileEntry)
 end
 
 
-function getduplfiles(X::AbstractVector{<:FileEntry})
+function getdupl(X::AbstractVector{<:FileEntry})
     RET = Vector{Vector{FileEntry}}()
 
     d = group(X; fkey=filesize, Tkey=Int64, Tval=FileEntry, fhaving=x->length(x)>=2) 
@@ -240,7 +239,7 @@ function getduplfiles(X::AbstractVector{<:FileEntry})
     return DICT_RET
 end
 
-function checkduplfiles(X::AbstractVector{<:FileEntry})
+function checkdupl(X::AbstractVector{<:FileEntry})
     d = getduplfiles(X)
     length(d) == 0  &&  ( return X )
     erroruser("duplicate files found; use getduplfiles() to identify")
