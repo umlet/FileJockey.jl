@@ -137,10 +137,11 @@ function _dnames_and_hardlink(f::FileEntry, x::ExifData, dname)
     return (RET_dnames_full, RET_lname_full)
 end
 
-function hardlinker(F::AbstractVector{<:FileEntry}, X::AbstractVector{ExifData}, dname)
-    dname = path(DirEntry(dname))
-    length(F) != length(X)  &&  error("length mismatch files and exifdata")
+function hardlinker(F::AbstractVector{<:FileEntry}, X::AbstractVector{ExifData}, d::DirEntry)
+    length(F) == 0  &&  erroruser("no input files given")
+    length(F) != length(X)  &&  erroruser("files and their exifdata do not match in size")
 
+    dname = path(d)
     dnames_full = String[]
     lnames_full = String[]
     for (f,x) in zip(F, X)
@@ -149,34 +150,37 @@ function hardlinker(F::AbstractVector{<:FileEntry}, X::AbstractVector{ExifData},
         push!(lnames_full, _lname_full)
     end
 
+    # check that all inputs are on same device, as well as the target dir
+    tmp = stat.(F) |> mp(filedevice) |> Set
+    @assert length(tmp) != 0
+    length(tmp) > 1  &&  erroruser("input files do not reside on the same device")
+    first(tmp) != filedevice(d)  &&  erroruser("target path for hardlinks not on same device as input files")
+
     #check for unique target filenames
-    if length(Set(lnames_full)) != length(lnames_full)
-        error("link paths are not unique!")
-    else
-        @info "$(length(lnames_full)) unique links will be created"
-    end
-    # make sure none of the target hardlinks exist
+    length(Set(lnames_full)) != length(lnames_full)  &&   erroruser("hardlink paths are not unique; maybe use uuid4() in link names")
+
+    # make sure none of the target hardlinks exist; impossible if non-existing target dir is enforced, but possible for import functionality
     for lname_full in lnames_full
-        ispath(lname_full)  &&  error("path '$(lname_full)' already exists")
+        ispath(lname_full)  &&  error("hardlink path '$(lname_full)' already exists")
     end
-    @info "(..none of them exists)"
+
 
     # create intermediate dirs
     dnames_full = OrderedSet(dnames_full) |> collect
-    @info "hardlinks will reside in $(length(dnames_full)) dirs; creating intermediate dirs.."
-
     for dname_full in dnames_full
         isdir(dname_full)  &&  continue
         mkdir(dname_full)
     end
-    @info "dirs created"
+    @info "$(length(dnames_full)) new, intermediate dirs created"
     
     for (f,lname_full) in zip(F, lnames_full)
         println(path(f), " <-- ", lname_full, " created")
         hardlink(path(f), lname_full)
     end
+    @info "$(length(lnames_full)) hardlinks created"
+    return nothing
 end
-
+hardlinker(F::AbstractVector{<:FileEntry}, X::AbstractVector{ExifData}, dname::AbstractString) = hardlinker(F, X, DirEntry(dname))
 
 
 

@@ -8,6 +8,7 @@ fileinode(st::StatStruct)::UInt64 = st.inode
 filedeviceinode(st::StatStruct)::Tuple{UInt64, UInt64} = (filedevice(st), fileinode(st))
 
 
+
 struct FsStats  # mutable avoids some boilerplate in construction
     # PARTITION for counting
     # - standard
