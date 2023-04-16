@@ -67,7 +67,7 @@ function describe(S::FsStats)
             d2 =  sortbyval(_d2; by=length, rev=true)
             for (k2,v2) in d2
                 if k2 === nothing
-                    push!(line, string(length(v2)) * "<> ")
+                    push!(line, string(length(v2)) * "/_ ")
                 else
                     push!(line, string(length(v2)) * "/\"" * k2 *"\" ")
                 end
