@@ -76,7 +76,7 @@ find(args...; skip_paths=String[]) = eachentry(args...; skip_paths=skip_paths) |
 #find(s::AbstractString="."; skip_paths=String[]) = find(Entry(s); skip_paths=skip_paths)
 #find(X::AbstractVector; skip_paths=String[]) = find.(X; skip_paths=skip_paths) |> flatten
 
-findfiles(args...) = find(args...) |> 
+findfiles(args...) = eachfile(args...) |> cl
 
 
 
