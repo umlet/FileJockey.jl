@@ -1,0 +1,33 @@
+
+
+
+
+"""
+    ls(path, ..), ll(path, ..)
+
+Get file system entries of a directory.
+"""
+:ls, :ll
+
+
+
+
+
+"""
+    find(path, ..)        findfiles(path, ..)
+    eachentry(path, ..)   eachfile(path, ..)
+
+Get file system entries of a directory tree.
+`find` returns all entries, including directories and symlinks.
+`findfiles` only returns regular files and the targets of file symlinks.
+
+`eachentry` and `eachfile` do the same, but return iterators.
+"""
+:eachentry, :eachfile, :find, :findfiles
+
+
+
+
+
+
+
