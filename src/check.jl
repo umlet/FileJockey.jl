@@ -244,10 +244,12 @@ function getdupl(X::AbstractVector{<:FileEntry})
     return DICT_RET
 end
 
+# TODO make const
+__DUPL__::OrderedDict{FileEntry, Vector{FileEntry}} = OrderedDict{FileEntry, Vector{FileEntry}}()
 function checkdupl(X::AbstractVector{<:FileEntry})
-    d = getdupl(X)
+    d = getdupl(X);  global __DUPL__ = d
     length(d) == 0  &&  ( return X )
-    erroruser("duplicate files found; use getduplfiles() to identify")
+    erroruser("duplicate files found and stored in '__DUPL__' (or use getdupl)")
 end
 
 
