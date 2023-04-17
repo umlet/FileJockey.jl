@@ -156,8 +156,8 @@ end
 # TODO better name
 function isduplicate(x::FileEntry, y::FileEntry)
     filesize(x) != filesize(y)  &&  ( return false )
-    scmd = "cmp $(path(x)) $(path(y))"  # TODO Windows!!!
-    R = exe(scmd; fail=false, splitlines=false)
+    cmds = ["cmp", path(x), path(y)]  # TODO Windows!!!
+    R = exe(cmds; fail=false, splitlines=false)
     R.exitcode == 0  &&  return true
     # non-zero exit:
     occursin(" differ: ", R.out)  &&  return false
