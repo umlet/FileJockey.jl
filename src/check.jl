@@ -285,5 +285,9 @@ function script_dedup(X::OrderedDict{FileEntry, Vector{FileEntry}})
     return RET
 end
 
+
+
+
 include("check.jl_exports")
+include("check.jl_docs")
 
