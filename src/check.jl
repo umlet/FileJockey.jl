@@ -244,7 +244,7 @@ function getdupl(X::AbstractVector{<:FileEntry})
     return DICT_RET
 end
 
-# TODO make const
+# TODO make const, export
 __DUPL__::OrderedDict{FileEntry, Vector{FileEntry}} = OrderedDict{FileEntry, Vector{FileEntry}}()
 function checkdupl(X::AbstractVector{<:FileEntry})
     d = getdupl(X);  global __DUPL__ = d

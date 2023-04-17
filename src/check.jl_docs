@@ -6,17 +6,19 @@
     __DUPL__
 
 `checkdupl` checks if any (distinct) files have the same content.
-- It first ensures that all canonical path names are different; otherwise removing one of the identical paths would remove both!
-- It then checks that there are no hardlinks that point to the same file. This would be less problematic, as removing one would still keep the other.
-- Finally, it checks the file contents for files of the same size.
+- It first ensures that all canonical path names are different (via calling `checkpaths`). Same paths can happen, e.g., with circular symlinks. This can be dangerous: "A.txt" and "symlink-to-A.txt" could represent the file "A.txt" twice; the two file entries ("A.txt", and "A.txt" as symlink target) "look" like duplicates, but are in fact just one file which must NOT be deleted.
+- It then checks that there are no hardlinks that point to the same file (via calling `checksame`). This would be less problematic, as removing one would still keep the other.
+- Finally, it checks the contents of same-sized files.
 
 If successful, it returns the input; otherwise it throws an exception. This way you can use it in a pipeline as an "assert-no-duplicates."
 
-As `checkdupl` can be expensive, it stores duplicates in the global variable `__DUPL__`. (You can also use `getdupl`.)
+As `checkdupl` can be expensive, it stores the found duplicates in the global variable `__DUPL__`. (You can also use the `getdupl` function.)
 
-See also: `rm` `checkpaths` `Dupl`
+See also: `checkpaths` `checksame` `Dupl` `rm`
 """
 :checkdupl, :getdupl, :__DUPL__
+
+
 
 
 """
@@ -26,6 +28,20 @@ Checks if the paths of all given entries are distinct. This makes certain operat
 
 If successful, it returns the input; otherwise it throws an exception. This way you can use it in a pipeline as an "assert-no-identical-paths."
 
-See also: `checkdupl`
+The series of checks is designed to find the most plausible cause for many duplicate paths first; most often, this is a symlink-to-dir that points to a directory within the current hierarchy.
+
+See also: `checkdupl` `getfiles`
 """
 :checkpaths
+
+
+
+
+"""
+    checksame(files)
+
+Checks if there are hardlinks among the files, i.e., files pointing to the same <device/inode> entry.
+
+Hardlinks are usually not a problem, but this check can avoid costly file content operations when looking for duplicates.
+"""
+:checksame
