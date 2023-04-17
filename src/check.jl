@@ -156,7 +156,7 @@ end
 # TODO better name
 function isduplicate(x::FileEntry, y::FileEntry)
     filesize(x) != filesize(y)  &&  ( return false )
-    scmd = "cmp $(path(x)) $(path(y))"
+    scmd = "cmp $(path(x)) $(path(y))"  # TODO Windows!!!
     R = exe(scmd; fail=false, splitlines=false)
     R.exitcode == 0  &&  return true
     # non-zero exit:
@@ -166,7 +166,12 @@ function isduplicate(x::FileEntry, y::FileEntry)
 end
 
 
+# TODO FileEntry interface; checkpaths; checksame
 function getdupl(X::AbstractVector{<:FileEntry})
+    checkpaths(X)  # throws exception on error
+    checksame(X)   # throws exception on error
+
+
     RET = Vector{Vector{FileEntry}}()
 
     d = group(X; fkey=filesize, Tkey=Int64, Tval=FileEntry, fhaving=x->length(x)>=2) 

@@ -3,13 +3,29 @@
 """
     checkdupl(files)
     getdupl(files)
-    LAST_DUPL
+    __DUPL__
 
 `checkdupl` checks if any (distinct) files have the same content.
 - It first ensures that all canonical path names are different; otherwise removing one of the identical paths would remove both!
 - It then checks that there are no hardlinks that point to the same file. This would be less problematic, as removing one would still keep the other.
-- It then checks file contents for files of the same size.
+- Finally, it checks the file contents for files of the same size.
+
+If successful, it returns the input; otherwise it throws an exception. This way you can use it in a pipeline as an "assert-no-duplicates."
+
+As `checkdupl` can be expensive, it stores duplicates in the global variable `__DUPL__`. (You can also use `getdupl`.)
+
+See also: `rm` `checkpaths` `Dupl`
+"""
+:checkdupl, :getdupl, :__DUPL__
 
 
 """
-:checkdupl, :getdupl, :__DUPL__
+    checkpaths(entries)
+
+Checks if the paths of all given entries are distinct. This makes certain operations (like the removal of duplicates) safe.
+
+If successful, it returns the input; otherwise it throws an exception. This way you can use it in a pipeline as an "assert-no-identical-paths."
+
+See also: `checkdupl`
+"""
+:checkpaths
