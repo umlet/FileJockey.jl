@@ -162,7 +162,7 @@ function isduplicate(x::FileEntry, y::FileEntry)
     # non-zero exit:
     occursin(" differ: ", R.out)  &&  return false
     # other, unexpected 'cmp' error; panic
-    error("unexpected exit of 'cmp': stdout = '$(R.out)'; stderr = '$(R.err)'")
+    error("unexpected exit of 'cmp'/'fc': stdout = '$(R.out)'; stderr = '$(R.err)'")
 end
 
 
