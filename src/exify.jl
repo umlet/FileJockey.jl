@@ -60,7 +60,11 @@ function info(x::ExifData, grep=nothing)
     end
 end
 
+Base.show(io::IO, ::MIME"text/plain", x::ExifData) = _show(io, x)
 
+function _show(io::IO, x::ExifData)
+    info(x)
+end
 
 
 
