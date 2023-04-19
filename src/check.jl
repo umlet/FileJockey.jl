@@ -122,133 +122,308 @@ function checkpaths(X::AbstractVector{<:AbstractEntry})
 
     return X
 end
-#dedupfiles(X::AbstractVector{<:AbstractEntry}) = dedup(X) |> fl(isfile) |> mp(follow)
 
 
 
 
+###############################################################################
 
 
 
 
+function aresame(x::FileEntry, y::FileEntry)
+    path(x) == path(y)  &&  erroruser("aresame: check for hardlinks requires distinct file paths; got '$(path(x))' twice")
+    return x.st.device == y.st.device  &&  x.st.inode == y.st.inode
+end
+aresame(s1::AbstractString, s2::AbstractString) = aresame(FileEntry(s1), FileEntry(s2))
 
+struct Same
+    _d::OrderedDict{FileEntry, Vector{FileEntry}}
+    function Same(X::AbstractVector{FileEntry})
+        checkpaths(X)  # TODO quiet, and mb catch exception?
+        d = group(X; fkey=x->filedeviceinode(x.st), fhaving=x->length(x)>=2)
+        RET = OrderedDict{FileEntry, Vector{FileEntry}}()
+        for (_,v) in d
+            RET[v[end]] = v[1:end-1]  # TODO function; default to LAST
+        end
+        return new(RET)
+    end
+end
+getsame(X::AbstractVector{FileEntry}) = Same(X)
 
-
-
-
-function checksame(X::AbstractVector{FileEntry})
-    S = stats(X)
-
-    if nsetfiledeviceinodes(S) == nfiles(S)
-        @info "Checking for same files (hardslinks).. OK: all files are distinct; no hardlinks found"
-        return X
+Base.show(io::IO, ::MIME"text/plain", x::Same) = _show(io, x)  # TODO out to base
+function _show(io::IO, x::Same)
+    if isempty(x._d)
+        println("Same files/hardlinks structure: EMPTY/no hardlinks found")
+        return
     end
 
-    erroruser("same files/hardslinks found; use getsame() to identify")
+    println("""Same files/hardlinks structure with $(length(x._d)) group$(length(x._d)==1 ? "" : "s"):""")
+    for (k,v) in x._d
+        println("  ", path(k), " => ", string(path.(v)))
+    end
 end
 
-# TODO getsame
+function checksame(X::AbstractVector{FileEntry})
+    sames = Same(X)
+    isempty(sames._d)  &&  return X
+    erroruser("files contain same entries/handlinks; use 'getsame' to identify")
+end
 
 
 
+###############################################################################
 
 
-# TODO better name
-function isduplicate(x::FileEntry, y::FileEntry)
-    filesize(x) != filesize(y)  &&  ( return false )
-    cmds = ["cmp", path(x), path(y)]  # TODO Windows!!!
+
+import Mmap
+function _aredupl_mmap(x::FileEntry, y::FileEntry)
+    open(path(x)) do f
+    open(path(y)) do g
+        return Mmap.mmap(f) == Mmap.mmap(g)
+    end
+    end
+end
+
+function _aredupl_os(x::FileEntry, y::FileEntry)
+    cmds = Sys.iswindows()  ?  ["fc", "/B", path(x), path(y)]  :  ["cmp", path(x), path(y)]
     R = exe(cmds; fail=false, splitlines=false)
     R.exitcode == 0  &&  return true
-    # non-zero exit:
-    occursin(" differ: ", R.out)  &&  return false
-    # other, unexpected 'cmp' error; panic
-    error("unexpected exit of 'cmp'/'fc': stdout = '$(R.out)'; stderr = '$(R.err)'")
+
+    # only return valid 'false' for confirmed file difference:
+    if Sys.iswindows()
+        # fc returns 0/same; 1/diff; 2/other error
+        R.exitcode == 1  &&  return false
+    else
+        occursin(" differ: ", R.out)  &&  return false
+    end
+    # something else has gone wrong; panic:
+    error("unexpected result of 'OS'-mode file compare: stdout = '$(R.out)'; stderr = '$(R.err)'")
 end
 
+function aredupl(x::FileEntry, y::FileEntry; mode=:mmap)  # or :os
+    !(mode in (:mmap, :os))  &&  error("aredupl: invalid mode ':$(mode)'")
 
-# TODO FileEntry interface; checkpaths; checksame
-function getdupl(X::AbstractVector{<:FileEntry})
-    checkpaths(X)  # throws exception on error
-    checksame(X)   # throws exception on error
+    path(x) == path(y)  &&  erroruser("aredupl: distinct file paths required; got '$(path(x))' twice")
+    aresame(x, y)       &&  erroruser("aredupl: same files/hardlinks not allowed: '$(path(x))' === '$(path(y))'")
+    filesize(x) != filesize(y)  &&  return false
+
+    mode == :mmap  &&  return _aredupl_mmap(x, y)
+    return _aredupl_os(x, y)
+end
+aredupl(s1::AbstractString, s2::AbstractString) = aredupl(FileEntry(s1), FileEntry(s2))
+export aredupl
 
 
-    RET = Vector{Vector{FileEntry}}()
 
-    d = group(X; fkey=filesize, Tkey=Int64, Tval=FileEntry, fhaving=x->length(x)>=2) 
-    ncand = values(d) .|> length |> sum
+function _info_msg_dupl(size::Int64, fname1::AbstractString, fname2::AbstractString, result::AbstractString)
+    ss = [
+        "Checking potential duplicates of same size $(size):",
+        fname1,
+        fname2,
+        result
+    ]
+    return join(ss, "\n")
+end
 
-    nnodup = 0
-    for (s,fs) in d
-        @info "Checking potential duplicate files of same size $(s):"
-        for f in fs  println(path(f))  end
+struct Dupl
+    _d::OrderedDict{FileEntry, Vector{FileEntry}}
+    function Dupl(X::AbstractVector{FileEntry})
+        checkpaths(X)  # throws exception on error
+        checksame(X)   # throws exception on error
 
-        REF_FS = Vector{Vector{FileEntry}}()
-        for f in fs
-            length(REF_FS) == 0  &&  ( push!(REF_FS, FileEntry[f]);  continue )
+        RET = OrderedDict{FileEntry, Vector{FileEntry}}()
+
+        d = group(X; fkey=filesize, Tkey=Int64, Tval=FileEntry, fhaving=x->length(x)>=2)
+        if isempty(d)
+            @info "no files with same size => no duplicates"
+            return new(RET)
+        end
+        ncand = values(d) .|> length |> sum        
+
+
+        GROUPS = Vector{Vector{FileEntry}}()
+        nnodup = 0
+        for (size, fs) in d
+            @info "Checking potential duplicates of same size $(size):"
+            for f in fs  println(" ", path(f))  end
+
+            REF_FS = Vector{Vector{FileEntry}}()
+            for f in fs
+                length(REF_FS) == 0  &&  ( push!(REF_FS, FileEntry[f]);  continue )
+                for ref_fs in REF_FS
+                    ref_f = ref_fs[1]
+                    if isduplicate(ref_f, f)
+                        push!(ref_fs, f)
+                        @info "!!!!! DUPLICATE FOUND !!!!!"
+                        break # ref check can end here
+                    else
+                        push!(REF_FS, FileEntry[f])
+                        @info "(contents differ; duplicate dismissed)"
+                        break # ref check MUST end here, as otherwise loop gets longer!!!
+                    end
+                end
+            end
             for ref_fs in REF_FS
-                ref_f = ref_fs[1]
-                if isduplicate(ref_f, f)
-                    push!(ref_fs, f)
-                    @info "DUPLICATE FOUND!"
-                    break # ref check can end here
+                @assert length(ref_fs) > 0
+                if length(ref_fs) >= 2  
+                    push!(GROUPS, ref_fs)
                 else
-                    push!(REF_FS, FileEntry[f])
-                    @info "OK: contents differ; duplicate dismissed"
-                    break # ref check MUST end here, as otherwise loop gets longer!!!
+                    nnodup += 1
                 end
             end
         end
-        for ref_fs in REF_FS
-            @assert length(ref_fs) > 0
-            if length(ref_fs) >= 2  
-                push!(RET, ref_fs)
-            else
-                nnodup += 1
-            end
+
+        ndupes = 0
+        length(GROUPS) > 0  &&  ( ndupes = GROUPS .|> length |> sum )
+        dstat = group(GROUPS; fkey=length, fval=x->1, freduce=sum)
+
+        for x in GROUPS
+            k = x[end]
+            v = x[1:end-1]
+            @assert length(v) > 0
+            RET[k] = v
         end
+
+        size_saving = 0
+        nremove = 0
+        if length(RET) > 0  
+            size_saving = values(RET) |> flatten |> mp(filesize) |> sum
+            nremove = values(RET) .|> length |> sum
+        end
+
+        println()
+        @info "checked $(length(X)) files"
+        @info "found $(ncand) potential duplicates via size check"
+        @info "..dismissed via full content check for $(nnodup) files"
+
+        #@info "expected dupes: $(ncand-nnodup)"
+        #@info "---"
+        @assert ncand-nnodup == ndupes
+
+        @info "---"
+        @info "duplicates: $(ndupes)"
+        for (s,n) in dstat
+            @info "  groups of size $(s): $(n) [removable: $((s-1)*n)]"
+        end
+        @info "---"
+        @info "removable files: $(nremove)"
+        @info "..with disk space: $(tostr´(size_saving)) bytes"
+
+        return new(RET)
     end
 
-    ndupes = 0
-    length(RET) > 0  &&  ( ndupes = RET .|> length |> sum )
-    dstat = group(RET; fkey=length, fval=x->1, freduce=sum)
-
-    DICT_RET = OrderedDict{FileEntry, Vector{FileEntry}}()
-    for x in RET
-        k = x[1]
-        v = x[2:end]
-        @assert length(v) > 0
-        DICT_RET[k] = v
-    end
-
-    size_saving = 0
-    nremove = 0
-    if length(DICT_RET) > 0  
-        size_saving = values(DICT_RET) |> mp(x->sum(filesize, x)) |> sum
-        nremove = values(DICT_RET) .|> length |> sum
-    end
-
-    println()
-    @info "checked $(length(X)) files"
-    @info "found $(ncand) candidate dupes via size check"
-    @info "false dupe alarm for $(nnodup) files"
-    @info "expected dupes: $(ncand-nnodup)"
-    @info "---"
-    @info "dupes: $(ndupes)"
-    for (s,n) in dstat
-        @info "  sets of size $(s): $(n) [removable: $((s-1)*n)]"
-    end
-    @info "---"
-    @info "removable files: $(nremove)"
-    @info "..with disk space: $(tostr´(size_saving)) bytes"
-
-    return DICT_RET
 end
 
-# TODO make const, export
-__DUPL__::OrderedDict{FileEntry, Vector{FileEntry}} = OrderedDict{FileEntry, Vector{FileEntry}}()
+
+
+
+
+
+
+
+# old; remove
+
+# # TODO better name
+# function isduplicate(x::FileEntry, y::FileEntry)
+#     filesize(x) != filesize(y)  &&  ( return false )
+#     cmds = ["cmp", path(x), path(y)]  # TODO Windows!!!
+#     R = exe(cmds; fail=false, splitlines=false)
+#     R.exitcode == 0  &&  return true
+#     # non-zero exit:
+#     occursin(" differ: ", R.out)  &&  return false
+#     # other, unexpected 'cmp' error; panic
+#     error("unexpected exit of 'cmp'/'fc': stdout = '$(R.out)'; stderr = '$(R.err)'")
+# end
+
+
+# old; remove
+
+# TODO FileEntry interface; checkpaths; checksame
+# function getdupl(X::AbstractVector{<:FileEntry})
+#     checkpaths(X)  # throws exception on error
+#     checksame(X)   # throws exception on error
+
+
+#     RET = Vector{Vector{FileEntry}}()
+
+#     d = group(X; fkey=filesize, Tkey=Int64, Tval=FileEntry, fhaving=x->length(x)>=2) 
+#     ncand = values(d) .|> length |> sum
+
+#     nnodup = 0
+#     for (s,fs) in d
+#         @info "Checking potential duplicate files of same size $(s):"
+#         for f in fs  println(path(f))  end
+
+#         REF_FS = Vector{Vector{FileEntry}}()
+#         for f in fs
+#             length(REF_FS) == 0  &&  ( push!(REF_FS, FileEntry[f]);  continue )
+#             for ref_fs in REF_FS
+#                 ref_f = ref_fs[1]
+#                 if isduplicate(ref_f, f)
+#                     push!(ref_fs, f)
+#                     @info "DUPLICATE FOUND!"
+#                     break # ref check can end here
+#                 else
+#                     push!(REF_FS, FileEntry[f])
+#                     @info "OK: contents differ; duplicate dismissed"
+#                     break # ref check MUST end here, as otherwise loop gets longer!!!
+#                 end
+#             end
+#         end
+#         for ref_fs in REF_FS
+#             @assert length(ref_fs) > 0
+#             if length(ref_fs) >= 2  
+#                 push!(RET, ref_fs)
+#             else
+#                 nnodup += 1
+#             end
+#         end
+#     end
+
+#     ndupes = 0
+#     length(RET) > 0  &&  ( ndupes = RET .|> length |> sum )
+#     dstat = group(RET; fkey=length, fval=x->1, freduce=sum)
+
+#     DICT_RET = OrderedDict{FileEntry, Vector{FileEntry}}()
+#     for x in RET
+#         k = x[1]
+#         v = x[2:end]
+#         @assert length(v) > 0
+#         DICT_RET[k] = v
+#     end
+
+#     size_saving = 0
+#     nremove = 0
+#     if length(DICT_RET) > 0  
+#         size_saving = values(DICT_RET) |> mp(x->sum(filesize, x)) |> sum
+#         nremove = values(DICT_RET) .|> length |> sum
+#     end
+
+#     println()
+#     @info "checked $(length(X)) files"
+#     @info "found $(ncand) candidate dupes via size check"
+#     @info "false dupe alarm for $(nnodup) files"
+#     @info "expected dupes: $(ncand-nnodup)"
+#     @info "---"
+#     @info "dupes: $(ndupes)"
+#     for (s,n) in dstat
+#         @info "  sets of size $(s): $(n) [removable: $((s-1)*n)]"
+#     end
+#     @info "---"
+#     @info "removable files: $(nremove)"
+#     @info "..with disk space: $(tostr´(size_saving)) bytes"
+
+#     return DICT_RET
+# end
+
+
+
+# TODO make const?, export
+__DUPL__ = nothing
 function checkdupl(X::AbstractVector{<:FileEntry})
-    d = getdupl(X);  global __DUPL__ = d
-    length(d) == 0  &&  ( return X )
+    dupl = getdupl(X);  global __DUPL__ = dupl
+    length(dupl._d) == 0  &&  return X
     erroruser("duplicate files found and stored in '__DUPL__' (or use getdupl)")
 end
 

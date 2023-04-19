@@ -2,11 +2,18 @@
 
 export checkpaths
 
-export checksame
-export getsame
 
-export checkdupl
+export aresame
+export Same
+export getsame
+export checksame
+
+
+export aredupl
+export Dupl
 export getdupl
+export checkdupl
+export __DUPL__
 
 
 
