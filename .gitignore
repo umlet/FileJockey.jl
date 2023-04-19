@@ -1,1 +1,12 @@
 Manifest.toml
+src/_test_sandbox/err_dupl/test_copy.jpg
+src/_test_sandbox/err_dupl/test.jpg
+src/_test_sandbox/err_hard/hard2test.jpg
+src/_test_sandbox/err_hard/test.jpg
+src/_test_sandbox/err_syml2dir/syml2sub
+src/_test_sandbox/err_syml2dir/sub/test.jpg
+src/_test_sandbox/err_syml2file/syml2test.jpg
+src/_test_sandbox/err_syml2file/test.jpg
+src/_test_sandbox/err_syml2file_ext0/ext1a_syml2test.jpg
+src/_test_sandbox/err_syml2file_ext0/ext1b_syml2test.jpg
+src/_test_sandbox/err_syml2file_ext1/test.jpg
