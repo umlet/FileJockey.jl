@@ -212,7 +212,6 @@ function aredupl(x::FileEntry, y::FileEntry; mode=:mmap)  # or :os
     return _aredupl_os(x, y)
 end
 aredupl(s1::AbstractString, s2::AbstractString) = aredupl(FileEntry(s1), FileEntry(s2))
-export aredupl
 
 
 
@@ -312,9 +311,8 @@ struct Dupl
 
         return new(RET)
     end
-
 end
-
+getdupl(X::AbstractVector{FileEntry}) = Dupl(X)
 
 
 
