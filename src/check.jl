@@ -252,7 +252,7 @@ struct Dupl
                 length(REF_FS) == 0  &&  ( push!(REF_FS, FileEntry[f]);  continue )
                 for ref_fs in REF_FS
                     ref_f = ref_fs[1]
-                    if isduplicate(ref_f, f)
+                    if aredupl(ref_f, f)
                         push!(ref_fs, f)
                         @info "!!!!! DUPLICATE FOUND !!!!!"
                         break # ref check can end here
