@@ -50,6 +50,7 @@ hasext(s::Symbol) = x -> Ext(x) == s
 
 
 #------------------------------------------------------------------------------
+# This list of extension synonym was scraped from Phil Harvey's exiftool homepage: https://exiftool.org/
 const _v_EXTDEF = [
 "360",
 "3FR",
@@ -195,7 +196,7 @@ const _v_EXTDEF = [
 "PICT,PCT",
 "PLIST",
 "PMP",
-"PNG, JNG,MNG",
+"PNG,JNG,MNG",
 "PPM,PBM,PGM",
 "PPT,PPS,POT",
 "POTX,POTM",
