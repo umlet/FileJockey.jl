@@ -230,7 +230,7 @@ end
 struct Dupl
     _d::OrderedDict{FileEntry, Vector{FileEntry}}
     function Dupl(X::AbstractVector{FileEntry})
-        checkpaths(X)  # throws exception on error
+        checkpaths(X; quiet=true)  # throws exception on error
         #checksame(X)   # no longer checked
 
         RET = OrderedDict{FileEntry, Vector{FileEntry}}()
