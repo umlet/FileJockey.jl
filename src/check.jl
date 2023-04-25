@@ -1,29 +1,29 @@
 
 
 
-function check_11_syml2dir_toknown(S::FsStats)
+function check_11_syml2dir_toknown(S::FsStats; quiet=false)
     msg = "  Check if a symlink points to an already known regular dir.. "
     entries = S.syml2direntries |> fl(x->x.target in S.direntries);  nentries = length(entries)
-    nentries == 0  &&  ( @info msg * "none found -- OK";  return true )
+    nentries == 0  &&  ( quiet  ||  @info msg * "none found -- OK";  return true )
 
     # error!
-    @info msg
+    quiet  ||  @info msg
     e = first( sort(entries; by=x->length(path(x))) )
     erroruser("""Symlink to known regular dir detected (<syml-path> -> <target-path>):
     "$(path(e))" -> "$(path(e.target))"
     => delete symlink, or add the <symlink-path> to the 'skip_paths' option.""")
 end
 
-function check_12_syml2dirs_tosameexternal(S::FsStats)  # after the previous test, they will point to unknown/external dirs
+function check_12_syml2dirs_tosameexternal(S::FsStats; quiet=false)  # after the previous test, they will point to unknown/external dirs
     msg = "  Check if two symlinks point to the same dir.. "
     entries = S.syml2direntries #=|> fl(x->!(x.target in S.direntries))=#;  nentries = length(entries)
-    nentries == 0  &&  ( @info msg * "none found -- OK";  return true )
+    nentries == 0  &&  ( quiet  ||  @info msg * "none found -- OK";  return true )
 
     d = group(entries;  fkey=path∘follow, fhaving=x->length(x)>=2)  # TODO improve anonymous function
-    length(d) == 0  &&  ( @info msg * "$(tostr´(nentries)) '$(typeof(entries[1]))'s checked -- OK";  return true )
+    length(d) == 0  &&  ( quiet  ||  @info msg * "$(tostr´(nentries)) '$(typeof(entries[1]))'s checked -- OK";  return true )
 
     # error!
-    @info msg
+    quiet  ||  @info msg
     targetpath,symlinks = first(d)
     s = [ "\"$(path(x))\" -> \"$(targetpath)\"" for x in symlinks ] |> jn("\n")
     erroruser("""Symlinks to same dir detected (<syml-path> -> <target-path>):
@@ -31,17 +31,17 @@ function check_12_syml2dirs_tosameexternal(S::FsStats)  # after the previous tes
     => for ALL BUT ONE of the symlinks: delete symlink, or add <symlink-path> to the 'skip_paths' option.""")
 end
 
-function check_13_dirs_distinctpaths(S::FsStats)
+function check_13_dirs_distinctpaths(S::FsStats; quiet=false)
     msg = "  Check if all dirs (known and symlinked) have distinct paths.. "
     entries = S.dirs;  nentries = length(entries)
-    nentries == 0  &&  ( @info msg * "none found -- OK";  return true )
-    nsetdirpaths(S) == nentries  &&  ( @info msg * "$(tostr´(nentries)) '$(typeof(entries[1]))'s checked -- OK";  return true )
+    nentries == 0  &&  ( quiet  ||  @info msg * "none found -- OK";  return true )
+    nsetdirpaths(S) == nentries  &&  ( quiet  ||  @info msg * "$(tostr´(nentries)) '$(typeof(entries[1]))'s checked -- OK";  return true )
 
     # maybe error!
     set = Set{String}()
     for s in path.(entries)
         if s in set
-            @info msg
+            quiet  ||  @info msg
             erroruser("""Duplicate dir found:
             "$(s)"
             => fix your input; this should not happen with standard tree traversal and sane symlinks-to-dirs""")
@@ -53,29 +53,29 @@ end
 
 
 
-function check_21_syml2file_toknown(S::FsStats)
+function check_21_syml2file_toknown(S::FsStats; quiet=false)
     msg = "  Check if a symlink points to an already known regular file.. "
     entries = S.syml2fileentries |> fl(x->x.target in S.fileentries);  nentries = length(entries)
-    nentries == 0  &&  ( @info msg * "none found -- OK";  return true )
+    nentries == 0  &&  ( quiet  ||  @info msg * "none found -- OK";  return true )
 
     # error!
-    @info msg
+    quiet  ||  @info msg
     e = first( sort(entries; by=x->length(path(x))) )
     erroruser("""Symlink to known regular file detected (<syml-path> -> <target-path>):
     "$(path(e))" -> "$(path(e.target))"
     => delete symlink, or add the <symlink-path> to the 'skip_paths' option.""")
 end
 
-function check_22_syml2files_tosameexternal(S::FsStats)
+function check_22_syml2files_tosameexternal(S::FsStats; quiet=false)
     msg = "  Check if two symlinks point to the same file.. "
     entries = S.syml2fileentries #=|> fl(x->!(x.target in S.direntries))=#;  nentries = length(entries)
-    nentries == 0  &&  ( @info msg * "none found -- OK";  return true )
+    nentries == 0  &&  ( quiet  ||  @info msg * "none found -- OK";  return true )
 
     d = group(entries;  fkey=path∘follow, fhaving=x->length(x)>=2)
-    length(d) == 0  &&  ( @info msg * "$(tostr´(nentries)) '$(typeof(entries[1]))'s checked -- OK";  return true )
+    length(d) == 0  &&  ( quiet  ||  @info msg * "$(tostr´(nentries)) '$(typeof(entries[1]))'s checked -- OK";  return true )
 
     # error!
-    @info msg
+    quiet  ||  @info msg
     targetpath,symlinks = first(d)
     s = [ "\"$(path(x))\" -> \"$(targetpath)\"" for x in symlinks ] |> jn("\n")
     erroruser("""Symlinks to same file detected (<syml-path> -> <target-path>):
@@ -83,17 +83,17 @@ function check_22_syml2files_tosameexternal(S::FsStats)
     => for ALL BUT ONE of the symlinks: delete symlink, or add <symlink-path> to the 'skip_paths' option.""")
 end
 
-function check_23_files_distinctpaths(S::FsStats)
+function check_23_files_distinctpaths(S::FsStats; quiet=false)
     msg = "  Check if all files (known and symlinked) have distinct paths.. "
     entries = S.files;  nentries = length(entries)
-    nentries == 0  &&  ( @info msg * "none found -- OK";  return true )
-    nsetfilepaths(S) == nentries  &&  ( @info msg * "$(tostr´(nentries)) '$(typeof(entries[1]))'s checked -- OK";  return true )
+    nentries == 0  &&  ( quiet  ||  @info msg * "none found -- OK";  return true )
+    nsetfilepaths(S) == nentries  &&  ( quiet  ||  @info msg * "$(tostr´(nentries)) '$(typeof(entries[1]))'s checked -- OK";  return true )
 
     # maybe error!
     set = Set{String}()
     for s in path.(entries)
         if s in set
-            @info msg
+            quiet  ||  @info msg
             erroruser("""Duplicate file found:
             "$(s)"
             => fix your input; this should not happen with standard tree traversal and sane symlinks-to-dirs""")
@@ -109,16 +109,16 @@ function checkpaths(X::AbstractVector{<:AbstractEntry}; quiet=false)
 
     quiet  ||  @info "Checking sanity of symlinks-to-dirs and dirs (most likely cause for duplicate files in a tree):"
 
-    check_11_syml2dir_toknown(S)
-    check_12_syml2dirs_tosameexternal(S)
-    check_13_dirs_distinctpaths(S)
+    check_11_syml2dir_toknown(S; quiet=quiet)
+    check_12_syml2dirs_tosameexternal(S; quiet=quiet)
+    check_13_dirs_distinctpaths(S; quiet=quiet)
 
 
     quiet  ||  @info "Checking sanity of symlinks-to-files and files:"
 
-    check_21_syml2file_toknown(S)
-    check_22_syml2files_tosameexternal(S)
-    check_23_files_distinctpaths(S)
+    check_21_syml2file_toknown(S; quiet=quiet)
+    check_22_syml2files_tosameexternal(S; quiet=quiet)
+    check_23_files_distinctpaths(S; quiet=quiet)
 
     return X
 end

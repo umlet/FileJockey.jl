@@ -27,7 +27,7 @@ end
 
     @test eachentry("_test_sandbox/") |> first |> isdir
 
-    @test length(findfiles("_test_sandbox/")) == length(find("_test_sandbox/") |> getfiles)
+    @test length(findfiles("_test_sandbox/ok")) == length(find("_test_sandbox/ok") |> getfiles)
 end
 
 @testset "ExtFilter" begin
@@ -55,7 +55,7 @@ end
         v = [v1; v2]
         try
             println("MUST FAIL AT 1c")
-            checkpaths(v)
+            checkpaths(v; quiet=true)
             false
         catch
             true
@@ -68,7 +68,7 @@ end
         v = [v; v]
         try
             println("MUST FAIL AT 2c")
-            checkpaths(v)
+            checkpaths(v; quiet=true)
             false
         catch
             true
@@ -86,7 +86,7 @@ end
         end
         try
             println("MUST FAIL AT 1a")
-            find("_test_sandbox/err_syml2dir/") |> checkpaths
+            find("_test_sandbox/err_syml2dir/") |> checkpaths(; quiet=true)
             false
         catch
             true
@@ -103,7 +103,7 @@ end
         end
         try
             println("MUST FAIL AT 2a")
-            find("_test_sandbox/err_syml2file/") |> checkpaths
+            find("_test_sandbox/err_syml2file/") |> checkpaths(; quiet=true)
             false
         catch
             true
@@ -124,7 +124,7 @@ end
         end
         try
             println("MUST FAIL AT 2a")
-            find("_test_sandbox/err_syml2file_ext0/") |> checkpaths
+            find("_test_sandbox/err_syml2file_ext0/") |> checkpaths(; quiet=true)
             false
         catch
             true
