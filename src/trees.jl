@@ -57,20 +57,17 @@ function Base.iterate(x::FsTreeIter, ::Nothing)
 end
 
 fswalkdir(x::AbstractEntry; skip_paths=String[]) = FsTreeIter(x, skip_paths)  # TODO skip_paths everywhere
-fswalkdir(s::AbstractString="."; skip_paths=String[]) = fswalkdir(Entry(s); skip_paths=skip_paths)
+fswalkdir(s::AbstractString; kwargs...) = fswalkdir(Entry(s); kwargs...)
+fswalkdir(; kwargs...) = fswalkdir(Entry("."); kwargs...)
 
 
-
-
-eachentry(args...; skip_paths=String[]) = fswalkdir(args...; skip_paths=skip_paths)
+# dir or vector of dirs
+eachentry(args...; skip_paths=String[]) = fswalkdir(args...; skip_paths=skip_paths)  # empty or string or Entry
 eachentry(X::AbstractVector; skip_paths=String[]) = eachentry.(X; skip_paths=skip_paths) |> flatten_ 
 
 
-
-
-
-
 find(args...; skip_paths=String[]) = eachentry(args...; skip_paths=skip_paths) |> cl
+
 
 findfiles(args...; kwargs...) = eachentry(args...; kwargs...) |> checkpaths(; quiet=true) |> fl_(isfile) |> mp(follow)
 

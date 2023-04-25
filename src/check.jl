@@ -229,8 +229,8 @@ end
 
 struct Dupl
     _d::OrderedDict{FileEntry, Vector{FileEntry}}
-    function Dupl(X::AbstractVector{FileEntry})
-        checkpaths(X; quiet=true)  # throws exception on error
+    function Dupl(X::AbstractVector{FileEntry}; skip_checkpaths=false)
+        skip_checkpaths  ||  checkpaths(X; quiet=true)  # throws exception on error
         #checksame(X)   # no longer checked
 
         RET = OrderedDict{FileEntry, Vector{FileEntry}}()
@@ -314,9 +314,11 @@ struct Dupl
         return new(RET)
     end
 end
-getdupl(X::AbstractVector{FileEntry}) = Dupl(X)
+getdupl(X::AbstractVector{FileEntry}; skip_checkpaths=false) = Dupl(X; skip_checkpaths=skip_checkpaths)
+_getdupl_checkpaths_done(X::AbstractVector{FileEntry}) = getdupl(X; skip_checkpaths=true)
 
-
+# no kwargs
+getdupl(args...) = find(args...) |> checkpaths |> getfiles |> _getdupl_checkpaths_done
 
 
 
