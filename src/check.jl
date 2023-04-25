@@ -104,17 +104,17 @@ end
 
 
 
-function checkpaths(X::AbstractVector{<:AbstractEntry})
+function checkpaths(X::AbstractVector{<:AbstractEntry}; quiet=false)
     S = stats(X)
 
-    @info "Checking sanity of symlinks-to-dirs and dirs (most likely cause for duplicate files in a tree):"
+    quiet  ||  @info "Checking sanity of symlinks-to-dirs and dirs (most likely cause for duplicate files in a tree):"
 
     check_11_syml2dir_toknown(S)
     check_12_syml2dirs_tosameexternal(S)
     check_13_dirs_distinctpaths(S)
 
 
-    @info "Checking sanity of symlinks-to-files and files:"
+    quiet  ||  @info "Checking sanity of symlinks-to-files and files:"
 
     check_21_syml2file_toknown(S)
     check_22_syml2files_tosameexternal(S)
@@ -123,7 +123,7 @@ function checkpaths(X::AbstractVector{<:AbstractEntry})
     return X
 end
 
-
+checkpaths(;quiet=false) = X -> checkpaths(X; quiet=quiet)
 
 
 ###############################################################################
@@ -229,7 +229,7 @@ struct Dupl
     _d::OrderedDict{FileEntry, Vector{FileEntry}}
     function Dupl(X::AbstractVector{FileEntry})
         checkpaths(X)  # throws exception on error
-        checksame(X)   # throws exception on error
+        #checksame(X)   # no longer checked
 
         RET = OrderedDict{FileEntry, Vector{FileEntry}}()
 

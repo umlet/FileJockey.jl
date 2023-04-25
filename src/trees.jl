@@ -65,18 +65,14 @@ fswalkdir(s::AbstractString="."; skip_paths=String[]) = fswalkdir(Entry(s); skip
 eachentry(args...; skip_paths=String[]) = fswalkdir(args...; skip_paths=skip_paths)
 eachentry(X::AbstractVector; skip_paths=String[]) = eachentry.(X; skip_paths=skip_paths) |> flatten_ 
 
-eachfile(args...) = eachentry(args...) |> fl_(isfile) |> mp_(follow)
 
 
 
 
 
 find(args...; skip_paths=String[]) = eachentry(args...; skip_paths=skip_paths) |> cl
-#find(x::AbstractEntry; skip_paths=String[]) = fswalkdir(x; skip_paths=skip_paths) |> cl
-#find(s::AbstractString="."; skip_paths=String[]) = find(Entry(s); skip_paths=skip_paths)
-#find(X::AbstractVector; skip_paths=String[]) = find.(X; skip_paths=skip_paths) |> flatten
 
-findfiles(args...) = eachfile(args...) |> cl
+findfiles(args...; kwargs...) = eachentry(args...; kwargs) |> checkpaths |> fl_(isfile) |> mp(follow)
 
 
 

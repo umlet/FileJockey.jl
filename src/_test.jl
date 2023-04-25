@@ -44,7 +44,7 @@ end
 @testset "Checkpaths" begin
 
     # OK/no dupl paths
-    @test find("_test_sandbox/ok/") |> checkpaths |> length > 0
+    @test find("_test_sandbox/ok/") |> checkpaths(;quiet=true) |> length > 0
 
 
 
