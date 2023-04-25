@@ -123,7 +123,9 @@ function checkpaths(X::AbstractVector{<:AbstractEntry}; quiet=false)
     return X
 end
 
-checkpaths(;quiet=false) = X -> checkpaths(X; quiet=quiet)
+checkpaths(itr; kwargs...) = checkpaths(collect(itr); kwargs...)
+
+checkpaths(; kwargs...) = X -> checkpaths(X; kwargs...)
 
 
 ###############################################################################

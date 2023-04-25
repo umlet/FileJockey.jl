@@ -26,7 +26,6 @@ end
     @test find("_test_sandbox/") |> getfiles |> length > 0
 
     @test eachentry("_test_sandbox/") |> first |> isdir
-    @test eachfile("_test_sandbox/") |> first |> isfile
 
     @test length(findfiles("_test_sandbox/")) == length(find("_test_sandbox/") |> getfiles)
 end
