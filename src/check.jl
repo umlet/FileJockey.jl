@@ -320,6 +320,22 @@ _getdupl_checkpaths_done(X::AbstractVector{FileEntry}) = getdupl(X; skip_checkpa
 # too dangerous; find yields vector-of-entries; perfroms find for each..
 #getdupl(args...) = find(args...) |> checkpaths |> getfiles |> _getdupl_checkpaths_done
 
+Base.show(io::IO, ::MIME"text/plain", x::Dupl) = _show(io, x)
+
+function _show(io::IO, x::Dupl)
+    isempty(x._d)  &&  ( print(io, "Dupl(), empty / 0 groups of <orig => [dupes]>");  return )
+    print(io, "Dupl(..) with $(length(x._d)) groups of <orig => [dupes]>:")
+    for (k,v) in x._d
+        print(" ")
+        _show(io, k)
+        print(" => [")
+        for f in v
+            print(" ")
+            _show(io, f)
+        end
+        print(" ]")
+    end
+end
 
 
 
