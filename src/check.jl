@@ -324,7 +324,7 @@ Base.show(io::IO, ::MIME"text/plain", x::Dupl) = _show(io, x)
 
 function _show(io::IO, x::Dupl)
     isempty(x._d)  &&  ( print(io, "Dupl(), empty / 0 groups of <orig => [dupes]>");  return )
-    print(io, "Dupl(..) with $(length(x._d)) groups of <orig => [dupes]>:")
+    println(io, "Dupl(..) with $(length(x._d)) groups of <orig => [dupes]>:")
     for (k,v) in x._d
         print(" ")
         _show(io, k)
