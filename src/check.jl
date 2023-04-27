@@ -317,8 +317,8 @@ end
 getdupl(X::AbstractVector{FileEntry}; skip_checkpaths=false) = Dupl(X; skip_checkpaths=skip_checkpaths)
 _getdupl_checkpaths_done(X::AbstractVector{FileEntry}) = getdupl(X; skip_checkpaths=true)
 
-# no kwargs
-getdupl(args...) = find(args...) |> checkpaths |> getfiles |> _getdupl_checkpaths_done
+# too dangerous; find yields vector-of-entries; perfroms find for each..
+#getdupl(args...) = find(args...) |> checkpaths |> getfiles |> _getdupl_checkpaths_done
 
 
 

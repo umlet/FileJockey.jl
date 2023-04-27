@@ -4,8 +4,19 @@
 
 
 function fsreaddir(x::Union{DirEntry, Symlink{DirEntry}})
-    ss = readdir(x.path.s; join=false, sort=false)
-    # now we are sure that x is a dirlike
+    _err = false
+    ss = String[]
+    try
+        ss = readdir(x.path.s; join=false, sort=false)
+    catch e
+        if isa(e, Base.IOError)  &&  occursin("permission denied", string(e))
+            _err = true
+        else
+            rethrow(e)
+        end
+    end
+    _err  &&  erroruser("no access rights for dir '$(x.path.s)'")  # we avoid the "caused by" backtrace of 'excpt wthin excpt'
+
     basepath = islink(x)  ?  x.target.path  :  x.path
     pcs = PathCanon.(Ref(basepath), ss)
     fsecs = EntryCanon.(pcs)
