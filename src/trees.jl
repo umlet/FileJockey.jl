@@ -80,7 +80,7 @@ eachentry(X::AbstractVector; skip_paths=String[]) = eachentry.(X; skip_paths=ski
 find(args...; skip_paths=String[]) = eachentry(args...; skip_paths=skip_paths) |> cl
 
 
-findfiles(args...; kwargs...) = eachentry(args...; kwargs...) |> checkpaths(; quiet=false) |> fl_(isfile) |> mp(follow)
+findfiles(args...; kwargs...) = eachentry(args...; kwargs...) |> checkpaths(; quiet=true) |> fl_(isfile) |> mp(follow)
 
 
 
