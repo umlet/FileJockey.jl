@@ -48,7 +48,7 @@ function describe(S::FsStats)
         if fsize <= 2^10
             push!(line, colorizeas(" -- $(tostr´(fsize)) bytes ", FileEntry))
         else
-            push!(line, colorizeas(" -- $(filesizehuman(fsize)) -- $(tostr´(fsize)) bytes ", FileEntry))
+            push!(line, colorizeas(" -- $(sizehuman(fsize)) -- $(tostr´(fsize)) bytes ", FileEntry))
         end
         push!(line, DARK_GRAY_FG("( #paths:$(nsetfilepaths(S))  #dev:$(nsetfiledevices(S))  #inodes&dev:$(nsetfiledeviceinodes(S)) )"))
         push!(line, colorizeas(" ]", FileEntry))
