@@ -82,7 +82,7 @@ find(args...; skip_paths=String[]) = eachentry(args...; skip_paths=skip_paths) |
 
 findfiles(args...; kwargs...) = eachentry(args...; kwargs...) |> checkpaths(; quiet=true) |> fl_(isfile) |> mp(follow)
 
-finddupl(args...; kwargs...) = findfiles(args...; kwargs...) |> _getdupl_checkpaths_done
+finddupl(args...; kwargs...) = eachentry(args...; kwargs...) |> checkpaths(; quiet=false) |> fl_(isfile) |> mp(follow) |> _getdupl_checkpaths_done
 
 
 include("trees.jl_exports")
