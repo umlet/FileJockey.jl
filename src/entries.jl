@@ -147,6 +147,7 @@ isstandard(x::AbstractEntry) = false
 follow(x::AbstractEntry) = x
 follow(x::Symlink) = x.target
 
+filesizehuman(x) = sizehuman(filesize(x))
 
 function getfiles(X::AbstractVector{<:AbstractEntry})
     return X |> fl(isfile) |> mp(follow)
