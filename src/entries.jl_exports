@@ -4,6 +4,7 @@ export EntryCanon
 export AbstractEntry
 export FileEntry, DirEntry, OtherEntry, Symlink, UnknownEntryNONEXIST
 export Entry
+export entry
 
 #export @fj_str
 
@@ -19,6 +20,8 @@ export filesizehuman
 export name
 export hasname
 
+export sizegt
+export sizelt
 
 
 

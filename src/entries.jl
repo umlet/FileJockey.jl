@@ -126,7 +126,7 @@ function Entry(x::EntryCanon)
     return OtherEntry(x)
 end
 Entry(s::AbstractString) = Entry(EntryCanon(s))
-
+entry(s::AbstractString) =Entry(s)
 
 
 
@@ -147,12 +147,17 @@ isstandard(x::AbstractEntry) = false
 follow(x::AbstractEntry) = x
 follow(x::Symlink) = x.target
 
-filesizehuman(x) = sizehuman(filesize(x))
+filesizehuman(x) = sizehuman(filesize(x))  # overridden in base
 
-name(x::AbstractEntry) = basename(x)  # override in base
+name(x::AbstractEntry) = basename(x)  # overridden in base
 
 hasname(x::AbstractEntry, s::AbstractString) = name(x) == s
 hasname(s::AbstractString) = x -> hasname(x, s)
+
+sizegt(x::FileEntry, n::Int64) = filesize(x) > n
+sizegt(n::Int64) = x -> sizegt(x, n)
+sizelt(x::FileEntry, n::Int64) = filesize(x) < n
+sizelt(n::Int64) = x -> sizelt(x, n)
 
 
 
