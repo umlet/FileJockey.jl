@@ -7,7 +7,7 @@ const _d_ext2Ext = OrderedDict{Union{String, Nothing}, Symbol}()
 const EXT = _d_ext2Ext
 function SHOWEXT()
     for (k,v) in EXT
-        println("$k => $v")
+        println("$k => :$v")
     end
 end
 
