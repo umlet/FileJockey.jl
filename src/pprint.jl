@@ -58,7 +58,7 @@ function describe(S::FsStats)
     # LINE 2
     line = []
     if nfiles(S) > 0
-        _d = group(S.files; fkey=Ext)
+        _d = group(S.files; fkey=exty)
         d = sortbyval(_d; by=length, rev=true)
         push!(line, "{ ")
         for (k,v) in d
