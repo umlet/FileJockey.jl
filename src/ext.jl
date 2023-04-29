@@ -2,7 +2,7 @@
 
 
 #const _d_Ext2exts = Dict{Symbol, Vector{String}}()
-const _d_ext2Ext = Dict{Union{String, Nothing}, Symbol}()
+const _d_ext2Ext = OrderedDict{Union{String, Nothing}, Symbol}()
 const EXT = _d_ext2Ext
 
 function initext()
