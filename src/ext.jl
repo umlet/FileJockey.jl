@@ -3,7 +3,13 @@
 
 #const _d_Ext2exts = Dict{Symbol, Vector{String}}()
 const _d_ext2Ext = OrderedDict{Union{String, Nothing}, Symbol}()
+
 const EXT = _d_ext2Ext
+function SHOWEXT()
+    for (k,v) in EXT
+        println("$k => $v")
+    end
+end
 
 function initext()
     _d_ext2Ext[nothing] = :__empty__
