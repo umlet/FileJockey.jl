@@ -54,8 +54,8 @@ exty(x) = ext(x) |> ext2Ext
 hasext(x::AbstractEntry, s::AbstractString) = ext(x) == s
 hasext(s::AbstractString) = x -> ext(x) == s
 
-hasext(x::AbstractEntry, sym::Symbol) = Ext(x) == sym
-hasext(sym::Symbol) = x -> Ext(x) == sym
+hasext(x::AbstractEntry, sym::Symbol) = exty(x) == sym
+hasext(sym::Symbol) = x -> exty(x) == sym
 
 # ??? hasexty not needed?
 
