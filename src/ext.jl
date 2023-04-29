@@ -3,6 +3,7 @@
 
 #const _d_Ext2exts = Dict{Symbol, Vector{String}}()
 const _d_ext2Ext = Dict{Union{String, Nothing}, Symbol}()
+const EXT = _d_ext2Ext
 
 function initext()
     _d_ext2Ext[nothing] = :__empty__
@@ -18,7 +19,7 @@ function initext()
     end
 end
 
-function toExt(e::Union{AbstractString, Nothing})  # ext is extension, not path!
+function ext2Ext(e::Union{AbstractString, Nothing})  # ext is extension, not path!
     e === nothing  &&  return _d_ext2Ext[e]
 
     e = uppercase(e)
@@ -31,19 +32,19 @@ function toExt(e::Union{AbstractString, Nothing})  # ext is extension, not path!
     return :__unregistered__
 end
 
-Ext(x) = ext(x) |> toExt
+exty(x) = ext(x) |> ext2Ext
 
-macro ex_str(s)
-    :(Ext($s))  # "Ext(s)" alone does not work..
-end
+# macro ex_str(s)
+#     :(Ext($s))  # "Ext(s)" alone does not work..
+# end
 
 hasext(x::AbstractEntry, s::AbstractString) = ext(x) == s
 hasext(s::AbstractString) = x -> ext(x) == s
 
-hasext(x::AbstractEntry, s::Symbol) = Ext(x) == s
-hasext(s::Symbol) = x -> Ext(x) == s
+hasext(x::AbstractEntry, sym::Symbol) = Ext(x) == sym
+hasext(sym::Symbol) = x -> Ext(x) == sym
 
-
+# ??? hasexty not needed?
 
 
 

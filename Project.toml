@@ -1,7 +1,7 @@
 name = "FileJockey"
 uuid = "bc1231ea-70fa-4965-b0b3-6932f742a22e"
 authors = ["Martin <martin@umlet.com>"]
-version = "0.2.0"
+version = "0.3.0"
 
 [deps]
 Crayons = "a8cc5b0e-0ffa-5ad4-8c14-923d3ee1735f"
