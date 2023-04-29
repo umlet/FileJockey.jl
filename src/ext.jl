@@ -6,9 +6,16 @@ const _d_ext2Ext = OrderedDict{Union{String, Nothing}, Symbol}()
 
 const EXT = _d_ext2Ext
 function SHOWEXT()
-    for (k,v) in EXT
-        println("$k => :$v")
+    lastsym = nothing
+    for (s,sym) in EXT
+        if sym != lastsym
+            println()
+            print(":$sym <=> ")
+            lastsym = sym
+        end
+        if s !== nothing  print(" \"$(s)\"")  else  print("<nothing>")  end
     end
+    println()
 end
 
 function initext()
