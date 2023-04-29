@@ -1,7 +1,7 @@
 
 
 export EXT
-export SHOWEXT()
+export SHOWEXT
 
 export Ext
 
