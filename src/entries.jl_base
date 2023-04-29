@@ -23,20 +23,21 @@ Base.Filesystem.lstat(x::AbstractEntry) = stat(x)
 Base.Filesystem.joinpath(x::AbstractEntry) = x
 
 
-Base.Filesystem.basename(x::FileEntry) = basename(x.path.s)
+Base.Filesystem.basename(x::AbstractEntry) = basename(path(x))
 
 
 # not over iterators, as hardlinks will need complete info
 function Base.filesize(X::AbstractVector{FileEntry})  # TODO account for handlinks
     return sum(filesize.(X))
 end
-
-# ? not needed; auto-promote ?
+# ??? not needed; auto-promote ?
 # function Base.filesize(X::AbstractVector{<:AbstractEntry})
 #     Y::AbstractXXX[] = X
 #     return filesize(Y)
 # end
 
+Base.Filesystem.rm(x::FileEntry) = rm(path(x))
+Base.Filesystem.rm(X::AbstractVector{FileEntry}) = foreach(rm, X)
 
 #####
 

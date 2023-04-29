@@ -149,9 +149,12 @@ follow(x::Symlink) = x.target
 
 filesizehuman(x) = sizehuman(filesize(x))
 
-function getfiles(X::AbstractVector{<:AbstractEntry})  # TODO iterator variant
-    return X |> fl_(isfile) |> mp(follow)
-end
+name(x::AbstractEntry) = basename(x)  # override in base
+
+hasname(x::AbstractEntry, s::AbstractString) = name(x) == s
+hasname(s::AbstractString) = x -> hasname(x, s)
+
+
 
 
 

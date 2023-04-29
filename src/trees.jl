@@ -85,5 +85,10 @@ findfiles(args...; kwargs...) = eachentry(args...; kwargs...) |> checkpaths(; qu
 finddupl(args...; kwargs...) = eachentry(args...; kwargs...) |> checkpaths(; quiet=false) |> fl_(isfile) |> mp(follow) |> _getdupl_checkpaths_done
 
 
+function getfiles(X::AbstractVector{<:AbstractEntry})  # TODO iterator variant
+    return X |> fl_(isfile) |> mp(follow)
+end
+
+
 include("trees.jl_exports")
 include("trees.jl_docs")

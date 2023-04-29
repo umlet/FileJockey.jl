@@ -16,4 +16,11 @@ export follow
 
 export filesizehuman
 
-export getfiles
+export name
+export hasname
+
+
+
+
+
+export rm
