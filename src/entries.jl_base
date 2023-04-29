@@ -24,6 +24,7 @@ Base.Filesystem.joinpath(x::AbstractEntry) = x
 
 
 Base.Filesystem.basename(x::AbstractEntry) = basename(path(x))
+Base.Filesystem.dirname(x::AbstractEntry) = dirname(path(x))
 
 
 # not over iterators, as hardlinks will need complete info
