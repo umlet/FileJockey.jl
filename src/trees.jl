@@ -67,14 +67,20 @@ function Base.iterate(x::FsTreeIter, ::Nothing)
     return (item, nothing)
 end
 
-fswalkdir(x::AbstractEntry; skip_paths=String[]) = FsTreeIter(x, skip_paths)  # TODO skip_paths everywhere
+fswalkdir(x::AbstractEntry; skip_paths::AbstractVector{<:AbstractString}=String[]) = FsTreeIter(x, skip_paths)  # TODO skip_paths everywhere
 fswalkdir(s::AbstractString; kwargs...) = fswalkdir(Entry(s); kwargs...)
-fswalkdir(; kwargs...) = fswalkdir(Entry("."); kwargs...)
+fswalkdir(; kwargs...) = fswalkdir("."; kwargs...)
 
 
-# dir or vector of dirs
-eachentry(args...; skip_paths=String[]) = fswalkdir(args...; skip_paths=skip_paths)  # empty or string or Entry
-eachentry(X::AbstractVector; skip_paths=String[]) = eachentry.(X; skip_paths=skip_paths) |> flatten_ 
+### OLD
+# eachentry(args...; skip_paths=String[]) = fswalkdir(args...; skip_paths=skip_paths)  # empty or string or Entry
+# eachentry(X::AbstractVector; skip_paths=String[]) = eachentry.(X; skip_paths=skip_paths) |> flatten_ 
+
+
+eachentry(x::AbstractEntry; skip_paths::AbstractVector{<:AbstractString}=String[]) = fswalkdir(x; skip_paths=skip_paths)
+eachentry(s::AbstractString; kwargs...) = eachentry(Entry(s); kwargs...)
+eachentry(; kwargs...) = eachentry("."; kwargs...)
+eachentry(args...; kwargs...) = eachentry.(X; kwargs...) |> flatten_ 
 
 
 find(args...; skip_paths=String[]) = eachentry(args...; skip_paths=skip_paths) |> cl
