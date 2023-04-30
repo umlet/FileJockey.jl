@@ -80,7 +80,7 @@ fswalkdir(; kwargs...) = fswalkdir("."; kwargs...)
 eachentry(x::AbstractEntry; skip_paths::AbstractVector{<:AbstractString}=String[]) = fswalkdir(x; skip_paths=skip_paths)
 eachentry(s::AbstractString; kwargs...) = eachentry(Entry(s); kwargs...)
 eachentry(; kwargs...) = eachentry("."; kwargs...)
-eachentry(args...; kwargs...) = eachentry.(X; kwargs...) |> flatten_ 
+eachentry(args...; kwargs...) = eachentry.(args; kwargs...) |> flatten_ 
 
 
 find(args...; skip_paths=String[]) = eachentry(args...; skip_paths=skip_paths) |> cl
