@@ -154,11 +154,17 @@ name(x::AbstractEntry) = basename(x)  # overridden in base
 hasname(x::AbstractEntry, s::AbstractString) = name(x) == s
 hasname(s::AbstractString) = x -> hasname(x, s)
 
+
 sizegt(x::FileEntry, n::Int64) = filesize(x) > n
 sizegt(n::Int64) = x -> sizegt(x, n)
+
 sizelt(x::FileEntry, n::Int64) = filesize(x) < n
 sizelt(n::Int64) = x -> sizelt(x, n)
 
+sizeeq(x::FileEntry, n::Int64) = filesize(x) == n
+sizeeq(n::Int64) = x -> sizeeq(x, n)
+
+sizezero(x::FileEntry) = sizeeq(x, 0)
 
 
 

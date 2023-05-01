@@ -22,7 +22,8 @@ export hasname
 
 export sizegt
 export sizelt
-
+export sizeeq
+export sizezero
 
 
 
