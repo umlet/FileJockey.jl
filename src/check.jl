@@ -487,7 +487,7 @@ end
 
 
 
-
+include("check.jl_base")
 include("check.jl_exports")
 include("check.jl_docs")
 

@@ -1,0 +1,7 @@
+
+
+function Base.Filesystem.rm(X::Dupl)
+    v = values(X._d) |> collect |> flatten
+    rm(v)
+end
+
