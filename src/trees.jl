@@ -86,13 +86,13 @@ eachentry(args...; kwargs...) = eachentry.(args; kwargs...) |> flatten_
 find(args...; skip_paths=String[]) = eachentry(args...; skip_paths=skip_paths) |> cl
 
 
-findfiles(args...; kwargs...) = eachentry(args...; kwargs...) |> checkpaths(; quiet=true) |> fl_(isfile) |> mp(follow)
+findfiles(args...; kwargs...) = eachentry(args...; kwargs...) |> checkpaths(; quiet=true) |> filter_(isfile) |> mp(follow)
 
-finddupl(args...; kwargs...) = eachentry(args...; kwargs...) |> checkpaths(; quiet=false) |> fl_(isfile) |> mp(follow) |> _getdupl_checkpaths_done
+finddupl(args...; kwargs...) = eachentry(args...; kwargs...) |> checkpaths(; quiet=false) |> filter_(isfile) |> mp(follow) |> _getdupl_checkpaths_done
 
 
 function getfiles(X::AbstractVector{<:AbstractEntry})  # TODO iterator variant
-    return X |> fl_(isfile) |> mp(follow)
+    return X |> filter_(isfile) |> mp(follow)
 end
 
 

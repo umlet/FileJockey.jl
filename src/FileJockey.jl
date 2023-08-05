@@ -10,7 +10,7 @@ using Crayons
 using Crayons.Box
 
 
-using Juliettine
+using CommandLiner
 
 
 include("conf.jl")
@@ -51,9 +51,9 @@ end
 # export hasext
 
 
-Juliettine.ext(x::AbstractEntry) = ext(x.path.s)
+CommandLiner.ext(x::AbstractEntry) = ext(x.path.s)
 
-Juliettine.save(io::IO, x::AbstractEntry) = save(io, path(x))
+CommandLiner.save(io::IO, x::AbstractEntry) = save(io, path(x))
 
 
 
