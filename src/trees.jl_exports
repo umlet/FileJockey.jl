@@ -5,7 +5,7 @@
 
 
 export ls
-export ll
+#export ll
 
 
 export eachentry
