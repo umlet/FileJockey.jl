@@ -214,7 +214,7 @@ function _exify_base(ss::Vector{<:AbstractString})  # ! all fs must be valid, re
     cmds = ["exiftool"]
     append!(cmds, exiftool_options)
     append!(cmds, ss)
-    s = exe(cmds; splitlines=false)[2]
+    s = exe(cmds; splitlines=false)
 
     js = JSON.parse(s; dicttype=OrderedDict)
     return changeexifkeys.(js)
