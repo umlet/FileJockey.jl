@@ -1,0 +1,4 @@
+
+
+Base.show(io::IO, ::MIME"text/plain", X::AbstractVector{<:AbstractEntry}) = _showrepl(io, X)
+

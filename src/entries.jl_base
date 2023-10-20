@@ -44,4 +44,4 @@ Base.Filesystem.rm(X::AbstractVector{FileEntry}) = foreach(rm, X)
 
 Base.show(io::IO, ::MIME"text/plain", x::AbstractEntry) = _show(io, x)
 
-Base.show(io::IO, ::MIME"text/plain", x::AbstractVector{<:AbstractEntry}) = _show(io, x)
+#Base.show(io::IO, ::MIME"text/plain", x::AbstractVector{<:AbstractEntry}) = _show(io, x)

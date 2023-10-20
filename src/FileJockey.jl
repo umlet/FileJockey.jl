@@ -6,33 +6,49 @@ using UUIDs
 using OrderedCollections
 using JSON
 
-using Crayons
-using Crayons.Box
+#using Crayons
+#using Crayons.Box
 
 
-using CommandLiner
+#using CommandLiner
 
 
-include("conf.jl")
+# include("colorbox.jl")
+# using .ColorBox
+# include("colorbox.jl_exports")
+
+#include("conf.jl")
 
 include("entries.jl")
-include("trees.jl")
+using .Entries
+include("entries.jl_exports")
 
-include("stats.jl")
-include("pprint.jl")
+# include("ext.jl")
+# using .Ext
+# include("ext.jl_exports")
 
-include("check.jl")
-
-include("exify.jl")
-
-include("ext.jl")
-
+include("entriesstats.jl")
+using .EntriesStats
+include("entriesstats.jl_exports")
 
 
-function __init__()
-    #@info "Initializing known file extensions"
-    initext()
-end
+
+include("filesys.jl")
+using .FileSys
+include("filesys.jl_exports")
+
+
+
+#include("check.jl")
+
+#include("exify.jl")
+
+
+
+
+# function __init__()
+#     Ext.initext()
+# end
 
 
 
@@ -51,9 +67,9 @@ end
 # export hasext
 
 
-CommandLiner.ext(x::AbstractEntry) = ext(x.path.s)
+#CommandLiner.ext(x::AbstractEntry) = ext(x.path.s)
 
-CommandLiner.save(io::IO, x::AbstractEntry) = save(io, path(x))
+#CommandLiner.save(io::IO, x::AbstractEntry) = save(io, path(x))
 
 
 

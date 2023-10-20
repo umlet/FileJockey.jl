@@ -1,0 +1,112 @@
+
+
+function _showrepl(io::IO, X::AbstractVector{<:AbstractEntry})
+    println("$(length(X))-element Vector{AbstractEntry}:")
+    tmp = tk(X, 11)
+    for x in take_(tmp, 10)
+        print(" ")
+        Entries._show(io, x)
+        println()
+    end
+    length(tmp) == 11  &&  println(" ...")
+    println()
+    #println("describe():")
+    describe(X)
+end
+
+
+function describe(S::Stats)
+    # LINE 1
+    line = []
+    if nfiles(S) == 0
+        push!(line, Cbx("[ no files ]", "p"))
+    else
+        push!(line, Cbx("[ $(tostr´(nfiles(S))) files ", FileEntry))
+        if nsyml2fileentries(S) == 0
+            push!(line, Cbx("( none of which symlinked )", "p"))
+        else
+            push!(line, Cbx("( $(tostr´(nsyml2fileentries(S))) symlinked )", Symlink{FileEntry}))
+        end
+        fsize = filesize(S)
+        if fsize <= 2^10
+            push!(line, Cbx(" -- $(tostr´(fsize)) bytes ", FileEntry))
+        else
+            push!(line, Cbx(" -- $(sizehuman(fsize)) -- $(tostr´(fsize)) bytes ", FileEntry))
+        end
+        push!(line, Cbx("( #paths:$(nsetfilepaths(S))  #dev:$(nsetfiledevices(S))  #inodes&dev:$(nsetfiledeviceinodes(S)) )", "p"))
+        push!(line, Cbx(" ]", FileEntry))
+    end
+    println(line...)
+
+    # LINE 2
+    line = []
+    if nfiles(S) > 0
+        _d = group(S.files; fkey=exty)
+        d = sortbyval(_d; by=length, rev=true)
+        push!(line, "{ ")
+        for (k,v) in d
+            push!(line, ":" * string(k) * " ")
+            _d2 = group(v, fkey=ext)
+            d2 =  sortbyval(_d2; by=length, rev=true)
+            for (k2,v2) in d2
+                if k2 === nothing
+                    push!(line, string(length(v2)) * "/_ ")
+                else
+                    push!(line, string(length(v2)) * "/\"" * k2 *"\" ")
+                end
+            end
+        end
+        push!(line, "}")
+
+        println(line...)
+    end
+
+
+    # LINE 3
+    line = []
+    if ndirs(S) == 0
+        push!(line, Cbx("[ no dirs ]", "p"))
+    else
+        push!(line, Cbx("[ $(tostr´(ndirs(S))) dirs ", DirEntry))
+        if nsyml2direntries(S) == 0
+            push!(line, Cbx("( no syml )", "p"))
+        else
+            push!(line, Cbx("( $(tostr´(nsyml2direntries(S))) symlinked )", Symlink{DirEntry}))
+        end
+        push!(line, Cbx(" ( #paths:$(nsetdirpaths(S)) )", "p"))
+        push!(line, Cbx(" ]", DirEntry))
+    end
+
+    push!(line, Cbx(" :: ", "p"))
+
+    if nothers(S) == 0
+        push!(line, Cbx("[ no dev,sock,fifo.. ]", "p"))
+    else
+        push!(line, Cbx("[ $(tostr´(nothers(S))) dev,sock,fifo ", OtherEntry))
+        if nsyml2otherentries(S) == 0
+            push!(line, Cbx("( no syml )", "p"))
+        else
+            push!(line, Cbx("( $(tostr´(nsyml2otherentries(S))) syml )", Symlink{OtherEntry}))
+        end        
+        push!(line, Cbx(" ]", OtherEntry))
+    end
+
+    push!(line, Cbx(" :: ", "p"))
+
+    if nunknowns(S) == 0
+        push!(line, Cbx("[ no unknown/broken ]", "p"))
+    else
+        push!(line, Cbx("[ $(tostr´(nunknowns(S))) unknown/broken ", UnknownEntryNONEXIST))
+        if nsyml2unknownentriesNONEXIST(S) == 0
+            push!(line, Cbx("( no syml )", "p"))
+        else
+            push!(line, Cbx("( $(tostr´(nsyml2unknownentriesNONEXIST(S))) syml )", Symlink{UnknownEntryNONEXIST}))
+        end        
+        push!(line, Cbx(" ]", UnknownEntryNONEXIST))
+    end
+
+    println(line...)
+end
+
+describe(X::AbstractVector{<:AbstractEntry}) = describe(stats(X))
+

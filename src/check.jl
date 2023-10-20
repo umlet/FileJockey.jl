@@ -1,7 +1,7 @@
 
 
 
-function check_11_syml2dir_toknown(S::FsStats; quiet=false)
+function check_11_syml2dir_toknown(S::Stats; quiet=false)
     msg = "  Check if a symlink points to an already known regular dir.. "
     entries = S.syml2direntries |> fl(x->x.target in S.direntries);  nentries = length(entries)
     nentries == 0  &&  ( quiet  ||  @info msg * "none found -- OK";  return true )
@@ -14,7 +14,7 @@ function check_11_syml2dir_toknown(S::FsStats; quiet=false)
     => delete symlink, or add the <symlink-path> to the 'skip_paths' option.""")
 end
 
-function check_12_syml2dirs_tosameexternal(S::FsStats; quiet=false)  # after the previous test, they will point to unknown/external dirs
+function check_12_syml2dirs_tosameexternal(S::Stats; quiet=false)  # after the previous test, they will point to unknown/external dirs
     msg = "  Check if two symlinks point to the same dir.. "
     entries = S.syml2direntries #=|> fl(x->!(x.target in S.direntries))=#;  nentries = length(entries)
     nentries == 0  &&  ( quiet  ||  @info msg * "none found -- OK";  return true )
@@ -31,7 +31,7 @@ function check_12_syml2dirs_tosameexternal(S::FsStats; quiet=false)  # after the
     => for ALL BUT ONE of the symlinks: delete symlink, or add <symlink-path> to the 'skip_paths' option.""")
 end
 
-function check_13_dirs_distinctpaths(S::FsStats; quiet=false)
+function check_13_dirs_distinctpaths(S::Stats; quiet=false)
     msg = "  Check if all dirs (known and symlinked) have distinct paths.. "
     entries = S.dirs;  nentries = length(entries)
     nentries == 0  &&  ( quiet  ||  @info msg * "none found -- OK";  return true )
@@ -53,7 +53,7 @@ end
 
 
 
-function check_21_syml2file_toknown(S::FsStats; quiet=false)
+function check_21_syml2file_toknown(S::Stats; quiet=false)
     msg = "  Check if a symlink points to an already known regular file.. "
     entries = S.syml2fileentries |> fl(x->x.target in S.fileentries);  nentries = length(entries)
     nentries == 0  &&  ( quiet  ||  @info msg * "none found -- OK";  return true )
@@ -66,7 +66,7 @@ function check_21_syml2file_toknown(S::FsStats; quiet=false)
     => delete symlink, or add the <symlink-path> to the 'skip_paths' option.""")
 end
 
-function check_22_syml2files_tosameexternal(S::FsStats; quiet=false)
+function check_22_syml2files_tosameexternal(S::Stats; quiet=false)
     msg = "  Check if two symlinks point to the same file.. "
     entries = S.syml2fileentries #=|> fl(x->!(x.target in S.direntries))=#;  nentries = length(entries)
     nentries == 0  &&  ( quiet  ||  @info msg * "none found -- OK";  return true )
@@ -83,7 +83,7 @@ function check_22_syml2files_tosameexternal(S::FsStats; quiet=false)
     => for ALL BUT ONE of the symlinks: delete symlink, or add <symlink-path> to the 'skip_paths' option.""")
 end
 
-function check_23_files_distinctpaths(S::FsStats; quiet=false)
+function check_23_files_distinctpaths(S::Stats; quiet=false)
     msg = "  Check if all files (known and symlinked) have distinct paths.. "
     entries = S.files;  nentries = length(entries)
     nentries == 0  &&  ( quiet  ||  @info msg * "none found -- OK";  return true )

@@ -1,38 +1,38 @@
 
-function colorize(s::AbstractString, COLORS...)
-    !CONF.colors  &&  return s
-    RET = s
-    for COLOR in COLORS
-        RET = COLOR(RET)
-    end
-    return RET
-end
-colorizeas(s::AbstractString, ::FileEntry) = colorize(s, LIGHT_GREEN_FG)
-colorizeas(s::AbstractString, ::DirEntry) = colorize(s, LIGHT_BLUE_FG)
-colorizeas(s::AbstractString, ::OtherEntry) = colorize(s, YELLOW_FG)
-    #=special case=# colorizeas(s::AbstractString, ::UnknownEntryNONEXIST) = colorize(s, RED_FG)
+# function colorize(s::AbstractString, COLORS...)
+#     !CONF.colors  &&  return s
+#     RET = s
+#     for COLOR in COLORS
+#         RET = COLOR(RET)
+#     end
+#     return RET
+# end
+# colorizeas(s::AbstractString, ::FileEntry) = colorize(s, LIGHT_GREEN_FG)
+# colorizeas(s::AbstractString, ::DirEntry) = colorize(s, LIGHT_BLUE_FG)
+# colorizeas(s::AbstractString, ::OtherEntry) = colorize(s, YELLOW_FG)
+#     #=special case=# colorizeas(s::AbstractString, ::UnknownEntryNONEXIST) = colorize(s, RED_FG)
 
-colorizeas(s::AbstractString, ::Symlink{FileEntry}) = colorize(s, GREEN_FG, NEGATIVE)
-colorizeas(s::AbstractString, ::Symlink{DirEntry}) = colorize(s, BLUE_FG, NEGATIVE)
-colorizeas(s::AbstractString, ::Symlink{OtherEntry}) = colorize(s, YELLOW_FG, NEGATIVE)
-colorizeas(s::AbstractString, ::Symlink{UnknownEntryNONEXIST}) = colorize(s, RED_FG, NEGATIVE)
-#----------
-colorizeas(s::AbstractString, ::Type{FileEntry}) = colorize(s, LIGHT_GREEN_FG)
-colorizeas(s::AbstractString, ::Type{DirEntry}) = colorize(s, LIGHT_BLUE_FG)
-colorizeas(s::AbstractString, ::Type{OtherEntry}) = colorize(s, YELLOW_FG)
-    #=special case=# colorizeas(s::AbstractString, ::Type{UnknownEntryNONEXIST}) = colorize(s, RED_FG)
+# colorizeas(s::AbstractString, ::Symlink{FileEntry}) = colorize(s, GREEN_FG, NEGATIVE)
+# colorizeas(s::AbstractString, ::Symlink{DirEntry}) = colorize(s, BLUE_FG, NEGATIVE)
+# colorizeas(s::AbstractString, ::Symlink{OtherEntry}) = colorize(s, YELLOW_FG, NEGATIVE)
+# colorizeas(s::AbstractString, ::Symlink{UnknownEntryNONEXIST}) = colorize(s, RED_FG, NEGATIVE)
+# #----------
+# colorizeas(s::AbstractString, ::Type{FileEntry}) = colorize(s, LIGHT_GREEN_FG)
+# colorizeas(s::AbstractString, ::Type{DirEntry}) = colorize(s, LIGHT_BLUE_FG)
+# colorizeas(s::AbstractString, ::Type{OtherEntry}) = colorize(s, YELLOW_FG)
+#     #=special case=# colorizeas(s::AbstractString, ::Type{UnknownEntryNONEXIST}) = colorize(s, RED_FG)
 
-colorizeas(s::AbstractString, ::Type{Symlink{FileEntry}}) = colorize(s, GREEN_FG, NEGATIVE)
-colorizeas(s::AbstractString, ::Type{Symlink{DirEntry}}) = colorize(s, BLUE_FG, NEGATIVE)
-colorizeas(s::AbstractString, ::Type{Symlink{OtherEntry}}) = colorize(s, YELLOW_FG, NEGATIVE)
-colorizeas(s::AbstractString, ::Type{Symlink{UnknownEntryNONEXIST}}) = colorize(s, RED_FG, NEGATIVE)
-
-
+# colorizeas(s::AbstractString, ::Type{Symlink{FileEntry}}) = colorize(s, GREEN_FG, NEGATIVE)
+# colorizeas(s::AbstractString, ::Type{Symlink{DirEntry}}) = colorize(s, BLUE_FG, NEGATIVE)
+# colorizeas(s::AbstractString, ::Type{Symlink{OtherEntry}}) = colorize(s, YELLOW_FG, NEGATIVE)
+# colorizeas(s::AbstractString, ::Type{Symlink{UnknownEntryNONEXIST}}) = colorize(s, RED_FG, NEGATIVE)
 
 
 
 
-function describe(S::FsStats)
+
+
+function describe(S::Stats)
     # LINE 1
     line = []
     if nfiles(S) == 0
@@ -129,19 +129,19 @@ describe(X::AbstractVector{<:AbstractEntry}) = describe(stats(X))
 
 
 
-function _show(io::IO, X::AbstractVector{<:AbstractEntry})
-    println("$(length(X))-element Vector{AbstractEntry}:")
-    tmp = tk(X, 11)
-    for x in take_(tmp, 10)
-        print(" ")
-        _show(io, x)
-        println()
-    end
-    length(tmp) == 11  &&  println(" ...")
-    println()
-    #println("describe():")
-    describe(X)
-end
+# function _show(io::IO, X::AbstractVector{<:AbstractEntry})
+#     println("$(length(X))-element Vector{AbstractEntry}:")
+#     tmp = tk(X, 11)
+#     for x in take_(tmp, 10)
+#         print(" ")
+#         _show(io, x)
+#         println()
+#     end
+#     length(tmp) == 11  &&  println(" ...")
+#     println()
+#     #println("describe():")
+#     describe(X)
+# end
 
 
 

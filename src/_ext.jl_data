@@ -1,71 +1,9 @@
 
 
-
-#const _d_Ext2exts = Dict{Symbol, Vector{String}}()
-const _d_ext2Ext = OrderedDict{Union{String, Nothing}, Symbol}()
-
-const EXT = _d_ext2Ext
-function SHOWEXT()
-    lastsym = nothing
-    for (s,sym) in EXT
-        if sym != lastsym
-            println()
-            print(":$sym <=> ")
-            lastsym = sym
-        end
-        if s !== nothing  print(" \"$(s)\"")  else  print("<nothing>")  end
-    end
-    println()
-end
-
-function initext()
-    _d_ext2Ext[nothing] = :__empty__
-    _d_ext2Ext[""] = :__empty__
-
-    for sdef in _v_EXTDEF
-        ss = split(sdef, ',')
-        extcanon = ss |> first |> lowercase |> Symbol
-        for s in ss
-            haskey(_d_ext2Ext, s)  &&  error("duplicate extension '$(s)' in config line: '$(sdef)'")
-            _d_ext2Ext[s] = extcanon
-        end
-    end
-end
-
-function ext2Ext(e::Union{AbstractString, Nothing})  # ext is extension, not path!
-    e === nothing  &&  return _d_ext2Ext[e]
-
-    e = uppercase(e)
-
-    # check that an extension is not, by coincidence, clashing with special symbols
-    @assert e != "__EMPTY__"
-    @assert e != "__UNREGISTERED__"
-    
-    haskey(_d_ext2Ext, e)  &&  return _d_ext2Ext[e]
-    return :__unregistered__
-end
-
-exty(x) = ext(x) |> ext2Ext
-
-# macro ex_str(s)
-#     :(Ext($s))  # "Ext(s)" alone does not work..
-# end
-
-hasext(x::AbstractEntry, s::AbstractString) = ext(x) == s
-hasext(s::AbstractString) = x -> ext(x) == s
-
-hasext(x::AbstractEntry, sym::Symbol) = exty(x) == sym
-hasext(sym::Symbol) = x -> exty(x) == sym
-
-# ??? hasexty not needed?
+const ___EXTGROUPS_DEFAULT = Vector{Vector{String}}();
 
 
-
-
-
-#------------------------------------------------------------------------------
-# This list of extension synonym was scraped from Phil Harvey's exiftool homepage: https://exiftool.org/
-const _v_EXTDEF = [
+const ___EXTGROUPS_DEFAULT_RAWSTRINGS = [
 "360",
 "3FR",
 "3G2,3GP2",
@@ -247,6 +185,7 @@ const _v_EXTDEF = [
 "TTF,TTC",
 "TORRENT",
 "TXT",
+"UXF",
 "VCF,VCARD",
 "VOB",
 "VRD",
@@ -266,12 +205,3 @@ const _v_EXTDEF = [
 "ZIP",
 ]
 
-
-
-
-
-
-
-
-
-include("ext.jl_exports")

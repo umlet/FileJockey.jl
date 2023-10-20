@@ -1,6 +1,17 @@
+module EntriesStats
 
 
+using Base.Filesystem
 
+
+using CommandLiner.Iter
+using CommandLiner.Conv
+using CommandLiner.Group
+using CommandLiner.Ext
+using CommandLiner.ColorBox
+
+
+using ..Entries
 
 
 filedevice(st::StatStruct)::UInt64 = st.device
@@ -9,7 +20,7 @@ filedeviceinode(st::StatStruct)::Tuple{UInt64, UInt64} = (filedevice(st), filein
 
 
 
-struct FsStats  # mutable avoids some boilerplate in construction
+struct Stats  # mutable avoids some boilerplate in construction
     # PARTITION for counting
     # - standard
     fileentries::Vector{FileEntry}
@@ -40,7 +51,7 @@ struct FsStats  # mutable avoids some boilerplate in construction
 
     setdirpaths::Set{String}
 
-    function FsStats(X::AbstractVector{<:AbstractEntry})
+    function Stats(X::AbstractVector{<:AbstractEntry})
         # BASE
         # standard
         fileentries::Vector{FileEntry} = FileEntry[]
@@ -111,35 +122,38 @@ struct FsStats  # mutable avoids some boilerplate in construction
         )
     end    
 end
-stats(X::AbstractVector{<:AbstractEntry}) = FsStats(X)
+stats(X::AbstractVector{<:AbstractEntry}) = Stats(X)
 
-Base.filesize(S::FsStats) = sum(filesize.(S.files))
+Base.filesize(S::Stats) = sum(filesize.(S.files))
 
-nfileentries(S::FsStats) = length(S.fileentries)
-nsyml2fileentries(S::FsStats) = length(S.syml2fileentries)
-ndirentries(S::FsStats) = length(S.direntries)
-nsyml2direntries(S::FsStats) = length(S.syml2direntries)
-notherentries(S::FsStats) = length(S.otherentries)
-nsyml2otherentries(S::FsStats) = length(S.syml2otherentries)
-nunknownentriesNONEXIST(S::FsStats) = length(S.unknownentriesNONEXIST)
-nsyml2unknownentriesNONEXIST(S::FsStats) = length(S.syml2unknownentriesNONEXIST)
+nfileentries(S::Stats) = length(S.fileentries)
+nsyml2fileentries(S::Stats) = length(S.syml2fileentries)
+ndirentries(S::Stats) = length(S.direntries)
+nsyml2direntries(S::Stats) = length(S.syml2direntries)
+notherentries(S::Stats) = length(S.otherentries)
+nsyml2otherentries(S::Stats) = length(S.syml2otherentries)
+nunknownentriesNONEXIST(S::Stats) = length(S.unknownentriesNONEXIST)
+nsyml2unknownentriesNONEXIST(S::Stats) = length(S.syml2unknownentriesNONEXIST)
 
-nsymltarget_fileentries(S::FsStats) = length(S.symltarget_fileentries)
-nsymltarget_direntries(S::FsStats) = length(S.symltarget_direntries)
-nsymltarget_otherentries(S::FsStats) = length(S.symltarget_otherentries)
-nsymltarget_unknownentriesNONEXIST(S::FsStats) = length(S.symltarget_unknownentriesNONEXIST)
+nsymltarget_fileentries(S::Stats) = length(S.symltarget_fileentries)
+nsymltarget_direntries(S::Stats) = length(S.symltarget_direntries)
+nsymltarget_otherentries(S::Stats) = length(S.symltarget_otherentries)
+nsymltarget_unknownentriesNONEXIST(S::Stats) = length(S.symltarget_unknownentriesNONEXIST)
 
-nfiles(S::FsStats) = length(S.files)
-ndirs(S::FsStats) = length(S.dirs)
-nothers(S::FsStats) = length(S.others)
-nunknowns(S::FsStats) = length(S.unknowns)
+nfiles(S::Stats) = length(S.files)
+ndirs(S::Stats) = length(S.dirs)
+nothers(S::Stats) = length(S.others)
+nunknowns(S::Stats) = length(S.unknowns)
 
-nsetfilepaths(S::FsStats) = length(S.setfilepaths)
-nsetfiledevices(S::FsStats) = length(S.setfiledevices)
-nsetfiledeviceinodes(S::FsStats) = length(S.setfiledeviceinodes)
+nsetfilepaths(S::Stats) = length(S.setfilepaths)
+nsetfiledevices(S::Stats) = length(S.setfiledevices)
+nsetfiledeviceinodes(S::Stats) = length(S.setfiledeviceinodes)
 
-nsetdirpaths(S::FsStats) = length(S.setdirpaths)
+nsetdirpaths(S::Stats) = length(S.setdirpaths)
 
 
 
-include("stats.jl_exports")
+include("entriesstats.jl_base")
+include("entriesstats.jl_show")
+include("entriesstats.jl_exports")
+end # module

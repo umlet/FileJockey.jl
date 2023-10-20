@@ -1,3 +1,12 @@
+module Entries
+
+
+using Base.Filesystem
+
+
+using CommandLiner.ColorBox
+
+
 
 
 struct PathCanon
@@ -54,7 +63,7 @@ struct FileEntry <: AbstractEntry
     end
 end
 FileEntry(s::AbstractString)::FileEntry = Entry(s)
-_show(io::IO, x::FileEntry) = print(io, colorizeas("FileEntry", x), """("$(path(x))", $(Base.Filesystem.filemode_string(x.st)), $(filesize(x.st)) bytes)""")
+_show(io::IO, x::FileEntry) = print(io, Cbx("FileEntry", x), """("$(path(x))", $(Base.Filesystem.filemode_string(x.st)), $(filesize(x.st)) bytes)""")
 
 struct DirEntry <: AbstractEntry
     path::PathCanon
@@ -64,7 +73,7 @@ struct DirEntry <: AbstractEntry
     end
 end
 DirEntry(s::AbstractString)::DirEntry = Entry(s)
-_show(io::IO, x::DirEntry) = print(io, colorizeas("DirEntry", x), """("$(path(x))", $(Base.Filesystem.filemode_string(x.st)))""")
+_show(io::IO, x::DirEntry) = print(io, Cbx("DirEntry", x), """("$(path(x))", $(Base.Filesystem.filemode_string(x.st)))""")
 
 struct OtherEntry <: AbstractEntry
     path::PathCanon
@@ -74,7 +83,7 @@ struct OtherEntry <: AbstractEntry
     end
 end
 OtherEntry(s::AbstractString)::OtherEntry = Entry(s)
-_show(io::IO, x::OtherEntry) = print(io, colorizeas("OtherEntry", x), """("$(path(x))", $(Base.Filesystem.filemode_string(x.st)))""")
+_show(io::IO, x::OtherEntry) = print(io, Cbx("OtherEntry", x), """("$(path(x))", $(Base.Filesystem.filemode_string(x.st)))""")
 
 
 
@@ -87,7 +96,7 @@ struct Symlink{T} <: AbstractEntry
         return new{T}(x.path, x.st, target)
     end
 end
-_show(io::IO, x::Symlink) = print(io, colorizeas("$(typeof(x))", x), """("$(path(x))" -> "$(path(x.target))")""")
+_show(io::IO, x::Symlink) = print(io, Cbx("$(typeof(x))", x), """("$(path(x))" -> "$(path(x.target))")""")
 
 struct UnknownEntryNONEXIST <: AbstractEntry
     path::String  # NOT path canon!
@@ -96,7 +105,7 @@ struct UnknownEntryNONEXIST <: AbstractEntry
         return new(f, st0)  # new(f, st)
     end
 end
-_show(io::IO, x::UnknownEntryNONEXIST) = print(io, colorizeas("UnknownEntryNONEXIST", x), """(???$(x.path)???)""")
+_show(io::IO, x::UnknownEntryNONEXIST) = print(io, Cbx("UnknownEntryNONEXIST", x), """(???$(x.path)???)""")
 
 # ATTENTION: statstruct contains fname; do not use in identity checks!!!
 
@@ -170,13 +179,54 @@ sizezero(x::FileEntry) = sizeeq(x, 0)
 
 
 
+# function _show(io::IO, X::AbstractVector{<:AbstractEntry})
+#     println("$(length(X))-element Vector{AbstractEntry}:")
+#     tmp = tk(X, 11)
+#     for x in take_(tmp, 10)
+#         print(" ")
+#         _show(io, x)
+#         println()
+#     end
+#     length(tmp) == 11  &&  println(" ...")
+#     println()
+#     #println("describe():")
+#     describe(X)
+# end
+
+
+ColorBox.style(x::AbstractEntry) = ColorBox.style(typeof(x))
+
+ColorBox.style(::Type{FileEntry}) = "g"
+ColorBox.style(::Type{DirEntry}) = "b"
+ColorBox.style(::Type{OtherEntry}) = "y"
+ColorBox.style(::Type{UnknownEntryNONEXIST}) = "r"
+
+ColorBox.style(::Type{Symlink{FileEntry}}) = "g!"
+ColorBox.style(::Type{Symlink{DirEntry}}) = "b!"
+ColorBox.style(::Type{Symlink{OtherEntry}}) = "y!"
+ColorBox.style(::Type{Symlink{UnknownEntryNONEXIST}}) = "r!"
 
 
 
+# colorizeas(s::AbstractString, ::FileEntry) = colorize(s, LIGHT_GREEN_FG)
+# colorizeas(s::AbstractString, ::DirEntry) = colorize(s, LIGHT_BLUE_FG)
+# colorizeas(s::AbstractString, ::OtherEntry) = colorize(s, YELLOW_FG)
+#     #=special case=# colorizeas(s::AbstractString, ::UnknownEntryNONEXIST) = colorize(s, RED_FG)
 
+# colorizeas(s::AbstractString, ::Symlink{FileEntry}) = colorize(s, GREEN_FG, NEGATIVE)
+# colorizeas(s::AbstractString, ::Symlink{DirEntry}) = colorize(s, BLUE_FG, NEGATIVE)
+# colorizeas(s::AbstractString, ::Symlink{OtherEntry}) = colorize(s, YELLOW_FG, NEGATIVE)
+# colorizeas(s::AbstractString, ::Symlink{UnknownEntryNONEXIST}) = colorize(s, RED_FG, NEGATIVE)
+# #----------
+# colorizeas(s::AbstractString, ::Type{FileEntry}) = colorize(s, LIGHT_GREEN_FG)
+# colorizeas(s::AbstractString, ::Type{DirEntry}) = colorize(s, LIGHT_BLUE_FG)
+# colorizeas(s::AbstractString, ::Type{OtherEntry}) = colorize(s, YELLOW_FG)
+#     #=special case=# colorizeas(s::AbstractString, ::Type{UnknownEntryNONEXIST}) = colorize(s, RED_FG)
 
-
-
+# colorizeas(s::AbstractString, ::Type{Symlink{FileEntry}}) = colorize(s, GREEN_FG, NEGATIVE)
+# colorizeas(s::AbstractString, ::Type{Symlink{DirEntry}}) = colorize(s, BLUE_FG, NEGATIVE)
+# colorizeas(s::AbstractString, ::Type{Symlink{OtherEntry}}) = colorize(s, YELLOW_FG, NEGATIVE)
+# colorizeas(s::AbstractString, ::Type{Symlink{UnknownEntryNONEXIST}}) = colorize(s, RED_FG, NEGATIVE)
 
 
 
@@ -186,3 +236,4 @@ sizezero(x::FileEntry) = sizeeq(x, 0)
 
 include("entries.jl_base")
 include("entries.jl_exports")
+end # module

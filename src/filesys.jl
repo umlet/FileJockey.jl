@@ -1,3 +1,10 @@
+module FileSys
+
+
+using CommandLiner.Iter
+
+
+using ..Entries
 
 
 #Base.Filesystem.islink(x::AbstractEntry) = islink(x.st)
@@ -96,5 +103,6 @@ function getfiles(X::AbstractVector{<:AbstractEntry})  # TODO iterator variant
 end
 
 
-include("trees.jl_exports")
-include("trees.jl_docs")
+include("filesys.jl_exports")
+include("filesys.jl_docs")
+end # module
