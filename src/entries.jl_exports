@@ -1,5 +1,8 @@
-export PathCanon
-export EntryCanon
+# export PathCanon
+# export EntryCanon
+
+export Realpath
+export Pathseg
 
 export AbstractEntry
 export FileEntry, DirEntry, OtherEntry, Symlink, UnknownEntryNONEXIST
@@ -8,10 +11,10 @@ export entry
 
 #export @fj_str
 
-export path
+export path                 # tested
 export haspath
 
-export isstandard
+export isstandard           
 
 export follow
 

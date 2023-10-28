@@ -24,11 +24,15 @@ function fsreaddir(x::Union{DirEntry, Symlink{DirEntry}})
     end
     _err  &&  erroruser("no access rights for dir '$(x.path.s)'")  # we avoid the "caused by" backtrace of 'excpt wthin excpt'
 
-    basepath = islink(x)  ?  x.target.path  :  x.path
-    pcs = PathCanon.(Ref(basepath), ss)
-    fsecs = EntryCanon.(pcs)
-    fses = Entry.(fsecs)
-    return fses
+    # basepath = islink(x)  ?  x.target.path  :  x.path
+    # pcs = PathCanon.(Ref(basepath), ss)
+    # fsecs = EntryCanon.(pcs)
+    # fses = Entry.(fsecs)
+
+    realpath_dirnm::Realpath = islink(x)  ?  follow(x).path  :  x.path
+    segs = Pathseg.(ss)
+    es = Entry.(Ref(realpath_dirnm), segs)
+    return es
 end
 fsreaddir(s::AbstractString=".") = fsreaddir(Entry(s))
 

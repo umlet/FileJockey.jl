@@ -1,0 +1,43 @@
+
+
+@testset "Entries" begin
+
+    # dir
+    @test entry("sandbox") |> is(DirEntry)
+    @test entry("sandbox/") |> is(DirEntry)
+
+    # file
+    @test entry("sandbox/A.txt") |> is(FileEntry)
+    @test try
+        entry("sandbox/A.txt/") |> is(FileEntry)
+    catch
+        true
+    finally
+        false
+    end
+
+    # symlink
+    # TODO
+
+    @test entry("sandbox/") |> isdir == true
+    @test entry("sandbox/") |> isfile == false
+    @test entry("sandbox/") |> islink == false
+
+    @test entry("sandbox/A.txt") |> isfile == true
+    @test entry("sandbox/A.txt") |> isdir == false
+    @test entry("sandbox/A.txt") |> islink == false
+
+    @test entry("sandbox/syml2A.txt") |> islink == true
+    @test entry("sandbox/syml2A.txt") |> isfile == true
+    @test entry("sandbox/syml2A.txt") |> isdir == false
+
+    @test entry("sandbox/syml2ok") |> islink == true
+    @test entry("sandbox/syml2ok") |> isfile == false
+    @test entry("sandbox/syml2ok") |> isdir == true
+
+
+
+    # @test entry("sandbox/ok/test.jpg") |> path |> is(String)
+    # @test entry("sandbox/ok/test.tiff") |> filesize > 0
+    
+end

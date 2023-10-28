@@ -5,13 +5,8 @@ Base.endswith(x::AbstractEntry, a) = endswith(x.path.s, a)
 Base.splitext(x::AbstractEntry) = splitext(x.path.s)
 
 
-
-# OK, behaviour in line with lstat returning stat implicitly
-Base.Filesystem.lstat(x::PathCanon) = lstat(x.s)
-Base.Filesystem.stat(x::PathCanon) = stat(x.s)
-
 # stat returns target
-Base.Filesystem.stat(x::Symlink) = x.target.st
+Base.Filesystem.stat(x::Symlink) = stat(x.target)  # should also work recursively for syml2syml2syml..
 Base.Filesystem.stat(x::AbstractEntry) = x.st
 
 # lstat defaults to stat if no symlink
@@ -21,6 +16,26 @@ Base.Filesystem.lstat(x::AbstractEntry) = stat(x)
 # stat & lstat should usually be sufficient to override
 # however, Base.Filesystem throws in a rather weird joinpath; so we override that as well
 Base.Filesystem.joinpath(x::AbstractEntry) = x
+
+Base.show(io::IO, ::MIME"text/plain", x::AbstractEntry) = _show(io, x)
+
+
+
+# # OK, behaviour in line with lstat returning stat implicitly
+# Base.Filesystem.lstat(x::PathCanon) = lstat(x.s)
+# Base.Filesystem.stat(x::PathCanon) = stat(x.s)
+
+# # stat returns target
+# Base.Filesystem.stat(x::Symlink) = x.target.st
+# Base.Filesystem.stat(x::AbstractEntry) = x.st
+
+# # lstat defaults to stat if no symlink
+# Base.Filesystem.lstat(x::Symlink) = x.st
+# Base.Filesystem.lstat(x::AbstractEntry) = stat(x)
+
+# # stat & lstat should usually be sufficient to override
+# # however, Base.Filesystem throws in a rather weird joinpath; so we override that as well
+# Base.Filesystem.joinpath(x::AbstractEntry) = x
 
 
 Base.Filesystem.basename(x::AbstractEntry) = basename(path(x))
@@ -42,6 +57,6 @@ Base.Filesystem.rm(X::AbstractVector{FileEntry}) = foreach(rm, X)
 
 #####
 
-Base.show(io::IO, ::MIME"text/plain", x::AbstractEntry) = _show(io, x)
+#Base.show(io::IO, ::MIME"text/plain", x::AbstractEntry) = _show(io, x)
 
 #Base.show(io::IO, ::MIME"text/plain", x::AbstractVector{<:AbstractEntry}) = _show(io, x)

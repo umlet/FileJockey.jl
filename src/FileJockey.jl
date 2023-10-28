@@ -1,36 +1,23 @@
 module FileJockey
 
 
-using Base.Filesystem
-using UUIDs
-using OrderedCollections
-using JSON
+# using Base.Filesystem
+# using UUIDs
+# using OrderedCollections
+# using JSON
 
-#using Crayons
-#using Crayons.Box
-
-
-#using CommandLiner
-
-
-# include("colorbox.jl")
-# using .ColorBox
-# include("colorbox.jl_exports")
 
 #include("conf.jl")
+
 
 include("entries.jl")
 using .Entries
 include("entries.jl_exports")
 
-# include("ext.jl")
-# using .Ext
-# include("ext.jl_exports")
 
 include("entriesstats.jl")
 using .EntriesStats
 include("entriesstats.jl_exports")
-
 
 
 include("filesys.jl")
@@ -53,11 +40,10 @@ include("filesys.jl_exports")
 
 
 
-
-
-
-
 # Base.readline(x::FsFile) = readline(x.path)
+
+
+# just forward splitext; this satisfies hasext interface!
 
 # function hasext(fse::FsFile, ext::AbstractString)
 #     _,fseext = splitext(fse.path)
@@ -66,9 +52,10 @@ include("filesys.jl_exports")
 # hasext(ext::AbstractString) = x -> hasext(x, ext)
 # export hasext
 
-
 #CommandLiner.ext(x::AbstractEntry) = ext(x.path.s)
 
+
+# TODO
 #CommandLiner.save(io::IO, x::AbstractEntry) = save(io, path(x))
 
 
@@ -82,3 +69,4 @@ include("filesys.jl_exports")
 
 
 end # module
+

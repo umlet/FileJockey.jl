@@ -2,8 +2,8 @@
 
 using Test
 
-import Juliettine: map, filter
-using Juliettine
+import CommandLiner.Iter.Hack: map, filter
+using CommandLiner
 
 using FileJockey
 
