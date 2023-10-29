@@ -20,6 +20,8 @@ filedeviceinode(st::StatStruct)::Tuple{UInt64, UInt64} = (filedevice(st), filein
 
 
 
+# TODO chained symlinks could alter #symlinks!!!
+
 struct Stats  # mutable avoids some boilerplate in construction
     # PARTITION for counting
     # - standard
@@ -67,14 +69,16 @@ struct Stats  # mutable avoids some boilerplate in construction
     
         for x in X
             x isa FileEntry             &&  ( push!(fileentries, x);                continue )
-            x isa Symlink{FileEntry}    &&  ( push!(syml2fileentries, x);           continue )
             x isa DirEntry              &&  ( push!(direntries, x);                 continue )
-            x isa Symlink{DirEntry}     &&  ( push!(syml2direntries, x);            continue )
-
             x isa OtherEntry            &&  ( push!(otherentries, x);               continue )
-            x isa Symlink{OtherEntry}   &&  ( push!(syml2otherentries, x);          continue )
             x isa UnknownEntryNONEXIST  &&  ( push!(unknownentriesNONEXIST, x);     continue )
-            x isa Symlink{UnknownEntryNONEXIST}  &&  ( push!(syml2unknownentriesNONEXIST, x);  continue )
+            if x isa Symlink
+                x = follow(x)
+                x isa FileEntry             &&  ( push!(syml2fileentries, x);               continue )
+                x isa DirEntry              &&  ( push!(syml2direntries, x);                continue )
+                x isa OtherEntry            &&  ( push!(syml2otherentries, x);              continue )
+                x isa UnknownEntryNONEXIST  &&  ( push!(syml2unknownentriesNONEXIST, x);    continue )
+            end
             @assert false
         end
 

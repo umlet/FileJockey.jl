@@ -2,42 +2,78 @@
 
 @testset "Entries" begin
 
-    # dir
-    @test entry("sandbox") |> is(DirEntry)
-    @test entry("sandbox/") |> is(DirEntry)
-
-    # file
-    @test entry("sandbox/A.txt") |> is(FileEntry)
-    @test try
-        entry("sandbox/A.txt/") |> is(FileEntry)
-    catch
-        true
-    finally
-        false
-    end
-
-    # symlink
-    # TODO
-
-    @test entry("sandbox/") |> isdir == true
-    @test entry("sandbox/") |> isfile == false
-    @test entry("sandbox/") |> islink == false
-
-    @test entry("sandbox/A.txt") |> isfile == true
-    @test entry("sandbox/A.txt") |> isdir == false
-    @test entry("sandbox/A.txt") |> islink == false
-
-    @test entry("sandbox/syml2A.txt") |> islink == true
-    @test entry("sandbox/syml2A.txt") |> isfile == true
-    @test entry("sandbox/syml2A.txt") |> isdir == false
-
-    @test entry("sandbox/syml2ok") |> islink == true
-    @test entry("sandbox/syml2ok") |> isfile == false
-    @test entry("sandbox/syml2ok") |> isdir == true
 
 
 
-    # @test entry("sandbox/ok/test.jpg") |> path |> is(String)
-    # @test entry("sandbox/ok/test.tiff") |> filesize > 0
-    
+# dir
+@test entry("sandbox") |> is(DirEntry)
+@test entry("sandbox/") |> is(DirEntry)
+
+# file
+@test entry("sandbox/A.txt") |> is(FileEntry)
+@test try
+    entry("sandbox/A.txt/") |> is(FileEntry)
+catch  # exception: not a dir
+    true
+else
+    false
 end
+
+# symlink
+            if Sys.iswindows()
+println("(skipping symlink tests on Windows)")
+            else
+
+println("symlink tests; on Linux only")
+@test entry("sandbox/syml2A.txt") |> is(Symlink{FileEntry})
+@test entry("sandbox/syml2ok") |> is(Symlink{DirEntry})
+@test entry("sandbox/ssyml2A.txt") |> is(Symlink{Symlink{FileEntry}})
+@test try
+    entry("sandbox/syml2ok/")
+catch  # exception: ambiguous symlink/dir
+    true
+else
+    false
+end
+
+            end  # Windows
+
+
+
+
+            let
+e = entry("sandbox")
+@test isdir(e)
+@test !isfile(e)
+@test !islink(e)
+
+e = entry("sandbox/A.txt")
+@test isfile(e)
+@test !isdir(e)
+@test !islink(e)
+
+                        if !Sys.iswindows()
+e = entry("sandbox/syml2A.txt")
+@test islink(e)
+@test isfile(e)
+@test !isdir(e)
+
+e = follow(e)
+@test !islink(e)
+@test isfile(e)
+
+e = entry("sandbox/syml2ok")
+@test islink(e)
+@test isdir(e)
+@test !isfile(e)
+
+e = entry("sandbox/ssyml2A.txt")
+e = follow(e)
+@test isfile(e)
+@test !islink(e)
+                        end
+    
+            end  # let
+
+end
+

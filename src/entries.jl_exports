@@ -1,22 +1,20 @@
-# export PathCanon
-# export EntryCanon
 
-export Realpath
-export Pathseg
 
-export AbstractEntry
-export FileEntry, DirEntry, OtherEntry, Symlink, UnknownEntryNONEXIST
-export Entry
-export entry
+#noexport Realpath
+#noexport Pathseg
 
-#export @fj_str
+export AbstractEntry    # (tested)
+export FileEntry, DirEntry, OtherEntry, Symlink, UnknownEntryNONEXIST       # ..tested
+export Entry            # ..tested
+export entry            # tested
 
-export path                 # tested
+
+export path                 
 export haspath
 
-export isstandard           
+export isstandard          
 
-export follow
+export follow           # tested
 
 export filesizehuman
 
@@ -29,5 +27,5 @@ export sizeeq
 export sizezero
 
 
-
 export rm
+

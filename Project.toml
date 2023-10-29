@@ -13,8 +13,8 @@ UUIDs = "cf7118a7-6976-5b1a-9a39-7adc72f591a4"
 
 [compat]
 CommandLiner = "0.3"
-OrderedCollections = "1.6"
-JSON = "0"
+OrderedCollections = "1.6.2"
+JSON = "0.21.4"
 Mmap = "<0.0.1, 1"
 UUIDs = "<0.0.1, 1"
 Test = "<0.0.1, 1"

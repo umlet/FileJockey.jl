@@ -4,7 +4,7 @@ module FileSys
 using CommandLiner.Iter
 
 
-using ..Entries
+import ..Entries: Realpath, Pathseg, DirEntry, Symlink, AbstractEntry, Entry, path, follow
 
 
 #Base.Filesystem.islink(x::AbstractEntry) = islink(x.st)
@@ -46,7 +46,7 @@ ls() = ls(".")
 
 ls(X::AbstractVector) = ls.(X) |> flatten
 
-ll(args...) = ls(args...)
+#ll(args...) = ls(args...)
 
 
 
@@ -105,6 +105,8 @@ finddupl(args...; kwargs...) = eachentry(args...; kwargs...) |> checkpaths(; qui
 function getfiles(X::AbstractVector{<:AbstractEntry})  # TODO iterator variant
     return X |> filter_(isfile) |> mp(follow)
 end
+
+
 
 
 include("filesys.jl_exports")

@@ -4,16 +4,16 @@
 #export fswalkdir
 
 
-export ls
-#export ll
+export ls           # tested
 
 
-export eachentry
+export eachentry    # tested
 
 
-export find
-export findfiles
-export finddupl
+export find         # tested
+#export findfiles    # NOT tested; requires checkpaths..
+#export finddupl     # NOT tested; requires checkpaths..
 
 
-export getfiles
+export getfiles     # tested
+

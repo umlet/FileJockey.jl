@@ -24,9 +24,9 @@ Some problem areas FileJockey tries to help you with:
 
 * Traversing large directories that contain symlinks (especially symlinks to directories inside the very same hierarchy) can easily lead to duplicate file paths in our pipeline. On the other hand, skipping symlinks could "lose" files if the symlinks refer to dirs outside the original hierarchy. FileJockey explicitly tracks symlinks and can check for those pitfalls.
 
-* Using raw strings as paths can be error-prone. Say, for example, you want to remove duplicate files (i.e., different file entries whose file contents are identical). Yet the paths "A.txt" and "../mydir/A.txt" could easily actually be the same file entry--deleting one of them could delete *that one* file. While it would be tempting to just `realpath` everything, this would also destroy valuable symlink information. FileJockey treats paths in a canonical way so you don't have to worry about `normpath`-/`abspath`-/`realpath`-ing anything. (For example, a symlink's file entry path consists of its "real" (symlink-free) dirname combined with the symlink's basename.) Paths are thus identical *if and only if* the underlying entries are.
+* Using raw strings as paths can be error-prone. Say, for example, you want to remove duplicate files (i.e., different file entries whose file contents are identical). Yet the paths "A.txt" and "../mydir/A.txt" could easily actually be the same file entry--deleting one of them could delete *that one* file. While it would be tempting to just `realpath` everything, this would also destroy valuable symlink information. FileJockey treats paths in a canonical way so you don't have to worry about `normpath`-/`abspath`-/`realpath`-ing anything. (For example, a `Symlink`'s file entry path consists of its "real" (symlink-free) dirname combined with the symlink's own basename.) Paths are thus identical *if and only if* the underlying entries are.
 
-* We often don't thing about using functions like `isfile` or `isdir`--but those can be costly operations, especially when working with many files on slow network drives. FileJockey caches a file system entry's `StatStruct`; those operation become basically free (or unnecessary, as we can dispatch on the FileJockey types).
+* We often don't thing about liberally using functions like `isfile` or `isdir`--but those can be surprisingly costly operations, especially when working with many files on slow network drives. FileJockey caches a file system entry's `StatStruct`; those operation become basically free (or unnecessary, as we can dispatch on the FileJockey types).
 
 <br>
 <br>
@@ -46,9 +46,63 @@ This should help us tackle higher-level issues in a more hassle-free way:
 <br>
 <br>
 
+*(Some examples below use curries versions of `filter` and `map` for clarity; they are available via `CommandLiner.jl`.)*
+
+<br>
+<br>
 
 
-### API
+
+### Basic Operations
+
+* `ls(path)` -- list files; returns vector of file system entries (`AbstractEntry`s).
+
+* `find(path)` -- akin to Unix `find`, returns all file system entries of a dir hierarchy.
+
+* `eachentry(path)` -- same as `find()`, but returns iterator. Compose with `eachentry(.) |> filter(hasext("jpg")) |> first`
+
+* `getfiles(X)` -- called on file system entries, returns only regular files and targets of symlinks-to-files (resulting in a `Vector{FileEntry}`).
+
+<br>
+<br>
+
+
+
+### Sanity Checks and Summary Info
+
+* `info(X)` -- in progress.
+
+* `checkpaths` -- in progress.
+
+<br>
+<br>
+
+
+
+### Duplicates
+
+* `finddupl(X)` -- in progress.
+
+<br>
+<br>
+
+
+
+### EXIF Metadata
+
+* `exify(path)` -- in progress.
+
+<br>
+<br>
+
+
+
+### Hardlinker
+
+* `hardlinker(paths, newpaths)` -- in progress.
+
+
+<!-- ### API
 
 [in progress; use `?` in Julia on:]
 
@@ -58,7 +112,8 @@ This should help us tackle higher-level issues in a more hassle-free way:
 
 `find` and `eachentry`
 
-`finddupl`
+
+`getfiles` -->
 
 
 

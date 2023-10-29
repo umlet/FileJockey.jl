@@ -13,14 +13,13 @@ Get file system entries of a directory.
 
 
 
-
 """
     find(path)
     find(path, path2,.. ; skip_paths=[])
 
     eachentry(path,..)
-    findfiles(path,..)
-    finddupl(path,..)
+    findfiles(path,..)  [TODO]
+    finddupl(path,..)   [TODO]
 
 Get file system entries of a directory tree.
 - `find` returns all entries found, including directories and symlinks.
@@ -35,6 +34,13 @@ You can enter multiple paths; useful, e.g., for duplicate-checking a new import 
 
 
 
+"""
+    getfiles(X)
 
+Filters only file-like entries (regular files or symlink-to-files); then follows all symlinks. Results are `FileEntry`s only.
+
+Shortcut for `X |> filter(isfile) |> map(follow)` (with `import CommandLiner.Iter.Hack: filter, map` for currying).
+"""
+:getfiles
 
 

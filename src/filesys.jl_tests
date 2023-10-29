@@ -1,0 +1,20 @@
+
+
+@testset "Filesys" begin
+
+
+@test ls("sandbox/") |> length > 0
+
+
+@test find("sandbox/") |> length > 0
+
+
+@test eachentry("sandbox/") |> collect |> length > 0
+
+            let
+es = find("sandbox") |> getfiles
+@test typeof(es) == Vector{FileEntry}
+            end
+
+end
+
