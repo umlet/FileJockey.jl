@@ -1,5 +1,8 @@
 
 
+import .EntriesStats.nsetdirpaths
+import .EntriesStats.nsetfilepaths
+
 
 function check_11_syml2dir_toknown(S::Stats; quiet=false)
     msg = "  Check if a symlink points to an already known regular dir.. "

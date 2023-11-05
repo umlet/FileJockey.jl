@@ -25,8 +25,11 @@ using .FileSys
 include("filesys.jl_exports")
 
 
-
-#include("check.jl")
+using OrderedCollections
+using CommandLiner
+import .EntriesStats.Stats  # TODO modularize
+include("check.jl")
+# TODO factor Dupl out of Check
 
 #include("exify.jl")
 

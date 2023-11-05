@@ -168,4 +168,4 @@ nsetdirpaths(S::Stats) = length(S.setdirpaths)
 include("entriesstats.jl_base")
 include("entriesstats.jl_show")
 include("entriesstats.jl_exports")
-end # module
+end  # module
