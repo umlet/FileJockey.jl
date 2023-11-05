@@ -24,16 +24,20 @@ filedeviceinode(st::StatStruct)::Tuple{UInt64, UInt64} = (filedevice(st), filein
 
 struct Stats  # mutable avoids some boilerplate in construction
     # PARTITION for counting
-    # - standard
     fileentries::Vector{FileEntry}
-    syml2fileentries::Vector{Symlink{FileEntry}}
     direntries::Vector{DirEntry}
-    syml2direntries::Vector{Symlink{DirEntry}}
-    # non-standard
     otherentries::Vector{OtherEntry}
-    syml2otherentries::Vector{Symlink{OtherEntry}}
     unknownentriesNONEXIST::Vector{UnknownEntryNONEXIST}
-    syml2unknownentriesNONEXIST::Vector{Symlink{UnknownEntryNONEXIST}}  # shortcut for '2unknownnonexist'
+
+    # syml2fileentries::Vector{Symlink{FileEntry}}
+    # syml2direntries::Vector{Symlink{DirEntry}}
+    # syml2otherentries::Vector{Symlink{OtherEntry}}
+    # syml2unknownentriesNONEXIST::Vector{Symlink{UnknownEntryNONEXIST}}  # shortcut for '2unknownnonexist'
+
+    syml2fileentries::Vector{Symlink}
+    syml2direntries::Vector{Symlink}
+    syml2otherentries::Vector{Symlink}
+    syml2unknownentriesNONEXIST::Vector{Symlink}  # shortcut for '2unknownnonexist'
 
 
     # standard combinations
@@ -55,29 +59,32 @@ struct Stats  # mutable avoids some boilerplate in construction
 
     function Stats(X::AbstractVector{<:AbstractEntry})
         # BASE
-        # standard
         fileentries::Vector{FileEntry} = FileEntry[]
-        syml2fileentries::Vector{Symlink{FileEntry}} = Symlink{FileEntry}[]
         direntries::Vector{DirEntry} = DirEntry[]
-        syml2direntries::Vector{Symlink{DirEntry}} = Symlink{DirEntry}[]
-    
-        # non-standard
         otherentries::Vector{OtherEntry} = OtherEntry[]
-        syml2otherentries::Vector{Symlink{OtherEntry}} = Symlink{OtherEntry}[]
         unknownentriesNONEXIST::Vector{UnknownEntryNONEXIST} = UnknownEntryNONEXIST[]
-        syml2unknownentriesNONEXIST::Vector{Symlink{UnknownEntryNONEXIST}} = Symlink{UnknownEntryNONEXIST}[]  # shortcut for '2unknownnonexist'
-    
+
+        # syml2fileentries::Vector{Symlink{FileEntry}} = Symlink{FileEntry}[]
+        # syml2direntries::Vector{Symlink{DirEntry}} = Symlink{DirEntry}[]
+        # syml2otherentries::Vector{Symlink{OtherEntry}} = Symlink{OtherEntry}[]
+        # syml2unknownentriesNONEXIST::Vector{Symlink{UnknownEntryNONEXIST}} = Symlink{UnknownEntryNONEXIST}[]  # shortcut for '2unknownnonexist'
+
+        syml2fileentries::Vector{Symlink} = Symlink[]
+        syml2direntries::Vector{Symlink} = Symlink[]
+        syml2otherentries::Vector{Symlink} = Symlink[]
+        syml2unknownentriesNONEXIST::Vector{Symlink} = Symlink[]  # shortcut for '2unknownnonexist'
+
         for x in X
             x isa FileEntry             &&  ( push!(fileentries, x);                continue )
             x isa DirEntry              &&  ( push!(direntries, x);                 continue )
             x isa OtherEntry            &&  ( push!(otherentries, x);               continue )
             x isa UnknownEntryNONEXIST  &&  ( push!(unknownentriesNONEXIST, x);     continue )
             if x isa Symlink
-                x = follow(x)
-                x isa FileEntry             &&  ( push!(syml2fileentries, x);               continue )
-                x isa DirEntry              &&  ( push!(syml2direntries, x);                continue )
-                x isa OtherEntry            &&  ( push!(syml2otherentries, x);              continue )
-                x isa UnknownEntryNONEXIST  &&  ( push!(syml2unknownentriesNONEXIST, x);    continue )
+                fx = follow(x)
+                fx isa FileEntry             &&  ( push!(syml2fileentries, x);               continue )
+                fx isa DirEntry              &&  ( push!(syml2direntries, x);                continue )
+                fx isa OtherEntry            &&  ( push!(syml2otherentries, x);              continue )
+                fx isa UnknownEntryNONEXIST  &&  ( push!(syml2unknownentriesNONEXIST, x);    continue )
             end
             @assert false
         end
@@ -100,12 +107,13 @@ struct Stats  # mutable avoids some boilerplate in construction
 
         return new(
             fileentries,
-            syml2fileentries,
             direntries,
-            syml2direntries,
             otherentries,
-            syml2otherentries,
             unknownentriesNONEXIST,
+
+            syml2fileentries,
+            syml2direntries,
+            syml2otherentries,
             syml2unknownentriesNONEXIST,
 
             symltarget_fileentries,
