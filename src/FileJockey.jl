@@ -14,6 +14,9 @@ include("entries.jl")
 using .Entries
 include("entries.jl_exports")
 
+include("catalog.jl")
+using .Catalog
+include("catalog.jl_exports")
 
 include("entriesstats.jl")
 using .EntriesStats
