@@ -1,4 +1,12 @@
-
+#
+#
+# TODO TODO TODO
+# 1 Dupl constructor has bug; breaks too early
+# 2 aresame() needs to account for "bind mounts":
+#   realpath() resolves differently-mounted paths to different path names; so they look like hardlinks, but
+#   nlink=1 instead of 2, and deleting one entry "deletes both"
+#
+#
 
 import .EntriesStats.nsetdirpaths
 import .EntriesStats.nsetfilepaths
