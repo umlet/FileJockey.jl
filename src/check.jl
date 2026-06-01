@@ -5,6 +5,10 @@
 # 2 aresame() needs to account for "bind mounts":
 #   realpath() resolves differently-mounted paths to different path names; so they look like hardlinks, but
 #   nlink=1 instead of 2, and deleting one entry "deletes both"
+# 3 Windows "junctions" -- act like symlinks, but not reaported via islink
+# (firmlinks/macOS, and reparse points/Windows -- both handled via nlink logic..)
+# 101 macOS: different attributes/metadata/resource forks can be added to 2 files that look duplicate-y; rm one of them would destroy that metadata -> WARN
+# 102 win: photo.jpg + photo.jpg:Zone.Identifier (called named streams) -- 2 identical files might carry different streams -> WARN
 #
 #
 
