@@ -12,6 +12,7 @@ module FileJockey
 
 include("entries.jl")
 using .Entries
+using .Entries: DirEntry
 include("entries.jl_exports")
 
 include("catalog.jl")

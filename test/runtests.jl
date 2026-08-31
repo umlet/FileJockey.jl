@@ -6,6 +6,7 @@ using OrderedCollections
 using CommandLiner
 
 using FileJockey
+using FileJockey: DirEntry
 
 
 include("../src/entries.jl_tests")
